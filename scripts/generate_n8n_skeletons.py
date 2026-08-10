@@ -1322,6 +1322,12 @@ def main():
         configure_paola_p0_workflows(ROOT)
     except ImportError:
         pass
+    try:
+        from configure_paola_22_website_extraction import configure_paola_22_workflows
+
+        configure_paola_22_workflows(ROOT)
+    except ImportError:
+        pass
     print(f"Generated {len(WORKFLOWS)} workflows and {len(SCHEMAS)} schemas.")
 
 
