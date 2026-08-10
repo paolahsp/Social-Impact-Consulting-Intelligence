@@ -1,0 +1,59 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://example.local/contracts/finding.schema.json",
+  "title": "Finding",
+  "type": "object",
+  "required": [
+    "finding_id",
+    "domain",
+    "finding",
+    "evidence_ids",
+    "finding_type",
+    "confidence",
+    "requires_validation",
+    "validation_question"
+  ],
+  "additionalProperties": true,
+  "properties": {
+    "finding_id": {
+      "type": "string",
+      "pattern": "^F-"
+    },
+    "domain": {
+      "type": "string"
+    },
+    "finding": {
+      "type": "string"
+    },
+    "evidence_ids": {
+      "type": "array",
+      "items": {
+        "type": "string",
+        "pattern": "^EV-"
+      }
+    },
+    "finding_type": {
+      "type": "string",
+      "enum": [
+        "observed",
+        "inferred",
+        "hypothesis",
+        "unknown"
+      ]
+    },
+    "confidence": {
+      "type": "number",
+      "minimum": 0,
+      "maximum": 1
+    },
+    "requires_validation": {
+      "type": "boolean"
+    },
+    "validation_question": {
+      "type": [
+        "string",
+        "null"
+      ]
+    }
+  }
+}

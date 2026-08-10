@@ -1,0 +1,175 @@
+{
+  "name": "51_REVENUE_RESILIENCE_AGENT",
+  "nodes": [
+    {
+      "parameters": {
+        "content": "PURPOSE\nProduce a structured Revenue Resilience finding from evidence and retrieved context.\n\nOWNER\nPAOLA TRACK A\n\nINPUT CONTRACT\nrevenue evidence plus revenue RAG context\n\nOUTPUT CONTRACT\nfinding.schema.json[] for revenue resilience\n\nSTATUS\nPhase 2B repository-ready. Inactive by default. No credentials.",
+        "height": 340,
+        "width": 520,
+        "color": 4
+      },
+      "id": "00_readme__purpose_owner_contracts_status",
+      "name": "00_README__PURPOSE_OWNER_CONTRACTS_STATUS",
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [
+        -420,
+        -320
+      ]
+    },
+    {
+      "parameters": {
+        "content": "PHASE 2B P0 N8N EXECUTION\nRepository-ready n8n implementation for Paola P0 only.\nn8n owns the visible execution path and state passing.\n21 uses an HTTP Request node against DuckDuckGo Lite HTML with no credentials.\nCode nodes are limited to compact deterministic parsing, mapping, retrieval scoring, and validation.\nNo Python runner is called by n8n. No secrets are stored.",
+        "height": 300,
+        "width": 520,
+        "color": 5
+      },
+      "id": "note__phase2b_p0_n8n_execution",
+      "name": "NOTE__PHASE2B_P0_N8N_EXECUTION",
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [
+        -420,
+        60
+      ]
+    },
+    {
+      "parameters": {},
+      "id": "start__sub_workflow_trigger",
+      "name": "START__SUB_WORKFLOW_TRIGGER",
+      "type": "n8n-nodes-base.executeWorkflowTrigger",
+      "typeVersion": 1,
+      "position": [
+        0,
+        0
+      ]
+    },
+    {
+      "parameters": {
+        "jsCode": "return items.map(item => ({ json: { ...item.json, revenue_evidence: (item.json.evidence || []).filter(ev => ev.domain === 'revenue_resilience'), rag_context: item.json.rag_context || { contexts: [] } } }));\n"
+      },
+      "id": "input_contract__revenue_evidence_and_rag",
+      "name": "INPUT_CONTRACT__REVENUE_EVIDENCE_AND_RAG",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        260,
+        0
+      ]
+    },
+    {
+      "parameters": {
+        "jsCode": "return items.map(item => {\n  const supported = (item.json.revenue_evidence || []).filter(ev => ev.evidence_type === 'fact' && ['supported', 'partially_supported'].includes(ev.status));\n  const finding = supported.length\n    ? { finding_id: 'F-001', domain: 'revenue_resilience', finding: 'Public search results surfaced revenue-resilience signals that should be reviewed before drawing conclusions about funding mix or concentration.', evidence_ids: supported.map(ev => ev.evidence_id), finding_type: 'observed', confidence: Math.round(Math.min(0.72, supported.reduce((sum, ev) => sum + ev.confidence, 0) / supported.length) * 100) / 100, requires_validation: true, validation_question: 'Which revenue sources are material, recurring, or concentrated in the current financial year?' }\n    : { finding_id: 'F-001', domain: 'revenue_resilience', finding: 'Public search did not provide enough evidence to assess revenue resilience.', evidence_ids: (item.json.revenue_evidence || []).map(ev => ev.evidence_id), finding_type: 'unknown', confidence: 0.35, requires_validation: true, validation_question: \"What are the organization's main revenue sources and how concentrated are they?\" };\n  finding.rag_context_ids = (item.json.rag_context?.contexts || []).map(ctx => ctx.context_id);\n  finding.limitations = ['No revenue numbers are inferred from search metadata.', 'Missing financial evidence remains unknown rather than negative.'];\n  return { json: { ...item.json, findings: [finding] } };\n});\n"
+      },
+      "id": "revenue_evaluation",
+      "name": "REVENUE_EVALUATION",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        560,
+        0
+      ]
+    },
+    {
+      "parameters": {
+        "jsCode": "return items.map(item => {\n  const evidenceIds = new Set((item.json.evidence || []).map(ev => ev.evidence_id));\n  const findings = (item.json.findings || []).map(finding => ({ ...finding, evidence_ids: (finding.evidence_ids || []).filter(id => evidenceIds.has(id)) }));\n  return { json: { ...item.json, findings } };\n});\n"
+      },
+      "id": "evidence_trace_check",
+      "name": "EVIDENCE_TRACE_CHECK",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        860,
+        0
+      ]
+    },
+    {
+      "parameters": {
+        "jsCode": "return items.map(item => {\n  const hasUnknown = (item.json.revenue_evidence || []).some(ev => ev.evidence_type === 'unknown') || (item.json.findings || []).some(f => f.finding_type === 'unknown' || f.requires_validation);\n  const unknowns = hasUnknown ? [{ unknown_id: 'UNK-REV-001', domain: 'revenue_resilience', description: 'Revenue concentration and recurrence cannot be determined from the P0 public search slice alone.', evidence_ids: (item.json.findings?.[0]?.evidence_ids || []) }] : [];\n  return { json: { ...item.json, unknowns } };\n});\n"
+      },
+      "id": "unknown_limitations",
+      "name": "UNKNOWN_LIMITATIONS",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        1160,
+        0
+      ]
+    },
+    {
+      "parameters": {
+        "jsCode": "return items.map(item => ({ json: { run_context: item.json.run_context, sources: item.json.sources || [], evidence: item.json.evidence || [], findings: item.json.findings || [], unknowns: item.json.unknowns || [], contradictions: item.json.contradictions || [], rag_metadata: { retrieval_run_id: item.json.rag_context?.retrieval_run_id || null, domains: ['revenue_resilience'], retrieved_context_ids: (item.json.rag_context?.contexts || []).map(ctx => ctx.context_id) }, rag_context: item.json.rag_context, controlled_state: item.json.controlled_state, errors: item.json.errors || [] } }));\n"
+      },
+      "id": "output_contract__paola_track_output",
+      "name": "OUTPUT_CONTRACT__PAOLA_TRACK_OUTPUT",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        1460,
+        0
+      ]
+    }
+  ],
+  "connections": {
+    "START__SUB_WORKFLOW_TRIGGER": {
+      "main": [
+        [
+          {
+            "node": "INPUT_CONTRACT__REVENUE_EVIDENCE_AND_RAG",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "INPUT_CONTRACT__REVENUE_EVIDENCE_AND_RAG": {
+      "main": [
+        [
+          {
+            "node": "REVENUE_EVALUATION",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "REVENUE_EVALUATION": {
+      "main": [
+        [
+          {
+            "node": "EVIDENCE_TRACE_CHECK",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "EVIDENCE_TRACE_CHECK": {
+      "main": [
+        [
+          {
+            "node": "UNKNOWN_LIMITATIONS",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "UNKNOWN_LIMITATIONS": {
+      "main": [
+        [
+          {
+            "node": "OUTPUT_CONTRACT__PAOLA_TRACK_OUTPUT",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": false,
+  "settings": {
+    "executionOrder": "v1"
+  },
+  "pinData": {}
+}

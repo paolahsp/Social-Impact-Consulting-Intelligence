@@ -1,0 +1,13 @@
+{
+  "finding_id": "F-001",
+  "domain": "operations_cx",
+  "finding": "The public volunteer journey includes an online application form.",
+  "evidence_ids": [
+    "EV-001"
+  ],
+  "finding_type": "observed",
+  "confidence": 0.82,
+  "requires_validation": false,
+  "validation_question": null
+}
+

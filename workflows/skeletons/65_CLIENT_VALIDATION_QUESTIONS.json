@@ -1,0 +1,199 @@
+{
+  "name": "65_CLIENT_VALIDATION_QUESTIONS",
+  "nodes": [
+    {
+      "parameters": {
+        "content": "PURPOSE\nTurn evidence gaps and hypotheses into useful first-conversation consultant questions.\n\nOWNER\nGRETEL TRACK B\n\nINPUT CONTRACT\nfinding.schema.json[] plus hypothesis.schema.json[] plus diagnosis records\n\nOUTPUT CONTRACT\nvalidation_question.schema.json[]\n\nSTATUS\nSkeleton only. Inactive by default. No credentials. Configure TODO nodes after import.",
+        "height": 340,
+        "width": 520,
+        "color": 4
+      },
+      "id": "00_readme__purpose_owner_contracts_status",
+      "name": "00_README__PURPOSE_OWNER_CONTRACTS_STATUS",
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [
+        -420,
+        -320
+      ]
+    },
+    {
+      "parameters": {
+        "content": "CORE MVP WORKFLOW\nExample validation question: What happens internally after someone submits the volunteer form?",
+        "height": 200,
+        "width": 520,
+        "color": 4
+      },
+      "id": "note__1",
+      "name": "NOTE__1",
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [
+        -420,
+        60
+      ]
+    },
+    {
+      "parameters": {},
+      "id": "start__sub_workflow_trigger",
+      "name": "START__SUB_WORKFLOW_TRIGGER",
+      "type": "n8n-nodes-base.executeWorkflowTrigger",
+      "typeVersion": 1,
+      "position": [
+        0,
+        0
+      ]
+    },
+    {
+      "parameters": {
+        "jsCode": "// SKELETON_PLACEHOLDER: INPUT_CONTRACT__GAPS_HYPOTHESES\n// Accept evidence gaps, findings, hypotheses, and diagnosis records.\n// TODO: Replace this placeholder with configured production logic.\n// Contract discipline: preserve FACT / INFERENCE / HYPOTHESIS / UNKNOWN boundaries.\nreturn items;\n"
+      },
+      "id": "input_contract__gaps_hypotheses",
+      "name": "INPUT_CONTRACT__GAPS_HYPOTHESES",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        260,
+        0
+      ]
+    },
+    {
+      "parameters": {
+        "jsCode": "// SKELETON_PLACEHOLDER: QUESTION_SCOPE_SELECTION\n// Select questions tied to a finding or hypothesis.\n// TODO: Replace this placeholder with configured production logic.\n// Contract discipline: preserve FACT / INFERENCE / HYPOTHESIS / UNKNOWN boundaries.\nreturn items;\n"
+      },
+      "id": "question_scope_selection",
+      "name": "QUESTION_SCOPE_SELECTION",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        560,
+        0
+      ]
+    },
+    {
+      "parameters": {
+        "jsCode": "// SKELETON_PLACEHOLDER: TODO_AGENT__CLIENT_QUESTIONS\n// AGENT_INTERFACE__CLIENT_VALIDATION_QUESTIONS.\n// TODO: Replace this placeholder with configured production logic.\n// Contract discipline: preserve FACT / INFERENCE / HYPOTHESIS / UNKNOWN boundaries.\nreturn items;\n"
+      },
+      "id": "todo_agent__client_questions",
+      "name": "TODO_AGENT__CLIENT_QUESTIONS",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        860,
+        0
+      ]
+    },
+    {
+      "parameters": {
+        "jsCode": "// SKELETON_PLACEHOLDER: NEUTRALITY_AND_SPECIFICITY_CHECK\n// Ensure questions are specific, neutral, non-leading, and consultant-useful.\n// TODO: Replace this placeholder with configured production logic.\n// Contract discipline: preserve FACT / INFERENCE / HYPOTHESIS / UNKNOWN boundaries.\nreturn items;\n"
+      },
+      "id": "neutrality_and_specificity_check",
+      "name": "NEUTRALITY_AND_SPECIFICITY_CHECK",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        1160,
+        0
+      ]
+    },
+    {
+      "parameters": {
+        "jsCode": "// SKELETON_PLACEHOLDER: TRACEABILITY_CHECK\n// Require finding_ids or hypothesis_ids on every question.\n// TODO: Replace this placeholder with configured production logic.\n// Contract discipline: preserve FACT / INFERENCE / HYPOTHESIS / UNKNOWN boundaries.\nreturn items;\n"
+      },
+      "id": "traceability_check",
+      "name": "TRACEABILITY_CHECK",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        1460,
+        0
+      ]
+    },
+    {
+      "parameters": {
+        "jsCode": "// TERMINAL_OUTPUT_NODE: OUTPUT_CONTRACT__VALIDATION_QUESTIONS\n// Return validation question records.\n// TODO: Replace this placeholder with configured production logic.\n// Contract discipline: preserve FACT / INFERENCE / HYPOTHESIS / UNKNOWN boundaries.\nreturn items;\n"
+      },
+      "id": "output_contract__validation_questions",
+      "name": "OUTPUT_CONTRACT__VALIDATION_QUESTIONS",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        1760,
+        0
+      ]
+    }
+  ],
+  "connections": {
+    "START__SUB_WORKFLOW_TRIGGER": {
+      "main": [
+        [
+          {
+            "node": "INPUT_CONTRACT__GAPS_HYPOTHESES",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "INPUT_CONTRACT__GAPS_HYPOTHESES": {
+      "main": [
+        [
+          {
+            "node": "QUESTION_SCOPE_SELECTION",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "QUESTION_SCOPE_SELECTION": {
+      "main": [
+        [
+          {
+            "node": "TODO_AGENT__CLIENT_QUESTIONS",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "TODO_AGENT__CLIENT_QUESTIONS": {
+      "main": [
+        [
+          {
+            "node": "NEUTRALITY_AND_SPECIFICITY_CHECK",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "NEUTRALITY_AND_SPECIFICITY_CHECK": {
+      "main": [
+        [
+          {
+            "node": "TRACEABILITY_CHECK",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "TRACEABILITY_CHECK": {
+      "main": [
+        [
+          {
+            "node": "OUTPUT_CONTRACT__VALIDATION_QUESTIONS",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": false,
+  "settings": {
+    "executionOrder": "v1"
+  },
+  "pinData": {}
+}

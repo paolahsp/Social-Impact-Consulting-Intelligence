@@ -1,0 +1,271 @@
+{
+  "name": "00_MAIN_ORCHESTRATOR",
+  "nodes": [
+    {
+      "parameters": {
+        "content": "PURPOSE\nCoordinate the complete public-data-first diagnostic run.\n\nOWNER\nSHARED\n\nINPUT CONTRACT\nrun_context.schema.json plus initial user/web app payload\n\nOUTPUT CONTRACT\nfinal_package.schema.json\n\nSTATUS\nSkeleton only. Inactive by default. No credentials. Configure TODO nodes after import.",
+        "height": 340,
+        "width": 520,
+        "color": 4
+      },
+      "id": "00_readme__purpose_owner_contracts_status",
+      "name": "00_README__PURPOSE_OWNER_CONTRACTS_STATUS",
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [
+        -420,
+        -320
+      ]
+    },
+    {
+      "parameters": {
+        "content": "LINK SUB-WORKFLOW AFTER IMPORT\nDo not invent workflow IDs. Replace TODO_LINK_SUBWORKFLOW nodes with Execute Workflow nodes only after each imported workflow has a real n8n workflow ID.",
+        "height": 200,
+        "width": 520,
+        "color": 4
+      },
+      "id": "note__1",
+      "name": "NOTE__1",
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [
+        -420,
+        60
+      ]
+    },
+    {
+      "parameters": {},
+      "id": "start__manual_trigger",
+      "name": "START__MANUAL_TRIGGER",
+      "type": "n8n-nodes-base.manualTrigger",
+      "typeVersion": 1,
+      "position": [
+        0,
+        0
+      ]
+    },
+    {
+      "parameters": {
+        "jsCode": "// SKELETON_PLACEHOLDER: INPUT_CONTRACT__RUN_REQUEST\n// Validate minimum intake fields and preserve optional context.\n// TODO: Replace this placeholder with configured production logic.\n// Contract discipline: preserve FACT / INFERENCE / HYPOTHESIS / UNKNOWN boundaries.\nreturn items;\n"
+      },
+      "id": "input_contract__run_request",
+      "name": "INPUT_CONTRACT__RUN_REQUEST",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        260,
+        0
+      ]
+    },
+    {
+      "parameters": {
+        "jsCode": "// SKELETON_PLACEHOLDER: TODO_LINK_SUBWORKFLOW__10_INTAKE_AND_ORG_RESOLVER\n// LINK SUB-WORKFLOW AFTER IMPORT: 10_INTAKE_AND_ORG_RESOLVER.\n// TODO: Replace this placeholder with configured production logic.\n// Contract discipline: preserve FACT / INFERENCE / HYPOTHESIS / UNKNOWN boundaries.\nreturn items;\n"
+      },
+      "id": "todo_link_subworkflow__10_intake_and_org_resolver",
+      "name": "TODO_LINK_SUBWORKFLOW__10_INTAKE_AND_ORG_RESOLVER",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        560,
+        0
+      ]
+    },
+    {
+      "parameters": {
+        "jsCode": "// SKELETON_PLACEHOLDER: TODO_LINK_SUBWORKFLOW__20_CONTEXT_RESEARCH\n// LINK SUB-WORKFLOW AFTER IMPORT: 20_CONTEXT_RESEARCH_ORCHESTRATOR.\n// TODO: Replace this placeholder with configured production logic.\n// Contract discipline: preserve FACT / INFERENCE / HYPOTHESIS / UNKNOWN boundaries.\nreturn items;\n"
+      },
+      "id": "todo_link_subworkflow__20_context_research",
+      "name": "TODO_LINK_SUBWORKFLOW__20_CONTEXT_RESEARCH",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        860,
+        0
+      ]
+    },
+    {
+      "parameters": {
+        "jsCode": "// SKELETON_PLACEHOLDER: TODO_LINK_SUBWORKFLOW__30_EVIDENCE_PIPELINE\n// LINK SUB-WORKFLOW AFTER IMPORT: 30_EVIDENCE_PIPELINE.\n// TODO: Replace this placeholder with configured production logic.\n// Contract discipline: preserve FACT / INFERENCE / HYPOTHESIS / UNKNOWN boundaries.\nreturn items;\n"
+      },
+      "id": "todo_link_subworkflow__30_evidence_pipeline",
+      "name": "TODO_LINK_SUBWORKFLOW__30_EVIDENCE_PIPELINE",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        1160,
+        0
+      ]
+    },
+    {
+      "parameters": {
+        "jsCode": "// SKELETON_PLACEHOLDER: TODO_LINK_SUBWORKFLOW__40_RAG_RETRIEVAL\n// LINK SUB-WORKFLOW AFTER IMPORT: 40_RAG_RETRIEVAL_PIPELINE.\n// TODO: Replace this placeholder with configured production logic.\n// Contract discipline: preserve FACT / INFERENCE / HYPOTHESIS / UNKNOWN boundaries.\nreturn items;\n"
+      },
+      "id": "todo_link_subworkflow__40_rag_retrieval",
+      "name": "TODO_LINK_SUBWORKFLOW__40_RAG_RETRIEVAL",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        1460,
+        0
+      ]
+    },
+    {
+      "parameters": {
+        "jsCode": "// SKELETON_PLACEHOLDER: TODO_LINK_SUBWORKFLOW__50_ANALYSIS\n// LINK SUB-WORKFLOW AFTER IMPORT: 50_ANALYSIS_ORCHESTRATOR.\n// TODO: Replace this placeholder with configured production logic.\n// Contract discipline: preserve FACT / INFERENCE / HYPOTHESIS / UNKNOWN boundaries.\nreturn items;\n"
+      },
+      "id": "todo_link_subworkflow__50_analysis",
+      "name": "TODO_LINK_SUBWORKFLOW__50_ANALYSIS",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        1760,
+        0
+      ]
+    },
+    {
+      "parameters": {
+        "jsCode": "// SKELETON_PLACEHOLDER: TODO_LINK_SUBWORKFLOW__60_TRANSFORMATION\n// LINK SUB-WORKFLOW AFTER IMPORT: 60_TRANSFORMATION_ORCHESTRATOR.\n// TODO: Replace this placeholder with configured production logic.\n// Contract discipline: preserve FACT / INFERENCE / HYPOTHESIS / UNKNOWN boundaries.\nreturn items;\n"
+      },
+      "id": "todo_link_subworkflow__60_transformation",
+      "name": "TODO_LINK_SUBWORKFLOW__60_TRANSFORMATION",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        2060,
+        0
+      ]
+    },
+    {
+      "parameters": {
+        "jsCode": "// SKELETON_PLACEHOLDER: TODO_LINK_SUBWORKFLOW__70_REPORT_QA_DELIVERY\n// LINK SUB-WORKFLOW AFTER IMPORT: 70_REPORT_QA_DELIVERY.\n// TODO: Replace this placeholder with configured production logic.\n// Contract discipline: preserve FACT / INFERENCE / HYPOTHESIS / UNKNOWN boundaries.\nreturn items;\n"
+      },
+      "id": "todo_link_subworkflow__70_report_qa_delivery",
+      "name": "TODO_LINK_SUBWORKFLOW__70_REPORT_QA_DELIVERY",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        2360,
+        0
+      ]
+    },
+    {
+      "parameters": {
+        "jsCode": "// TERMINAL_OUTPUT_NODE: OUTPUT_CONTRACT__FINAL_PACKAGE\n// Return canonical final package JSON and run status.\n// TODO: Replace this placeholder with configured production logic.\n// Contract discipline: preserve FACT / INFERENCE / HYPOTHESIS / UNKNOWN boundaries.\nreturn items;\n"
+      },
+      "id": "output_contract__final_package",
+      "name": "OUTPUT_CONTRACT__FINAL_PACKAGE",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        2660,
+        0
+      ]
+    }
+  ],
+  "connections": {
+    "START__MANUAL_TRIGGER": {
+      "main": [
+        [
+          {
+            "node": "INPUT_CONTRACT__RUN_REQUEST",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "INPUT_CONTRACT__RUN_REQUEST": {
+      "main": [
+        [
+          {
+            "node": "TODO_LINK_SUBWORKFLOW__10_INTAKE_AND_ORG_RESOLVER",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "TODO_LINK_SUBWORKFLOW__10_INTAKE_AND_ORG_RESOLVER": {
+      "main": [
+        [
+          {
+            "node": "TODO_LINK_SUBWORKFLOW__20_CONTEXT_RESEARCH",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "TODO_LINK_SUBWORKFLOW__20_CONTEXT_RESEARCH": {
+      "main": [
+        [
+          {
+            "node": "TODO_LINK_SUBWORKFLOW__30_EVIDENCE_PIPELINE",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "TODO_LINK_SUBWORKFLOW__30_EVIDENCE_PIPELINE": {
+      "main": [
+        [
+          {
+            "node": "TODO_LINK_SUBWORKFLOW__40_RAG_RETRIEVAL",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "TODO_LINK_SUBWORKFLOW__40_RAG_RETRIEVAL": {
+      "main": [
+        [
+          {
+            "node": "TODO_LINK_SUBWORKFLOW__50_ANALYSIS",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "TODO_LINK_SUBWORKFLOW__50_ANALYSIS": {
+      "main": [
+        [
+          {
+            "node": "TODO_LINK_SUBWORKFLOW__60_TRANSFORMATION",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "TODO_LINK_SUBWORKFLOW__60_TRANSFORMATION": {
+      "main": [
+        [
+          {
+            "node": "TODO_LINK_SUBWORKFLOW__70_REPORT_QA_DELIVERY",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "TODO_LINK_SUBWORKFLOW__70_REPORT_QA_DELIVERY": {
+      "main": [
+        [
+          {
+            "node": "OUTPUT_CONTRACT__FINAL_PACKAGE",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": false,
+  "settings": {
+    "executionOrder": "v1"
+  },
+  "pinData": {}
+}

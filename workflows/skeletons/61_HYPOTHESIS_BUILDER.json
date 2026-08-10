@@ -1,0 +1,199 @@
+{
+  "name": "61_HYPOTHESIS_BUILDER",
+  "nodes": [
+    {
+      "parameters": {
+        "content": "PURPOSE\nBuild explicit hypotheses from public evidence while preserving fact/inference/hypothesis/unknown boundaries.\n\nOWNER\nGRETEL TRACK B\n\nINPUT CONTRACT\nfinding.schema.json[] plus evidence.schema.json[]\n\nOUTPUT CONTRACT\nhypothesis.schema.json[] plus updated finding references\n\nSTATUS\nSkeleton only. Inactive by default. No credentials. Configure TODO nodes after import.",
+        "height": 340,
+        "width": 520,
+        "color": 4
+      },
+      "id": "00_readme__purpose_owner_contracts_status",
+      "name": "00_README__PURPOSE_OWNER_CONTRACTS_STATUS",
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [
+        -420,
+        -320
+      ]
+    },
+    {
+      "parameters": {
+        "content": "PRODUCT LOGIC\nObserved fact: volunteer applications are collected through a website form.\nHypothesis: volunteer follow-up may rely on manual handoffs.\nThis must not become a confirmed diagnosis without validation.",
+        "height": 200,
+        "width": 520,
+        "color": 4
+      },
+      "id": "note__1",
+      "name": "NOTE__1",
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [
+        -420,
+        60
+      ]
+    },
+    {
+      "parameters": {},
+      "id": "start__sub_workflow_trigger",
+      "name": "START__SUB_WORKFLOW_TRIGGER",
+      "type": "n8n-nodes-base.executeWorkflowTrigger",
+      "typeVersion": 1,
+      "position": [
+        0,
+        0
+      ]
+    },
+    {
+      "parameters": {
+        "jsCode": "// SKELETON_PLACEHOLDER: INPUT_CONTRACT__FINDINGS_AND_EVIDENCE\n// Accept merged findings and traceable evidence ledger.\n// TODO: Replace this placeholder with configured production logic.\n// Contract discipline: preserve FACT / INFERENCE / HYPOTHESIS / UNKNOWN boundaries.\nreturn items;\n"
+      },
+      "id": "input_contract__findings_and_evidence",
+      "name": "INPUT_CONTRACT__FINDINGS_AND_EVIDENCE",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        260,
+        0
+      ]
+    },
+    {
+      "parameters": {
+        "jsCode": "// SKELETON_PLACEHOLDER: CLASSIFY_FACT_INFERENCE_HYPOTHESIS_UNKNOWN\n// Preserve public-data-first distinction for every claim.\n// TODO: Replace this placeholder with configured production logic.\n// Contract discipline: preserve FACT / INFERENCE / HYPOTHESIS / UNKNOWN boundaries.\nreturn items;\n"
+      },
+      "id": "classify_fact_inference_hypothesis_unknown",
+      "name": "CLASSIFY_FACT_INFERENCE_HYPOTHESIS_UNKNOWN",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        560,
+        0
+      ]
+    },
+    {
+      "parameters": {
+        "jsCode": "// SKELETON_PLACEHOLDER: TODO_AGENT__HYPOTHESIS_BUILDER\n// AGENT_INTERFACE__HYPOTHESIS_BUILDER.\n// TODO: Replace this placeholder with configured production logic.\n// Contract discipline: preserve FACT / INFERENCE / HYPOTHESIS / UNKNOWN boundaries.\nreturn items;\n"
+      },
+      "id": "todo_agent__hypothesis_builder",
+      "name": "TODO_AGENT__HYPOTHESIS_BUILDER",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        860,
+        0
+      ]
+    },
+    {
+      "parameters": {
+        "jsCode": "// SKELETON_PLACEHOLDER: STRUCTURE_HYPOTHESIS_RECORD\n// Require evidence_ids, hypothesis, confidence, requires_validation=true, and validation_gap.\n// TODO: Replace this placeholder with configured production logic.\n// Contract discipline: preserve FACT / INFERENCE / HYPOTHESIS / UNKNOWN boundaries.\nreturn items;\n"
+      },
+      "id": "structure_hypothesis_record",
+      "name": "STRUCTURE_HYPOTHESIS_RECORD",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        1160,
+        0
+      ]
+    },
+    {
+      "parameters": {
+        "jsCode": "// SKELETON_PLACEHOLDER: VALIDATE_NO_HYPOTHESIS_AS_FACT\n// Prevent a public-evidence hypothesis from becoming a confirmed diagnosis.\n// TODO: Replace this placeholder with configured production logic.\n// Contract discipline: preserve FACT / INFERENCE / HYPOTHESIS / UNKNOWN boundaries.\nreturn items;\n"
+      },
+      "id": "validate_no_hypothesis_as_fact",
+      "name": "VALIDATE_NO_HYPOTHESIS_AS_FACT",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        1460,
+        0
+      ]
+    },
+    {
+      "parameters": {
+        "jsCode": "// TERMINAL_OUTPUT_NODE: OUTPUT_CONTRACT__HYPOTHESES\n// Return structured hypotheses.\n// TODO: Replace this placeholder with configured production logic.\n// Contract discipline: preserve FACT / INFERENCE / HYPOTHESIS / UNKNOWN boundaries.\nreturn items;\n"
+      },
+      "id": "output_contract__hypotheses",
+      "name": "OUTPUT_CONTRACT__HYPOTHESES",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        1760,
+        0
+      ]
+    }
+  ],
+  "connections": {
+    "START__SUB_WORKFLOW_TRIGGER": {
+      "main": [
+        [
+          {
+            "node": "INPUT_CONTRACT__FINDINGS_AND_EVIDENCE",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "INPUT_CONTRACT__FINDINGS_AND_EVIDENCE": {
+      "main": [
+        [
+          {
+            "node": "CLASSIFY_FACT_INFERENCE_HYPOTHESIS_UNKNOWN",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "CLASSIFY_FACT_INFERENCE_HYPOTHESIS_UNKNOWN": {
+      "main": [
+        [
+          {
+            "node": "TODO_AGENT__HYPOTHESIS_BUILDER",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "TODO_AGENT__HYPOTHESIS_BUILDER": {
+      "main": [
+        [
+          {
+            "node": "STRUCTURE_HYPOTHESIS_RECORD",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "STRUCTURE_HYPOTHESIS_RECORD": {
+      "main": [
+        [
+          {
+            "node": "VALIDATE_NO_HYPOTHESIS_AS_FACT",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "VALIDATE_NO_HYPOTHESIS_AS_FACT": {
+      "main": [
+        [
+          {
+            "node": "OUTPUT_CONTRACT__HYPOTHESES",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": false,
+  "settings": {
+    "executionOrder": "v1"
+  },
+  "pinData": {}
+}

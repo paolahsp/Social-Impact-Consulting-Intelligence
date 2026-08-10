@@ -1,0 +1,53 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://example.local/contracts/validation_question.schema.json",
+  "title": "Validation Question",
+  "type": "object",
+  "required": [
+    "question_id",
+    "finding_ids",
+    "hypothesis_ids",
+    "question",
+    "purpose",
+    "domain",
+    "priority"
+  ],
+  "additionalProperties": true,
+  "properties": {
+    "question_id": {
+      "type": "string",
+      "pattern": "^Q-"
+    },
+    "finding_ids": {
+      "type": "array",
+      "items": {
+        "type": "string",
+        "pattern": "^F-"
+      }
+    },
+    "hypothesis_ids": {
+      "type": "array",
+      "items": {
+        "type": "string",
+        "pattern": "^HYP-"
+      }
+    },
+    "question": {
+      "type": "string"
+    },
+    "purpose": {
+      "type": "string"
+    },
+    "domain": {
+      "type": "string"
+    },
+    "priority": {
+      "type": "string",
+      "enum": [
+        "low",
+        "medium",
+        "high"
+      ]
+    }
+  }
+}

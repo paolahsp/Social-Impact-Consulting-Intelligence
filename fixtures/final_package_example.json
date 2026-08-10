@@ -1,0 +1,263 @@
+{
+  "run_context": {
+    "run_id": "RUN-FICTIONAL-001",
+    "organization": {
+      "name": "Fictional River Learning Collective",
+      "website": "https://fictional-river-learning.example.org",
+      "country": "Germany",
+      "mission_area": "youth education"
+    },
+    "current_challenge": "Preparing for a pre-engagement diagnostic workshop",
+    "uploaded_document_refs": [],
+    "status": "completed",
+    "started_at": "2026-08-09T09:00:00Z",
+    "errors": []
+  },
+  "organization_snapshot": {
+    "name": "Fictional River Learning Collective",
+    "country": "Germany",
+    "mission_area": "youth education",
+    "summary": "A fictional NGO fixture used for Project 3 workflow configuration."
+  },
+  "public_evidence_map": [
+    {
+      "source_id": "SRC-001",
+      "title": "Fictional River Learning Collective Volunteer Page",
+      "url": "https://fictional-river-learning.example.org/volunteer",
+      "source_type": "official_website",
+      "publisher": "Fictional River Learning Collective",
+      "publication_date": null,
+      "retrieved_at": "2026-08-09T09:10:00Z",
+      "authority_level": "official",
+      "freshness": "current",
+      "is_official": true
+    },
+    {
+      "source_id": "SRC-002",
+      "title": "Fictional River Learning Collective Annual Snapshot",
+      "url": "https://fictional-river-learning.example.org/annual-snapshot",
+      "source_type": "public_report",
+      "publisher": "Fictional River Learning Collective",
+      "publication_date": "2026-03-01",
+      "retrieved_at": "2026-08-09T09:14:00Z",
+      "authority_level": "official",
+      "freshness": "recent",
+      "is_official": true
+    }
+  ],
+  "revenue_resilience": {
+    "summary": "Public reporting indicates more than one revenue signal, but funding concentration remains unknown."
+  },
+  "impact_and_evidence": {
+    "summary": "Impact reporting maturity is outside this fixture's tested slice."
+  },
+  "operations_stakeholder_experience": {
+    "summary": "The public volunteer journey includes an online application form; internal follow-up is unknown."
+  },
+  "findings": [
+    {
+      "finding_id": "F-001",
+      "domain": "operations_cx",
+      "finding": "The public volunteer journey includes an online application form.",
+      "evidence_ids": [
+        "EV-001"
+      ],
+      "finding_type": "observed",
+      "confidence": 0.82,
+      "requires_validation": false,
+      "validation_question": null
+    },
+    {
+      "finding_id": "F-002",
+      "domain": "revenue_resilience",
+      "finding": "Public reporting indicates more than one revenue signal, but the concentration of funding is not publicly visible.",
+      "evidence_ids": [
+        "EV-002"
+      ],
+      "finding_type": "inferred",
+      "confidence": 0.58,
+      "requires_validation": true,
+      "validation_question": "What share of annual income comes from the largest funding source?"
+    }
+  ],
+  "hypotheses": [
+    {
+      "hypothesis_id": "HYP-001",
+      "run_id": "RUN-FICTIONAL-001",
+      "domain": "operations_cx",
+      "evidence_ids": [
+        "EV-001",
+        "EV-003"
+      ],
+      "finding_ids": [
+        "F-001"
+      ],
+      "hypothesis": "Volunteer follow-up may rely on manual handoffs after form submission.",
+      "confidence": 0.48,
+      "requires_validation": true,
+      "validation_gap": "Public sources do not describe the internal follow-up process."
+    }
+  ],
+  "diagnoses": [
+    {
+      "diagnosis_id": "DX-001",
+      "domain": "operations_cx",
+      "diagnosis_type": "likely_cause",
+      "statement": "The volunteer journey may contain manual coordination steps that should be validated with staff.",
+      "finding_ids": [
+        "F-001"
+      ],
+      "hypothesis_ids": [
+        "HYP-001"
+      ],
+      "evidence_ids": [
+        "EV-001",
+        "EV-003"
+      ],
+      "confidence": 0.45,
+      "requires_validation": true
+    }
+  ],
+  "priority_hypotheses": [
+    {
+      "finding_id": "F-003",
+      "domain": "operations_cx",
+      "finding": "Volunteer follow-up may rely on manual handoffs after form submission.",
+      "evidence_ids": [
+        "EV-001",
+        "EV-003"
+      ],
+      "finding_type": "hypothesis",
+      "confidence": 0.48,
+      "requires_validation": true,
+      "validation_question": "What happens internally after someone submits the volunteer form?"
+    }
+  ],
+  "recommendations": [
+    {
+      "recommendation_id": "REC-001",
+      "finding_ids": [
+        "F-001"
+      ],
+      "diagnosis_ids": [
+        "DX-001"
+      ],
+      "diagnosis": "Volunteer follow-up may depend on manual handoffs.",
+      "action": "Map the volunteer intake handoff during the first client workshop before recommending automation.",
+      "priority": "medium",
+      "kpi": {
+        "name": "Volunteer follow-up time",
+        "baseline": null,
+        "baseline_status": "unknown",
+        "target": null,
+        "timeframe": "After baseline is confirmed",
+        "measurement_method": "Review timestamp from form submission to first staff response"
+      },
+      "confidence": 0.46,
+      "requires_human_review": true
+    }
+  ],
+  "actions": [
+    {
+      "action": "Map the volunteer intake handoff during the first client workshop before recommending automation.",
+      "recommendation_ids": [
+        "REC-001"
+      ]
+    }
+  ],
+  "kpis": [
+    {
+      "name": "Volunteer follow-up time",
+      "baseline": null,
+      "baseline_status": "unknown",
+      "target": null,
+      "timeframe": "After baseline is confirmed",
+      "measurement_method": "Review timestamp from form submission to first staff response"
+    }
+  ],
+  "client_validation_questions": [
+    {
+      "question_id": "Q-001",
+      "finding_ids": [
+        "F-001"
+      ],
+      "hypothesis_ids": [
+        "HYP-001"
+      ],
+      "question": "What happens internally after someone submits the volunteer form?",
+      "purpose": "Validate whether follow-up depends on manual handoffs.",
+      "domain": "operations_cx",
+      "priority": "high"
+    }
+  ],
+  "evidence_ledger": [
+    {
+      "evidence_id": "EV-001",
+      "run_id": "RUN-FICTIONAL-001",
+      "claim": "Volunteer applications are collected through a public website form.",
+      "source_ids": [
+        "SRC-001"
+      ],
+      "domain": "operations_cx",
+      "evidence_type": "fact",
+      "confidence": 0.86,
+      "status": "supported",
+      "contradiction_ids": [],
+      "requires_validation": false
+    },
+    {
+      "evidence_id": "EV-002",
+      "run_id": "RUN-FICTIONAL-001",
+      "claim": "The organization describes grant funding and small donor support in its annual snapshot.",
+      "source_ids": [
+        "SRC-002"
+      ],
+      "domain": "revenue_resilience",
+      "evidence_type": "fact",
+      "confidence": 0.78,
+      "status": "supported",
+      "contradiction_ids": [],
+      "requires_validation": false
+    },
+    {
+      "evidence_id": "EV-003",
+      "run_id": "RUN-FICTIONAL-001",
+      "claim": "The internal volunteer follow-up process is not described in public sources.",
+      "source_ids": [
+        "SRC-001"
+      ],
+      "domain": "operations_cx",
+      "evidence_type": "unknown",
+      "confidence": 0.7,
+      "status": "unknown",
+      "contradiction_ids": [],
+      "requires_validation": true
+    }
+  ],
+  "missing_information": [
+    "Internal volunteer follow-up process",
+    "Funding concentration by source"
+  ],
+  "confidence_limitations": [
+    "This fixture uses fictional public sources for workflow development.",
+    "Public evidence cannot validate internal operational handoffs."
+  ],
+  "roadmap_90_day": [
+    {
+      "roadmap_action_id": "RA-001",
+      "time_bucket": "30_days",
+      "action": "Validate the volunteer follow-up process during the client workshop.",
+      "action_type": "validation",
+      "recommendation_ids": [
+        "REC-001"
+      ],
+      "hypothesis_ids": [
+        "HYP-001"
+      ],
+      "validation_question_ids": [
+        "Q-001"
+      ]
+    }
+  ]
+}
+

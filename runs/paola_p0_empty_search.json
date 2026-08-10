@@ -1,0 +1,184 @@
+{
+  "input": {
+    "run_id": "RUN-PAOLA-P0-001",
+    "organization": {
+      "name": "GiveDirectly",
+      "website": "https://www.givedirectly.org",
+      "country": "United States",
+      "mission_area": "youth education"
+    },
+    "current_challenge": "Preparing for a pre-engagement diagnostic workshop",
+    "uploaded_document_refs": [],
+    "status": "created",
+    "started_at": "2026-08-09T09:00:00Z",
+    "errors": []
+  },
+  "execution_path": [
+    "21_WEB_SEARCH",
+    "30_EVIDENCE_PIPELINE",
+    "40_RAG_RETRIEVAL_PIPELINE",
+    "51_REVENUE_RESILIENCE_AGENT"
+  ],
+  "controlled_state": "empty_search",
+  "search": {
+    "provider": "simulated_empty_search",
+    "query": "GiveDirectly United States annual report revenue funding grants donations financial statements",
+    "search_url": null,
+    "raw_result_count": 0,
+    "results": []
+  },
+  "sources": [],
+  "evidence": [
+    {
+      "evidence_id": "EV-001",
+      "run_id": "RUN-PAOLA-P0-001",
+      "claim": "No revenue-resilience evidence was extracted from the available public search results.",
+      "source_ids": [],
+      "domain": "revenue_resilience",
+      "evidence_type": "unknown",
+      "confidence": 0.4,
+      "status": "unknown",
+      "contradiction_ids": [],
+      "requires_validation": true
+    }
+  ],
+  "rag_context": {
+    "retrieval_run_id": "RAG-P0-001",
+    "domain": "revenue_resilience",
+    "query": "No revenue-resilience evidence was extracted from the available public search results.",
+    "contexts": [
+      {
+        "context_id": "FRAMEWORK-REV-001",
+        "domain": "revenue_resilience",
+        "title": "Funding Concentration",
+        "content": "Revenue resilience assessment should check whether an organization depends heavily on one grant, donor, contract, or funder. Public evidence may reveal named funding sources, but concentration percentages are often unknown without internal financial data.",
+        "evaluation_use": "Use this when evidence mentions grants, funders, annual reports, or revenue sources. Do not infer concentration unless amounts or proportions are available.",
+        "retrieval_score": 8
+      },
+      {
+        "context_id": "FRAMEWORK-REV-004",
+        "domain": "revenue_resilience",
+        "title": "Financial Resilience Limitations",
+        "content": "Public-data-first diagnostics must separate facts from hypotheses. Missing financial evidence should remain unknown. Do not invent revenue numbers, donor concentration, cash runway, operating reserves, or growth rates.",
+        "evaluation_use": "Use this as a guardrail for all revenue resilience findings.",
+        "retrieval_score": 8
+      },
+      {
+        "context_id": "FRAMEWORK-REV-002",
+        "domain": "revenue_resilience",
+        "title": "Revenue Diversification",
+        "content": "Diversification considers whether public signals show multiple revenue types such as individual donations, grants, corporate partnerships, government contracts, memberships, or earned income. Public signals can support an observed finding that multiple revenue channels are described, but cannot prove resilience by themselves.",
+        "evaluation_use": "Use this when evidence mentions donations, grants, partnerships, fundraising, revenue, or financial reports.",
+        "retrieval_score": 6
+      }
+    ]
+  },
+  "findings": [
+    {
+      "finding_id": "F-001",
+      "domain": "revenue_resilience",
+      "finding": "Public search did not provide enough evidence to assess revenue resilience.",
+      "evidence_ids": [
+        "EV-001"
+      ],
+      "finding_type": "unknown",
+      "confidence": 0.35,
+      "requires_validation": true,
+      "validation_question": "What are the organization's main revenue sources and how concentrated are they?",
+      "rag_context_ids": [
+        "FRAMEWORK-REV-001",
+        "FRAMEWORK-REV-004",
+        "FRAMEWORK-REV-002"
+      ],
+      "limitations": [
+        "No revenue numbers are inferred from search metadata.",
+        "Missing financial evidence remains unknown rather than negative."
+      ]
+    }
+  ],
+  "paola_track_output": {
+    "run_context": {
+      "run_id": "RUN-PAOLA-P0-001",
+      "organization": {
+        "name": "GiveDirectly",
+        "website": "https://www.givedirectly.org",
+        "country": "United States",
+        "mission_area": "youth education"
+      },
+      "current_challenge": "Preparing for a pre-engagement diagnostic workshop",
+      "uploaded_document_refs": [],
+      "status": "created",
+      "started_at": "2026-08-09T09:00:00Z",
+      "errors": []
+    },
+    "sources": [],
+    "evidence": [
+      {
+        "evidence_id": "EV-001",
+        "run_id": "RUN-PAOLA-P0-001",
+        "claim": "No revenue-resilience evidence was extracted from the available public search results.",
+        "source_ids": [],
+        "domain": "revenue_resilience",
+        "evidence_type": "unknown",
+        "confidence": 0.4,
+        "status": "unknown",
+        "contradiction_ids": [],
+        "requires_validation": true
+      }
+    ],
+    "findings": [
+      {
+        "finding_id": "F-001",
+        "domain": "revenue_resilience",
+        "finding": "Public search did not provide enough evidence to assess revenue resilience.",
+        "evidence_ids": [
+          "EV-001"
+        ],
+        "finding_type": "unknown",
+        "confidence": 0.35,
+        "requires_validation": true,
+        "validation_question": "What are the organization's main revenue sources and how concentrated are they?",
+        "rag_context_ids": [
+          "FRAMEWORK-REV-001",
+          "FRAMEWORK-REV-004",
+          "FRAMEWORK-REV-002"
+        ],
+        "limitations": [
+          "No revenue numbers are inferred from search metadata.",
+          "Missing financial evidence remains unknown rather than negative."
+        ]
+      }
+    ],
+    "unknowns": [
+      {
+        "unknown_id": "UNK-001",
+        "domain": "revenue_resilience",
+        "description": "No public search results were returned.",
+        "evidence_ids": [
+          "EV-001"
+        ]
+      },
+      {
+        "unknown_id": "UNK-002",
+        "domain": "revenue_resilience",
+        "description": "Revenue concentration and recurrence cannot be determined from the P0 public search slice alone.",
+        "evidence_ids": [
+          "EV-001"
+        ]
+      }
+    ],
+    "contradictions": [],
+    "rag_metadata": {
+      "retrieval_run_id": "RAG-P0-001",
+      "domains": [
+        "revenue_resilience"
+      ],
+      "retrieved_context_ids": [
+        "FRAMEWORK-REV-001",
+        "FRAMEWORK-REV-004",
+        "FRAMEWORK-REV-002"
+      ]
+    }
+  },
+  "errors": []
+}

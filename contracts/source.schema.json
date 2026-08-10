@@ -1,0 +1,78 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://example.local/contracts/source.schema.json",
+  "title": "Source",
+  "type": "object",
+  "required": [
+    "source_id",
+    "title",
+    "url",
+    "source_type",
+    "retrieved_at",
+    "is_official"
+  ],
+  "additionalProperties": true,
+  "properties": {
+    "source_id": {
+      "type": "string",
+      "pattern": "^SRC-"
+    },
+    "title": {
+      "type": "string"
+    },
+    "url": {
+      "type": "string",
+      "format": "uri"
+    },
+    "source_type": {
+      "type": "string"
+    },
+    "publisher": {
+      "type": [
+        "string",
+        "null"
+      ]
+    },
+    "publication_date": {
+      "type": [
+        "string",
+        "null"
+      ],
+      "format": "date"
+    },
+    "retrieved_at": {
+      "type": "string",
+      "format": "date-time"
+    },
+    "authority_level": {
+      "type": [
+        "string",
+        "null"
+      ],
+      "enum": [
+        "official",
+        "registry",
+        "independent",
+        "media",
+        "unknown",
+        null
+      ]
+    },
+    "freshness": {
+      "type": [
+        "string",
+        "null"
+      ],
+      "enum": [
+        "current",
+        "recent",
+        "stale",
+        "unknown",
+        null
+      ]
+    },
+    "is_official": {
+      "type": "boolean"
+    }
+  }
+}

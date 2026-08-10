@@ -1,0 +1,183 @@
+{
+  "name": "99_GLOBAL_ERROR_HANDLER",
+  "nodes": [
+    {
+      "parameters": {
+        "content": "PURPOSE\nCentralized error observability for workflow failures.\n\nOWNER\nSHARED\n\nINPUT CONTRACT\nn8n error trigger event\n\nOUTPUT CONTRACT\nnormalized error log/notification placeholder\n\nSTATUS\nSkeleton only. Inactive by default. No credentials. Configure TODO nodes after import.",
+        "height": 340,
+        "width": 520,
+        "color": 4
+      },
+      "id": "00_readme__purpose_owner_contracts_status",
+      "name": "00_README__PURPOSE_OWNER_CONTRACTS_STATUS",
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [
+        -420,
+        -320
+      ]
+    },
+    {
+      "parameters": {},
+      "id": "start__error_trigger",
+      "name": "START__ERROR_TRIGGER",
+      "type": "n8n-nodes-base.errorTrigger",
+      "typeVersion": 1,
+      "position": [
+        0,
+        0
+      ]
+    },
+    {
+      "parameters": {
+        "jsCode": "// SKELETON_PLACEHOLDER: NORMALIZE_ERROR\n// Normalize n8n error payload.\n// TODO: Replace this placeholder with configured production logic.\n// Contract discipline: preserve FACT / INFERENCE / HYPOTHESIS / UNKNOWN boundaries.\nreturn items;\n"
+      },
+      "id": "normalize_error",
+      "name": "NORMALIZE_ERROR",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        260,
+        0
+      ]
+    },
+    {
+      "parameters": {
+        "jsCode": "// SKELETON_PLACEHOLDER: CAPTURE_ERROR_CONTEXT\n// Capture run_id, workflow_name, node_name, timestamp, error_type, message, partial_state_available.\n// TODO: Replace this placeholder with configured production logic.\n// Contract discipline: preserve FACT / INFERENCE / HYPOTHESIS / UNKNOWN boundaries.\nreturn items;\n"
+      },
+      "id": "capture_error_context",
+      "name": "CAPTURE_ERROR_CONTEXT",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        560,
+        0
+      ]
+    },
+    {
+      "parameters": {
+        "jsCode": "// SKELETON_PLACEHOLDER: CLASSIFY_RECOVERABLE_FATAL\n// Classify as recoverable or fatal.\n// TODO: Replace this placeholder with configured production logic.\n// Contract discipline: preserve FACT / INFERENCE / HYPOTHESIS / UNKNOWN boundaries.\nreturn items;\n"
+      },
+      "id": "classify_recoverable_fatal",
+      "name": "CLASSIFY_RECOVERABLE_FATAL",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        860,
+        0
+      ]
+    },
+    {
+      "parameters": {
+        "jsCode": "// SKELETON_PLACEHOLDER: TODO_STORAGE__ERROR_LOG\n// Placeholder for durable logging.\n// TODO: Replace this placeholder with configured production logic.\n// Contract discipline: preserve FACT / INFERENCE / HYPOTHESIS / UNKNOWN boundaries.\nreturn items;\n"
+      },
+      "id": "todo_storage__error_log",
+      "name": "TODO_STORAGE__ERROR_LOG",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        1160,
+        0
+      ]
+    },
+    {
+      "parameters": {
+        "jsCode": "// SKELETON_PLACEHOLDER: TODO_NOTIFICATION__ERROR_ALERT\n// Placeholder for future notification channel. No credentials configured.\n// TODO: Replace this placeholder with configured production logic.\n// Contract discipline: preserve FACT / INFERENCE / HYPOTHESIS / UNKNOWN boundaries.\nreturn items;\n"
+      },
+      "id": "todo_notification__error_alert",
+      "name": "TODO_NOTIFICATION__ERROR_ALERT",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        1460,
+        0
+      ]
+    },
+    {
+      "parameters": {
+        "jsCode": "// TERMINAL_OUTPUT_NODE: OUTPUT_CONTRACT__ERROR_EVENT\n// Return normalized error event.\n// TODO: Replace this placeholder with configured production logic.\n// Contract discipline: preserve FACT / INFERENCE / HYPOTHESIS / UNKNOWN boundaries.\nreturn items;\n"
+      },
+      "id": "output_contract__error_event",
+      "name": "OUTPUT_CONTRACT__ERROR_EVENT",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        1760,
+        0
+      ]
+    }
+  ],
+  "connections": {
+    "START__ERROR_TRIGGER": {
+      "main": [
+        [
+          {
+            "node": "NORMALIZE_ERROR",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "NORMALIZE_ERROR": {
+      "main": [
+        [
+          {
+            "node": "CAPTURE_ERROR_CONTEXT",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "CAPTURE_ERROR_CONTEXT": {
+      "main": [
+        [
+          {
+            "node": "CLASSIFY_RECOVERABLE_FATAL",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "CLASSIFY_RECOVERABLE_FATAL": {
+      "main": [
+        [
+          {
+            "node": "TODO_STORAGE__ERROR_LOG",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "TODO_STORAGE__ERROR_LOG": {
+      "main": [
+        [
+          {
+            "node": "TODO_NOTIFICATION__ERROR_ALERT",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "TODO_NOTIFICATION__ERROR_ALERT": {
+      "main": [
+        [
+          {
+            "node": "OUTPUT_CONTRACT__ERROR_EVENT",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": false,
+  "settings": {
+    "executionOrder": "v1"
+  },
+  "pinData": {}
+}

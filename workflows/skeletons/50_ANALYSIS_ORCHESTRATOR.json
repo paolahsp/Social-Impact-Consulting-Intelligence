@@ -1,0 +1,257 @@
+{
+  "name": "50_ANALYSIS_ORCHESTRATOR",
+  "nodes": [
+    {
+      "parameters": {
+        "content": "PURPOSE\nDispatch evidence and RAG context to specialist analysis workflows.\n\nOWNER\nSHARED\n\nINPUT CONTRACT\nevidence.schema.json[] plus rag_context\n\nOUTPUT CONTRACT\nfinding.schema.json[] with hypothesis builder output\n\nSTATUS\nSkeleton only. Inactive by default. No credentials. Configure TODO nodes after import.",
+        "height": 340,
+        "width": 520,
+        "color": 4
+      },
+      "id": "00_readme__purpose_owner_contracts_status",
+      "name": "00_README__PURPOSE_OWNER_CONTRACTS_STATUS",
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [
+        -420,
+        -320
+      ]
+    },
+    {
+      "parameters": {
+        "content": "LINK SUB-WORKFLOW AFTER IMPORT\nReplace specialist TODO_LINK nodes only after 51, 52, and 53 exist in n8n.",
+        "height": 200,
+        "width": 520,
+        "color": 4
+      },
+      "id": "note__1",
+      "name": "NOTE__1",
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [
+        -420,
+        60
+      ]
+    },
+    {
+      "parameters": {},
+      "id": "start__sub_workflow_trigger",
+      "name": "START__SUB_WORKFLOW_TRIGGER",
+      "type": "n8n-nodes-base.executeWorkflowTrigger",
+      "typeVersion": 1,
+      "position": [
+        0,
+        0
+      ]
+    },
+    {
+      "parameters": {
+        "jsCode": "// SKELETON_PLACEHOLDER: INPUT_CONTRACT__EVIDENCE_AND_RAG\n// Accept evidence ledger and domain RAG context.\n// TODO: Replace this placeholder with configured production logic.\n// Contract discipline: preserve FACT / INFERENCE / HYPOTHESIS / UNKNOWN boundaries.\nreturn items;\n"
+      },
+      "id": "input_contract__evidence_and_rag",
+      "name": "INPUT_CONTRACT__EVIDENCE_AND_RAG",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        260,
+        0
+      ]
+    },
+    {
+      "parameters": {
+        "jsCode": "// SKELETON_PLACEHOLDER: FAN_OUT__SPECIALIST_ANALYSIS\n// Dispatch to revenue, impact, and operations/CX specialists.\n// TODO: Replace this placeholder with configured production logic.\n// Contract discipline: preserve FACT / INFERENCE / HYPOTHESIS / UNKNOWN boundaries.\nreturn items;\n"
+      },
+      "id": "fan_out__specialist_analysis",
+      "name": "FAN_OUT__SPECIALIST_ANALYSIS",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        560,
+        0
+      ]
+    },
+    {
+      "parameters": {
+        "jsCode": "// SKELETON_PLACEHOLDER: TODO_LINK_SUBWORKFLOW__51_REVENUE_RESILIENCE\n// LINK SUB-WORKFLOW AFTER IMPORT: 51_REVENUE_RESILIENCE_AGENT.\n// TODO: Replace this placeholder with configured production logic.\n// Contract discipline: preserve FACT / INFERENCE / HYPOTHESIS / UNKNOWN boundaries.\nreturn items;\n"
+      },
+      "id": "todo_link_subworkflow__51_revenue_resilience",
+      "name": "TODO_LINK_SUBWORKFLOW__51_REVENUE_RESILIENCE",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        860,
+        0
+      ]
+    },
+    {
+      "parameters": {
+        "jsCode": "// SKELETON_PLACEHOLDER: TODO_LINK_SUBWORKFLOW__52_IMPACT_EVIDENCE\n// LINK SUB-WORKFLOW AFTER IMPORT: 52_IMPACT_EVIDENCE_AGENT.\n// TODO: Replace this placeholder with configured production logic.\n// Contract discipline: preserve FACT / INFERENCE / HYPOTHESIS / UNKNOWN boundaries.\nreturn items;\n"
+      },
+      "id": "todo_link_subworkflow__52_impact_evidence",
+      "name": "TODO_LINK_SUBWORKFLOW__52_IMPACT_EVIDENCE",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        1160,
+        0
+      ]
+    },
+    {
+      "parameters": {
+        "jsCode": "// SKELETON_PLACEHOLDER: TODO_LINK_SUBWORKFLOW__53_OPERATIONS_CX\n// LINK SUB-WORKFLOW AFTER IMPORT: 53_OPERATIONS_CX_AGENT.\n// TODO: Replace this placeholder with configured production logic.\n// Contract discipline: preserve FACT / INFERENCE / HYPOTHESIS / UNKNOWN boundaries.\nreturn items;\n"
+      },
+      "id": "todo_link_subworkflow__53_operations_cx",
+      "name": "TODO_LINK_SUBWORKFLOW__53_OPERATIONS_CX",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        1460,
+        0
+      ]
+    },
+    {
+      "parameters": {
+        "jsCode": "// SKELETON_PLACEHOLDER: MERGE_FINDINGS\n// Merge specialist outputs.\n// TODO: Replace this placeholder with configured production logic.\n// Contract discipline: preserve FACT / INFERENCE / HYPOTHESIS / UNKNOWN boundaries.\nreturn items;\n"
+      },
+      "id": "merge_findings",
+      "name": "MERGE_FINDINGS",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        1760,
+        0
+      ]
+    },
+    {
+      "parameters": {
+        "jsCode": "// SKELETON_PLACEHOLDER: HYPOTHESIS_BUILDER\n// Normalize cross-domain hypotheses and validation needs.\n// TODO: Replace this placeholder with configured production logic.\n// Contract discipline: preserve FACT / INFERENCE / HYPOTHESIS / UNKNOWN boundaries.\nreturn items;\n"
+      },
+      "id": "hypothesis_builder",
+      "name": "HYPOTHESIS_BUILDER",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        2060,
+        0
+      ]
+    },
+    {
+      "parameters": {
+        "jsCode": "// TERMINAL_OUTPUT_NODE: OUTPUT_CONTRACT__FINDINGS\n// Return structured findings.\n// TODO: Replace this placeholder with configured production logic.\n// Contract discipline: preserve FACT / INFERENCE / HYPOTHESIS / UNKNOWN boundaries.\nreturn items;\n"
+      },
+      "id": "output_contract__findings",
+      "name": "OUTPUT_CONTRACT__FINDINGS",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        2360,
+        0
+      ]
+    }
+  ],
+  "connections": {
+    "START__SUB_WORKFLOW_TRIGGER": {
+      "main": [
+        [
+          {
+            "node": "INPUT_CONTRACT__EVIDENCE_AND_RAG",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "INPUT_CONTRACT__EVIDENCE_AND_RAG": {
+      "main": [
+        [
+          {
+            "node": "FAN_OUT__SPECIALIST_ANALYSIS",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "FAN_OUT__SPECIALIST_ANALYSIS": {
+      "main": [
+        [
+          {
+            "node": "TODO_LINK_SUBWORKFLOW__51_REVENUE_RESILIENCE",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "TODO_LINK_SUBWORKFLOW__52_IMPACT_EVIDENCE",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "TODO_LINK_SUBWORKFLOW__53_OPERATIONS_CX",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "TODO_LINK_SUBWORKFLOW__51_REVENUE_RESILIENCE": {
+      "main": [
+        [
+          {
+            "node": "MERGE_FINDINGS",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "TODO_LINK_SUBWORKFLOW__52_IMPACT_EVIDENCE": {
+      "main": [
+        [
+          {
+            "node": "MERGE_FINDINGS",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "TODO_LINK_SUBWORKFLOW__53_OPERATIONS_CX": {
+      "main": [
+        [
+          {
+            "node": "MERGE_FINDINGS",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "MERGE_FINDINGS": {
+      "main": [
+        [
+          {
+            "node": "HYPOTHESIS_BUILDER",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "HYPOTHESIS_BUILDER": {
+      "main": [
+        [
+          {
+            "node": "OUTPUT_CONTRACT__FINDINGS",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": false,
+  "settings": {
+    "executionOrder": "v1"
+  },
+  "pinData": {}
+}

@@ -1,0 +1,120 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://example.local/contracts/final_package.schema.json",
+  "title": "Pre-Engagement Diagnostic Pack",
+  "type": "object",
+  "required": [
+    "run_context",
+    "organization_snapshot",
+    "public_evidence_map",
+    "evidence_ledger",
+    "findings",
+    "hypotheses",
+    "diagnoses",
+    "recommendations",
+    "kpis",
+    "client_validation_questions",
+    "roadmap_90_day",
+    "missing_information",
+    "confidence_limitations"
+  ],
+  "additionalProperties": true,
+  "properties": {
+    "run_context": {
+      "$ref": "run_context.schema.json"
+    },
+    "organization_snapshot": {
+      "type": "object"
+    },
+    "public_evidence_map": {
+      "type": "array",
+      "items": {
+        "$ref": "source.schema.json"
+      }
+    },
+    "revenue_resilience": {
+      "type": "object"
+    },
+    "impact_and_evidence": {
+      "type": "object"
+    },
+    "operations_stakeholder_experience": {
+      "type": "object"
+    },
+    "findings": {
+      "type": "array",
+      "items": {
+        "$ref": "finding.schema.json"
+      }
+    },
+    "hypotheses": {
+      "type": "array",
+      "items": {
+        "$ref": "hypothesis.schema.json"
+      }
+    },
+    "diagnoses": {
+      "type": "array",
+      "items": {
+        "$ref": "diagnosis.schema.json"
+      }
+    },
+    "priority_hypotheses": {
+      "type": "array",
+      "items": {
+        "$ref": "finding.schema.json"
+      }
+    },
+    "recommendations": {
+      "type": "array",
+      "items": {
+        "$ref": "recommendation.schema.json"
+      }
+    },
+    "actions": {
+      "type": "array",
+      "items": {
+        "type": "object"
+      }
+    },
+    "kpis": {
+      "type": "array",
+      "items": {
+        "$ref": "kpi.schema.json"
+      }
+    },
+    "client_validation_questions": {
+      "type": "array",
+      "items": {
+        "$ref": "validation_question.schema.json"
+      }
+    },
+    "evidence_ledger": {
+      "type": "array",
+      "items": {
+        "$ref": "evidence.schema.json"
+      }
+    },
+    "missing_information": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      }
+    },
+    "confidence_limitations": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      }
+    },
+    "roadmap_90_day": {
+      "type": [
+        "array",
+        "null"
+      ],
+      "items": {
+        "$ref": "roadmap_action.schema.json"
+      }
+    }
+  }
+}

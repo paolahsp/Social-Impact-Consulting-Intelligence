@@ -1,0 +1,110 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://example.local/contracts/recommendation.schema.json",
+  "title": "Recommendation",
+  "type": "object",
+  "required": [
+    "recommendation_id",
+    "finding_ids",
+    "diagnosis",
+    "action",
+    "priority",
+    "kpi",
+    "confidence",
+    "requires_human_review"
+  ],
+  "additionalProperties": true,
+  "properties": {
+    "recommendation_id": {
+      "type": "string",
+      "pattern": "^REC-"
+    },
+    "finding_ids": {
+      "type": "array",
+      "items": {
+        "type": "string",
+        "pattern": "^F-"
+      }
+    },
+    "diagnosis_ids": {
+      "type": "array",
+      "items": {
+        "type": "string",
+        "pattern": "^DX-"
+      },
+      "default": []
+    },
+    "diagnosis": {
+      "type": "string"
+    },
+    "action": {
+      "type": "string"
+    },
+    "priority": {
+      "type": "string",
+      "enum": [
+        "low",
+        "medium",
+        "high"
+      ]
+    },
+    "kpi": {
+      "type": "object",
+      "required": [
+        "name",
+        "baseline",
+        "baseline_status",
+        "target",
+        "timeframe",
+        "measurement_method"
+      ],
+      "additionalProperties": true,
+      "properties": {
+        "name": {
+          "type": "string"
+        },
+        "baseline": {
+          "type": [
+            "string",
+            "number",
+            "null"
+          ]
+        },
+        "baseline_status": {
+          "type": "string",
+          "enum": [
+            "known",
+            "estimated",
+            "unknown",
+            "not_applicable"
+          ]
+        },
+        "target": {
+          "type": [
+            "string",
+            "number",
+            "null"
+          ]
+        },
+        "timeframe": {
+          "type": [
+            "string",
+            "null"
+          ]
+        },
+        "measurement_method": {
+          "type": "string"
+        }
+      }
+    },
+    "confidence": {
+      "type": "number",
+      "minimum": 0,
+      "maximum": 1
+    },
+    "requires_human_review": {
+      "type": "boolean",
+      "default": true
+    }
+  }
+}

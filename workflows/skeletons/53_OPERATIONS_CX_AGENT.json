@@ -1,0 +1,183 @@
+{
+  "name": "53_OPERATIONS_CX_AGENT",
+  "nodes": [
+    {
+      "parameters": {
+        "content": "PURPOSE\nAssess publicly observable operations and stakeholder experience signals.\n\nOWNER\nGRETEL TRACK B\n\nINPUT CONTRACT\npublic operations/CX evidence plus operations RAG context\n\nOUTPUT CONTRACT\nfinding.schema.json[] for operations/CX with validation questions\n\nSTATUS\nSkeleton only. Inactive by default. No credentials. Configure TODO nodes after import.",
+        "height": 340,
+        "width": 520,
+        "color": 4
+      },
+      "id": "00_readme__purpose_owner_contracts_status",
+      "name": "00_README__PURPOSE_OWNER_CONTRACTS_STATUS",
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [
+        -420,
+        -320
+      ]
+    },
+    {
+      "parameters": {},
+      "id": "start__sub_workflow_trigger",
+      "name": "START__SUB_WORKFLOW_TRIGGER",
+      "type": "n8n-nodes-base.executeWorkflowTrigger",
+      "typeVersion": 1,
+      "position": [
+        0,
+        0
+      ]
+    },
+    {
+      "parameters": {
+        "jsCode": "// SKELETON_PLACEHOLDER: INPUT_CONTRACT__PUBLIC_OPERATIONS_EVIDENCE\n// Accept public evidence and operations/CX RAG.\n// TODO: Replace this placeholder with configured production logic.\n// Contract discipline: preserve FACT / INFERENCE / HYPOTHESIS / UNKNOWN boundaries.\nreturn items;\n"
+      },
+      "id": "input_contract__public_operations_evidence",
+      "name": "INPUT_CONTRACT__PUBLIC_OPERATIONS_EVIDENCE",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        260,
+        0
+      ]
+    },
+    {
+      "parameters": {
+        "jsCode": "// SKELETON_PLACEHOLDER: TODO_AGENT__OPERATIONS_CX\n// AGENT_INTERFACE__OPERATIONS_CX_ANALYSIS.\n// TODO: Replace this placeholder with configured production logic.\n// Contract discipline: preserve FACT / INFERENCE / HYPOTHESIS / UNKNOWN boundaries.\nreturn items;\n"
+      },
+      "id": "todo_agent__operations_cx",
+      "name": "TODO_AGENT__OPERATIONS_CX",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        560,
+        0
+      ]
+    },
+    {
+      "parameters": {
+        "jsCode": "// SKELETON_PLACEHOLDER: OBSERVABLE_FINDING\n// Record only publicly observable signals as facts.\n// TODO: Replace this placeholder with configured production logic.\n// Contract discipline: preserve FACT / INFERENCE / HYPOTHESIS / UNKNOWN boundaries.\nreturn items;\n"
+      },
+      "id": "observable_finding",
+      "name": "OBSERVABLE_FINDING",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        860,
+        0
+      ]
+    },
+    {
+      "parameters": {
+        "jsCode": "// SKELETON_PLACEHOLDER: HYPOTHESIS_BUILDER\n// Create hypotheses where internal process is not publicly evidenced.\n// TODO: Replace this placeholder with configured production logic.\n// Contract discipline: preserve FACT / INFERENCE / HYPOTHESIS / UNKNOWN boundaries.\nreturn items;\n"
+      },
+      "id": "hypothesis_builder",
+      "name": "HYPOTHESIS_BUILDER",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        1160,
+        0
+      ]
+    },
+    {
+      "parameters": {
+        "jsCode": "// SKELETON_PLACEHOLDER: VALIDATION_QUESTION\n// Generate client validation questions for operational unknowns.\n// TODO: Replace this placeholder with configured production logic.\n// Contract discipline: preserve FACT / INFERENCE / HYPOTHESIS / UNKNOWN boundaries.\nreturn items;\n"
+      },
+      "id": "validation_question",
+      "name": "VALIDATION_QUESTION",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        1460,
+        0
+      ]
+    },
+    {
+      "parameters": {
+        "jsCode": "// TERMINAL_OUTPUT_NODE: OUTPUT_CONTRACT__OPERATIONS_CX_FINDINGS\n// Return operations/CX findings.\n// TODO: Replace this placeholder with configured production logic.\n// Contract discipline: preserve FACT / INFERENCE / HYPOTHESIS / UNKNOWN boundaries.\nreturn items;\n"
+      },
+      "id": "output_contract__operations_cx_findings",
+      "name": "OUTPUT_CONTRACT__OPERATIONS_CX_FINDINGS",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        1760,
+        0
+      ]
+    }
+  ],
+  "connections": {
+    "START__SUB_WORKFLOW_TRIGGER": {
+      "main": [
+        [
+          {
+            "node": "INPUT_CONTRACT__PUBLIC_OPERATIONS_EVIDENCE",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "INPUT_CONTRACT__PUBLIC_OPERATIONS_EVIDENCE": {
+      "main": [
+        [
+          {
+            "node": "TODO_AGENT__OPERATIONS_CX",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "TODO_AGENT__OPERATIONS_CX": {
+      "main": [
+        [
+          {
+            "node": "OBSERVABLE_FINDING",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "OBSERVABLE_FINDING": {
+      "main": [
+        [
+          {
+            "node": "HYPOTHESIS_BUILDER",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "HYPOTHESIS_BUILDER": {
+      "main": [
+        [
+          {
+            "node": "VALIDATION_QUESTION",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "VALIDATION_QUESTION": {
+      "main": [
+        [
+          {
+            "node": "OUTPUT_CONTRACT__OPERATIONS_CX_FINDINGS",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": false,
+  "settings": {
+    "executionOrder": "v1"
+  },
+  "pinData": {}
+}

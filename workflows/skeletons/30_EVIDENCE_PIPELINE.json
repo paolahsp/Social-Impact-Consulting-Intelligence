@@ -1,0 +1,223 @@
+{
+  "name": "30_EVIDENCE_PIPELINE",
+  "nodes": [
+    {
+      "parameters": {
+        "content": "PURPOSE\nConvert normalized sources into traceable evidence for the P0 revenue slice.\n\nOWNER\nPAOLA TRACK A\n\nINPUT CONTRACT\nsource.schema.json[] plus run_context\n\nOUTPUT CONTRACT\nevidence.schema.json[] plus evidence ledger metadata\n\nSTATUS\nPhase 2B repository-ready. Inactive by default. No credentials.",
+        "height": 340,
+        "width": 520,
+        "color": 4
+      },
+      "id": "00_readme__purpose_owner_contracts_status",
+      "name": "00_README__PURPOSE_OWNER_CONTRACTS_STATUS",
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [
+        -420,
+        -320
+      ]
+    },
+    {
+      "parameters": {
+        "content": "PHASE 2B P0 N8N EXECUTION\nRepository-ready n8n implementation for Paola P0 only.\nn8n owns the visible execution path and state passing.\n21 uses an HTTP Request node against DuckDuckGo Lite HTML with no credentials.\nCode nodes are limited to compact deterministic parsing, mapping, retrieval scoring, and validation.\nNo Python runner is called by n8n. No secrets are stored.",
+        "height": 300,
+        "width": 520,
+        "color": 5
+      },
+      "id": "note__phase2b_p0_n8n_execution",
+      "name": "NOTE__PHASE2B_P0_N8N_EXECUTION",
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [
+        -420,
+        60
+      ]
+    },
+    {
+      "parameters": {},
+      "id": "start__sub_workflow_trigger",
+      "name": "START__SUB_WORKFLOW_TRIGGER",
+      "type": "n8n-nodes-base.executeWorkflowTrigger",
+      "typeVersion": 1,
+      "position": [
+        0,
+        0
+      ]
+    },
+    {
+      "parameters": {
+        "jsCode": "return items.map(item => ({ json: { ...item.json, sources: item.json.sources || [], evidence: item.json.evidence || [], errors: item.json.errors || [] } }));\n"
+      },
+      "id": "source_input",
+      "name": "SOURCE_INPUT",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        260,
+        0
+      ]
+    },
+    {
+      "parameters": {
+        "jsCode": "return items.map(item => {\n  const seen = new Set();\n  const sources = [];\n  for (const source of item.json.sources || []) {\n    const key = String(source.url || '').toLowerCase();\n    if (!key || seen.has(key)) continue;\n    seen.add(key);\n    sources.push(source);\n  }\n  return { json: { ...item.json, sources } };\n});\n"
+      },
+      "id": "source_deduplication",
+      "name": "SOURCE_DEDUPLICATION",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        560,
+        0
+      ]
+    },
+    {
+      "parameters": {
+        "jsCode": "return items.map(item => {\n  const sources = (item.json.sources || []).map(source => ({\n    ...source,\n    source_quality: {\n      has_title: Boolean(source.title),\n      has_url: Boolean(source.url),\n      official_signal: Boolean(source.is_official),\n      authority_level: source.authority_level || 'unknown'\n    }\n  }));\n  return { json: { ...item.json, sources } };\n});\n"
+      },
+      "id": "source_quality",
+      "name": "SOURCE_QUALITY",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        860,
+        0
+      ]
+    },
+    {
+      "parameters": {
+        "jsCode": "const revenueTerms = ['annual','report','financial','finance','revenue','funding','grant','grants','donor','donors','donation','donations','fundraising','income','partnership','partners','990'];\nreturn items.map(item => {\n  const runContext = item.json.run_context;\n  const evidence = [];\n  for (const source of item.json.sources || []) {\n    const text = `${source.title} ${source.url} ${source.search_snippet || ''}`.toLowerCase();\n    const terms = revenueTerms.filter(term => text.includes(term));\n    if (!terms.length) continue;\n    evidence.push({\n      evidence_id: `EV-${String(evidence.length + 1).padStart(3, '0')}`,\n      run_id: runContext.run_id,\n      claim: `Public source \"${source.title}\" contains revenue-resilience search signals: ${terms.slice(0, 5).join(', ')}.`,\n      source_ids: [source.source_id],\n      domain: 'revenue_resilience',\n      evidence_type: 'fact',\n      confidence: source.is_official ? 0.68 : 0.52,\n      status: 'supported',\n      contradiction_ids: [],\n      requires_validation: false\n    });\n  }\n  if (!evidence.length) {\n    evidence.push({ evidence_id: 'EV-001', run_id: runContext.run_id, claim: 'No revenue-resilience evidence was extracted from the available public search results.', source_ids: (item.json.sources || []).slice(0, 1).map(source => source.source_id), domain: 'revenue_resilience', evidence_type: 'unknown', confidence: 0.4, status: 'unknown', contradiction_ids: [], requires_validation: true });\n  }\n  return { json: { ...item.json, evidence } };\n});\n"
+      },
+      "id": "evidence_extraction_mapping",
+      "name": "EVIDENCE_EXTRACTION_MAPPING",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        1160,
+        0
+      ]
+    },
+    {
+      "parameters": {
+        "jsCode": "return items;\n"
+      },
+      "id": "evidence_classification",
+      "name": "EVIDENCE_CLASSIFICATION",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        1460,
+        0
+      ]
+    },
+    {
+      "parameters": {
+        "jsCode": "return items.map(item => {\n  const sourceIds = new Set((item.json.sources || []).map(source => source.source_id));\n  const evidence = (item.json.evidence || []).map(ev => {\n    const supportedRefs = (ev.source_ids || []).filter(id => sourceIds.has(id));\n    if (ev.evidence_type === 'fact' && !supportedRefs.length) {\n      return { ...ev, evidence_type: 'unknown', status: 'unknown', requires_validation: true, confidence: Math.min(ev.confidence || 0.4, 0.4) };\n    }\n    return ev;\n  });\n  return { json: { ...item.json, evidence } };\n});\n"
+      },
+      "id": "evidence_validation",
+      "name": "EVIDENCE_VALIDATION",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        1760,
+        0
+      ]
+    },
+    {
+      "parameters": {
+        "jsCode": "return items.map(item => ({ json: { ...item.json, evidence_ledger: item.json.evidence, contradictions: [], unknowns: (item.json.evidence || []).filter(ev => ev.evidence_type === 'unknown').map((ev, index) => ({ unknown_id: `UNK-${String(index + 1).padStart(3, '0')}`, domain: ev.domain, description: ev.claim, evidence_ids: [ev.evidence_id] })) } }));\n"
+      },
+      "id": "output_contract__evidence_ledger",
+      "name": "OUTPUT_CONTRACT__EVIDENCE_LEDGER",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        2060,
+        0
+      ]
+    }
+  ],
+  "connections": {
+    "START__SUB_WORKFLOW_TRIGGER": {
+      "main": [
+        [
+          {
+            "node": "SOURCE_INPUT",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "SOURCE_INPUT": {
+      "main": [
+        [
+          {
+            "node": "SOURCE_DEDUPLICATION",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "SOURCE_DEDUPLICATION": {
+      "main": [
+        [
+          {
+            "node": "SOURCE_QUALITY",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "SOURCE_QUALITY": {
+      "main": [
+        [
+          {
+            "node": "EVIDENCE_EXTRACTION_MAPPING",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "EVIDENCE_EXTRACTION_MAPPING": {
+      "main": [
+        [
+          {
+            "node": "EVIDENCE_CLASSIFICATION",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "EVIDENCE_CLASSIFICATION": {
+      "main": [
+        [
+          {
+            "node": "EVIDENCE_VALIDATION",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "EVIDENCE_VALIDATION": {
+      "main": [
+        [
+          {
+            "node": "OUTPUT_CONTRACT__EVIDENCE_LEDGER",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": false,
+  "settings": {
+    "executionOrder": "v1"
+  },
+  "pinData": {}
+}

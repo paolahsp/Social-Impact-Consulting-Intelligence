@@ -1,0 +1,31 @@
+[
+  {
+    "context_id": "FRAMEWORK-REV-001",
+    "domain": "revenue_resilience",
+    "title": "Funding Concentration",
+    "content": "Revenue resilience assessment should check whether an organization depends heavily on one grant, donor, contract, or funder. Public evidence may reveal named funding sources, but concentration percentages are often unknown without internal financial data.",
+    "evaluation_use": "Use this when evidence mentions grants, funders, annual reports, or revenue sources. Do not infer concentration unless amounts or proportions are available."
+  },
+  {
+    "context_id": "FRAMEWORK-REV-002",
+    "domain": "revenue_resilience",
+    "title": "Revenue Diversification",
+    "content": "Diversification considers whether public signals show multiple revenue types such as individual donations, grants, corporate partnerships, government contracts, memberships, or earned income. Public signals can support an observed finding that multiple revenue channels are described, but cannot prove resilience by themselves.",
+    "evaluation_use": "Use this when evidence mentions donations, grants, partnerships, fundraising, revenue, or financial reports."
+  },
+  {
+    "context_id": "FRAMEWORK-REV-003",
+    "domain": "revenue_resilience",
+    "title": "Recurring Revenue",
+    "content": "Recurring revenue signals include monthly giving, memberships, multi-year grants, subscriptions, retained service contracts, or repeat government funding. If these signals are not public, the correct result is an unknown or validation question, not a negative finding.",
+    "evaluation_use": "Use this when public evidence mentions recurring donors, monthly giving, memberships, or multi-year funding."
+  },
+  {
+    "context_id": "FRAMEWORK-REV-004",
+    "domain": "revenue_resilience",
+    "title": "Financial Resilience Limitations",
+    "content": "Public-data-first diagnostics must separate facts from hypotheses. Missing financial evidence should remain unknown. Do not invent revenue numbers, donor concentration, cash runway, operating reserves, or growth rates.",
+    "evaluation_use": "Use this as a guardrail for all revenue resilience findings."
+  }
+]
+

@@ -1,0 +1,15 @@
+{
+  "run_id": "RUN-FICTIONAL-001",
+  "organization": {
+    "name": "Fictional River Learning Collective",
+    "website": "https://fictional-river-learning.example.org",
+    "country": "Germany",
+    "mission_area": "youth education"
+  },
+  "current_challenge": "Preparing for a pre-engagement diagnostic workshop",
+  "uploaded_document_refs": [],
+  "status": "created",
+  "started_at": "2026-08-09T09:00:00Z",
+  "errors": []
+}
+

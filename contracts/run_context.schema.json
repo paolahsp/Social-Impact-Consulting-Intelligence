@@ -1,0 +1,98 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://example.local/contracts/run_context.schema.json",
+  "title": "Run Context",
+  "type": "object",
+  "required": [
+    "run_id",
+    "organization",
+    "status",
+    "started_at",
+    "errors"
+  ],
+  "additionalProperties": true,
+  "properties": {
+    "run_id": {
+      "type": "string",
+      "pattern": "^RUN-"
+    },
+    "organization": {
+      "type": "object",
+      "required": [
+        "name",
+        "website",
+        "country"
+      ],
+      "additionalProperties": true,
+      "properties": {
+        "name": {
+          "type": "string",
+          "minLength": 1
+        },
+        "website": {
+          "type": "string",
+          "format": "uri"
+        },
+        "country": {
+          "type": "string",
+          "minLength": 1
+        },
+        "mission_area": {
+          "type": [
+            "string",
+            "null"
+          ]
+        }
+      }
+    },
+    "current_challenge": {
+      "type": [
+        "string",
+        "null"
+      ]
+    },
+    "uploaded_document_refs": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      },
+      "default": []
+    },
+    "status": {
+      "type": "string",
+      "enum": [
+        "created",
+        "researching",
+        "analyzing",
+        "qa",
+        "completed",
+        "failed"
+      ]
+    },
+    "started_at": {
+      "type": "string",
+      "format": "date-time"
+    },
+    "errors": {
+      "type": "array",
+      "items": {
+        "type": "object"
+      }
+    }
+  },
+  "examples": [
+    {
+      "run_id": "RUN-...",
+      "organization": {
+        "name": "",
+        "website": "",
+        "country": "",
+        "mission_area": null
+      },
+      "current_challenge": null,
+      "status": "created",
+      "started_at": "",
+      "errors": []
+    }
+  ]
+}

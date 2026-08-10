@@ -1,0 +1,143 @@
+{
+  "run_context": {
+    "run_id": "RUN-FICTIONAL-001",
+    "organization": {
+      "name": "Fictional River Learning Collective",
+      "website": "https://fictional-river-learning.example.org",
+      "country": "Germany",
+      "mission_area": "youth education"
+    },
+    "current_challenge": "Preparing for a pre-engagement diagnostic workshop",
+    "uploaded_document_refs": [],
+    "status": "analyzing",
+    "started_at": "2026-08-09T09:00:00Z",
+    "errors": []
+  },
+  "sources": [
+    {
+      "source_id": "SRC-001",
+      "title": "Fictional River Learning Collective Volunteer Page",
+      "url": "https://fictional-river-learning.example.org/volunteer",
+      "source_type": "official_website",
+      "publisher": "Fictional River Learning Collective",
+      "publication_date": null,
+      "retrieved_at": "2026-08-09T09:10:00Z",
+      "authority_level": "official",
+      "freshness": "current",
+      "is_official": true
+    },
+    {
+      "source_id": "SRC-002",
+      "title": "Fictional River Learning Collective Annual Snapshot",
+      "url": "https://fictional-river-learning.example.org/annual-snapshot",
+      "source_type": "public_report",
+      "publisher": "Fictional River Learning Collective",
+      "publication_date": "2026-03-01",
+      "retrieved_at": "2026-08-09T09:14:00Z",
+      "authority_level": "official",
+      "freshness": "recent",
+      "is_official": true
+    }
+  ],
+  "evidence": [
+    {
+      "evidence_id": "EV-001",
+      "run_id": "RUN-FICTIONAL-001",
+      "claim": "Volunteer applications are collected through a public website form.",
+      "source_ids": [
+        "SRC-001"
+      ],
+      "domain": "operations_cx",
+      "evidence_type": "fact",
+      "confidence": 0.86,
+      "status": "supported",
+      "contradiction_ids": [],
+      "requires_validation": false
+    },
+    {
+      "evidence_id": "EV-002",
+      "run_id": "RUN-FICTIONAL-001",
+      "claim": "The organization describes grant funding and small donor support in its annual snapshot.",
+      "source_ids": [
+        "SRC-002"
+      ],
+      "domain": "revenue_resilience",
+      "evidence_type": "fact",
+      "confidence": 0.78,
+      "status": "supported",
+      "contradiction_ids": [],
+      "requires_validation": false
+    },
+    {
+      "evidence_id": "EV-003",
+      "run_id": "RUN-FICTIONAL-001",
+      "claim": "The internal volunteer follow-up process is not described in public sources.",
+      "source_ids": [
+        "SRC-001"
+      ],
+      "domain": "operations_cx",
+      "evidence_type": "unknown",
+      "confidence": 0.7,
+      "status": "unknown",
+      "contradiction_ids": [],
+      "requires_validation": true
+    }
+  ],
+  "findings": [
+    {
+      "finding_id": "F-001",
+      "domain": "operations_cx",
+      "finding": "The public volunteer journey includes an online application form.",
+      "evidence_ids": [
+        "EV-001"
+      ],
+      "finding_type": "observed",
+      "confidence": 0.82,
+      "requires_validation": false,
+      "validation_question": null
+    },
+    {
+      "finding_id": "F-002",
+      "domain": "revenue_resilience",
+      "finding": "Public reporting indicates more than one revenue signal, but the concentration of funding is not publicly visible.",
+      "evidence_ids": [
+        "EV-002"
+      ],
+      "finding_type": "inferred",
+      "confidence": 0.58,
+      "requires_validation": true,
+      "validation_question": "What share of annual income comes from the largest funding source?"
+    }
+  ],
+  "unknowns": [
+    {
+      "unknown_id": "UNK-001",
+      "domain": "operations_cx",
+      "description": "The internal follow-up process after volunteer form submission is not publicly visible.",
+      "evidence_ids": [
+        "EV-003"
+      ]
+    },
+    {
+      "unknown_id": "UNK-002",
+      "domain": "revenue_resilience",
+      "description": "Funding concentration cannot be determined from the public annual snapshot.",
+      "evidence_ids": [
+        "EV-002"
+      ]
+    }
+  ],
+  "contradictions": [],
+  "rag_metadata": {
+    "retrieval_run_id": "RAG-FICTIONAL-001",
+    "domains": [
+      "revenue_resilience",
+      "operations_cx"
+    ],
+    "retrieved_context_ids": [
+      "FRAMEWORK-REV-001",
+      "FRAMEWORK-OPS-001"
+    ]
+  }
+}
+

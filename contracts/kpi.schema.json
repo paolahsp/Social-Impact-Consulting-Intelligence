@@ -1,0 +1,52 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://example.local/contracts/kpi.schema.json",
+  "title": "KPI",
+  "type": "object",
+  "required": [
+    "name",
+    "baseline",
+    "baseline_status",
+    "target",
+    "timeframe",
+    "measurement_method"
+  ],
+  "additionalProperties": true,
+  "properties": {
+    "name": {
+      "type": "string"
+    },
+    "baseline": {
+      "type": [
+        "string",
+        "number",
+        "null"
+      ]
+    },
+    "baseline_status": {
+      "type": "string",
+      "enum": [
+        "known",
+        "estimated",
+        "unknown",
+        "not_applicable"
+      ]
+    },
+    "target": {
+      "type": [
+        "string",
+        "number",
+        "null"
+      ]
+    },
+    "timeframe": {
+      "type": [
+        "string",
+        "null"
+      ]
+    },
+    "measurement_method": {
+      "type": "string"
+    }
+  }
+}

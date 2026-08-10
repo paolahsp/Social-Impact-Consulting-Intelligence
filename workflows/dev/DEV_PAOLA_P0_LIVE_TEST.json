@@ -1,0 +1,204 @@
+{
+  "name": "DEV_PAOLA_P0_LIVE_TEST",
+  "nodes": [
+    {
+      "parameters": {
+        "content": "DEV_PAOLA_P0_LIVE_TEST\nImport after workflows 21, 30, 40, and 51.\nThis workflow provides GiveDirectly test input and visibly chains the four P0 workflows.\nWorkflow IDs must be linked manually after import.",
+        "height": 300,
+        "width": 520,
+        "color": 4
+      },
+      "id": "00_readme__dev_workflow",
+      "name": "00_README__DEV_WORKFLOW",
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [
+        -420,
+        -300
+      ]
+    },
+    {
+      "parameters": {},
+      "id": "start__manual_test_trigger",
+      "name": "START__MANUAL_TEST_TRIGGER",
+      "type": "n8n-nodes-base.manualTrigger",
+      "typeVersion": 1,
+      "position": [
+        0,
+        0
+      ]
+    },
+    {
+      "parameters": {
+        "jsCode": "return [{\n  json: {\n    organization_name: 'GiveDirectly',\n    website: 'https://www.givedirectly.org',\n    country: 'United States',\n    query: 'annual report revenue funding grants donations financial statements'\n  }\n}];\n"
+      },
+      "id": "dev_input__givedirectly",
+      "name": "DEV_INPUT__GIVEDIRECTLY",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        260,
+        0
+      ]
+    },
+    {
+      "parameters": {
+        "workflowId": "",
+        "options": {}
+      },
+      "id": "todo_link_subworkflow__21_web_search",
+      "name": "TODO_LINK_SUBWORKFLOW__21_WEB_SEARCH",
+      "type": "n8n-nodes-base.executeWorkflow",
+      "typeVersion": 1,
+      "position": [
+        560,
+        0
+      ],
+      "notes": "AFTER IMPORT: set workflowId to 21_WEB_SEARCH. Do not invent IDs in repo JSON."
+    },
+    {
+      "parameters": {
+        "workflowId": "",
+        "options": {}
+      },
+      "id": "todo_link_subworkflow__30_evidence_pipeline",
+      "name": "TODO_LINK_SUBWORKFLOW__30_EVIDENCE_PIPELINE",
+      "type": "n8n-nodes-base.executeWorkflow",
+      "typeVersion": 1,
+      "position": [
+        860,
+        0
+      ],
+      "notes": "AFTER IMPORT: set workflowId to 30_EVIDENCE_PIPELINE. Do not invent IDs in repo JSON."
+    },
+    {
+      "parameters": {
+        "workflowId": "",
+        "options": {}
+      },
+      "id": "todo_link_subworkflow__40_rag_retrieval",
+      "name": "TODO_LINK_SUBWORKFLOW__40_RAG_RETRIEVAL",
+      "type": "n8n-nodes-base.executeWorkflow",
+      "typeVersion": 1,
+      "position": [
+        1160,
+        0
+      ],
+      "notes": "AFTER IMPORT: set workflowId to 40_RAG_RETRIEVAL_PIPELINE. Do not invent IDs in repo JSON."
+    },
+    {
+      "parameters": {
+        "workflowId": "",
+        "options": {}
+      },
+      "id": "todo_link_subworkflow__51_revenue_resilience",
+      "name": "TODO_LINK_SUBWORKFLOW__51_REVENUE_RESILIENCE",
+      "type": "n8n-nodes-base.executeWorkflow",
+      "typeVersion": 1,
+      "position": [
+        1460,
+        0
+      ],
+      "notes": "AFTER IMPORT: set workflowId to 51_REVENUE_RESILIENCE_AGENT. Do not invent IDs in repo JSON."
+    },
+    {
+      "parameters": {
+        "jsCode": "return items;\n"
+      },
+      "id": "final_paola_track_output",
+      "name": "FINAL_PAOLA_TRACK_OUTPUT",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        1760,
+        0
+      ]
+    },
+    {
+      "parameters": {
+        "jsCode": "return [{\n  json: {\n    run_context: {\n      run_id: 'RUN-N8N-P0-EMPTY',\n      organization: { name: 'GiveDirectly', website: 'https://www.givedirectly.org', country: 'United States', mission_area: null },\n      current_challenge: null,\n      uploaded_document_refs: [],\n      status: 'created',\n      started_at: new Date().toISOString(),\n      errors: []\n    },\n    sources: [],\n    search: { provider: 'simulated_empty_search', query: 'SIMULATED_EMPTY_SEARCH', search_url: null, raw_result_count: 0, results: [] },\n    controlled_state: 'empty_search',\n    errors: []\n  }\n}];\n"
+      },
+      "id": "dev_input__simulated_empty_search_for_30",
+      "name": "DEV_INPUT__SIMULATED_EMPTY_SEARCH_FOR_30",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        260,
+        300
+      ]
+    }
+  ],
+  "connections": {
+    "START__MANUAL_TEST_TRIGGER": {
+      "main": [
+        [
+          {
+            "node": "DEV_INPUT__GIVEDIRECTLY",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "DEV_INPUT__GIVEDIRECTLY": {
+      "main": [
+        [
+          {
+            "node": "TODO_LINK_SUBWORKFLOW__21_WEB_SEARCH",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "TODO_LINK_SUBWORKFLOW__21_WEB_SEARCH": {
+      "main": [
+        [
+          {
+            "node": "TODO_LINK_SUBWORKFLOW__30_EVIDENCE_PIPELINE",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "TODO_LINK_SUBWORKFLOW__30_EVIDENCE_PIPELINE": {
+      "main": [
+        [
+          {
+            "node": "TODO_LINK_SUBWORKFLOW__40_RAG_RETRIEVAL",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "TODO_LINK_SUBWORKFLOW__40_RAG_RETRIEVAL": {
+      "main": [
+        [
+          {
+            "node": "TODO_LINK_SUBWORKFLOW__51_REVENUE_RESILIENCE",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "TODO_LINK_SUBWORKFLOW__51_REVENUE_RESILIENCE": {
+      "main": [
+        [
+          {
+            "node": "FINAL_PAOLA_TRACK_OUTPUT",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": false,
+  "settings": {
+    "executionOrder": "v1"
+  },
+  "pinData": {}
+}

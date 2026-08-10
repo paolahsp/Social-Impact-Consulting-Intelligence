@@ -1,0 +1,183 @@
+{
+  "name": "24_NEWS_EXTERNAL_CONTEXT",
+  "nodes": [
+    {
+      "parameters": {
+        "content": "PURPOSE\nResearch relevant recent public context.\n\nOWNER\nPAOLA TRACK A\n\nINPUT CONTRACT\nnews research_task plus run_context\n\nOUTPUT CONTRACT\nsource.schema.json[]\n\nSTATUS\nSkeleton only. Inactive by default. No credentials. Configure TODO nodes after import.",
+        "height": 340,
+        "width": 520,
+        "color": 4
+      },
+      "id": "00_readme__purpose_owner_contracts_status",
+      "name": "00_README__PURPOSE_OWNER_CONTRACTS_STATUS",
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [
+        -420,
+        -320
+      ]
+    },
+    {
+      "parameters": {},
+      "id": "start__sub_workflow_trigger",
+      "name": "START__SUB_WORKFLOW_TRIGGER",
+      "type": "n8n-nodes-base.executeWorkflowTrigger",
+      "typeVersion": 1,
+      "position": [
+        0,
+        0
+      ]
+    },
+    {
+      "parameters": {
+        "jsCode": "// SKELETON_PLACEHOLDER: INPUT_CONTRACT__NEWS_TASK\n// Accept news/external context task.\n// TODO: Replace this placeholder with configured production logic.\n// Contract discipline: preserve FACT / INFERENCE / HYPOTHESIS / UNKNOWN boundaries.\nreturn items;\n"
+      },
+      "id": "input_contract__news_task",
+      "name": "INPUT_CONTRACT__NEWS_TASK",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        260,
+        0
+      ]
+    },
+    {
+      "parameters": {
+        "jsCode": "// SKELETON_PLACEHOLDER: NEWS_QUERY\n// Build organization-aware news query.\n// TODO: Replace this placeholder with configured production logic.\n// Contract discipline: preserve FACT / INFERENCE / HYPOTHESIS / UNKNOWN boundaries.\nreturn items;\n"
+      },
+      "id": "news_query",
+      "name": "NEWS_QUERY",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        560,
+        0
+      ]
+    },
+    {
+      "parameters": {
+        "jsCode": "// SKELETON_PLACEHOLDER: TODO_API__NEWS\n// Placeholder for future news/search provider.\n// TODO: Replace this placeholder with configured production logic.\n// Contract discipline: preserve FACT / INFERENCE / HYPOTHESIS / UNKNOWN boundaries.\nreturn items;\n"
+      },
+      "id": "todo_api__news",
+      "name": "TODO_API__NEWS",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        860,
+        0
+      ]
+    },
+    {
+      "parameters": {
+        "jsCode": "// SKELETON_PLACEHOLDER: FILTER_ORGANIZATION_MATCH\n// Filter false positives and unrelated organizations.\n// TODO: Replace this placeholder with configured production logic.\n// Contract discipline: preserve FACT / INFERENCE / HYPOTHESIS / UNKNOWN boundaries.\nreturn items;\n"
+      },
+      "id": "filter_organization_match",
+      "name": "FILTER_ORGANIZATION_MATCH",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        1160,
+        0
+      ]
+    },
+    {
+      "parameters": {
+        "jsCode": "// SKELETON_PLACEHOLDER: NORMALIZE_NEWS_SOURCE\n// Normalize articles and external context as source records.\n// TODO: Replace this placeholder with configured production logic.\n// Contract discipline: preserve FACT / INFERENCE / HYPOTHESIS / UNKNOWN boundaries.\nreturn items;\n"
+      },
+      "id": "normalize_news_source",
+      "name": "NORMALIZE_NEWS_SOURCE",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        1460,
+        0
+      ]
+    },
+    {
+      "parameters": {
+        "jsCode": "// TERMINAL_OUTPUT_NODE: RETURN_SOURCES\n// Return news/external source records.\n// TODO: Replace this placeholder with configured production logic.\n// Contract discipline: preserve FACT / INFERENCE / HYPOTHESIS / UNKNOWN boundaries.\nreturn items;\n"
+      },
+      "id": "return_sources",
+      "name": "RETURN_SOURCES",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        1760,
+        0
+      ]
+    }
+  ],
+  "connections": {
+    "START__SUB_WORKFLOW_TRIGGER": {
+      "main": [
+        [
+          {
+            "node": "INPUT_CONTRACT__NEWS_TASK",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "INPUT_CONTRACT__NEWS_TASK": {
+      "main": [
+        [
+          {
+            "node": "NEWS_QUERY",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "NEWS_QUERY": {
+      "main": [
+        [
+          {
+            "node": "TODO_API__NEWS",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "TODO_API__NEWS": {
+      "main": [
+        [
+          {
+            "node": "FILTER_ORGANIZATION_MATCH",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "FILTER_ORGANIZATION_MATCH": {
+      "main": [
+        [
+          {
+            "node": "NORMALIZE_NEWS_SOURCE",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "NORMALIZE_NEWS_SOURCE": {
+      "main": [
+        [
+          {
+            "node": "RETURN_SOURCES",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": false,
+  "settings": {
+    "executionOrder": "v1"
+  },
+  "pinData": {}
+}

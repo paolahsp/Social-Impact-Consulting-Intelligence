@@ -1,0 +1,199 @@
+{
+  "name": "66_90_DAY_ROADMAP",
+  "nodes": [
+    {
+      "parameters": {
+        "content": "PURPOSE\nOrganize supported actions into 30, 60, and 90 day roadmap steps.\n\nOWNER\nGRETEL TRACK B\n\nINPUT CONTRACT\nactions, KPIs, validation questions, hypotheses, and diagnosis records\n\nOUTPUT CONTRACT\nroadmap_action.schema.json[]\n\nSTATUS\nSkeleton only. Inactive by default. No credentials. Configure TODO nodes after import.",
+        "height": 340,
+        "width": 520,
+        "color": 4
+      },
+      "id": "00_readme__purpose_owner_contracts_status",
+      "name": "00_README__PURPOSE_OWNER_CONTRACTS_STATUS",
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [
+        -420,
+        -320
+      ]
+    },
+    {
+      "parameters": {
+        "content": "ROADMAP RULE\nValidated or sufficiently supported actions may become implementation steps. Unvalidated hypotheses should become validation/discovery actions instead.",
+        "height": 200,
+        "width": 520,
+        "color": 4
+      },
+      "id": "note__1",
+      "name": "NOTE__1",
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [
+        -420,
+        60
+      ]
+    },
+    {
+      "parameters": {},
+      "id": "start__sub_workflow_trigger",
+      "name": "START__SUB_WORKFLOW_TRIGGER",
+      "type": "n8n-nodes-base.executeWorkflowTrigger",
+      "typeVersion": 1,
+      "position": [
+        0,
+        0
+      ]
+    },
+    {
+      "parameters": {
+        "jsCode": "// SKELETON_PLACEHOLDER: INPUT_CONTRACT__TRANSFORMATION_COMPONENTS\n// Accept actions, KPIs, questions, hypotheses, and diagnoses.\n// TODO: Replace this placeholder with configured production logic.\n// Contract discipline: preserve FACT / INFERENCE / HYPOTHESIS / UNKNOWN boundaries.\nreturn items;\n"
+      },
+      "id": "input_contract__transformation_components",
+      "name": "INPUT_CONTRACT__TRANSFORMATION_COMPONENTS",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        260,
+        0
+      ]
+    },
+    {
+      "parameters": {
+        "jsCode": "// SKELETON_PLACEHOLDER: UNVALIDATED_HYPOTHESIS_GATE\n// Do not treat unvalidated hypotheses as confirmed implementation tasks.\n// TODO: Replace this placeholder with configured production logic.\n// Contract discipline: preserve FACT / INFERENCE / HYPOTHESIS / UNKNOWN boundaries.\nreturn items;\n"
+      },
+      "id": "unvalidated_hypothesis_gate",
+      "name": "UNVALIDATED_HYPOTHESIS_GATE",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        560,
+        0
+      ]
+    },
+    {
+      "parameters": {
+        "jsCode": "// SKELETON_PLACEHOLDER: DISCOVERY_ACTION_BUILDER\n// Create discovery tasks such as Validate X during client workshop when appropriate.\n// TODO: Replace this placeholder with configured production logic.\n// Contract discipline: preserve FACT / INFERENCE / HYPOTHESIS / UNKNOWN boundaries.\nreturn items;\n"
+      },
+      "id": "discovery_action_builder",
+      "name": "DISCOVERY_ACTION_BUILDER",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        860,
+        0
+      ]
+    },
+    {
+      "parameters": {
+        "jsCode": "// SKELETON_PLACEHOLDER: TODO_AGENT__90_DAY_ROADMAP\n// AGENT_INTERFACE__90_DAY_ROADMAP.\n// TODO: Replace this placeholder with configured production logic.\n// Contract discipline: preserve FACT / INFERENCE / HYPOTHESIS / UNKNOWN boundaries.\nreturn items;\n"
+      },
+      "id": "todo_agent__90_day_roadmap",
+      "name": "TODO_AGENT__90_DAY_ROADMAP",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        1160,
+        0
+      ]
+    },
+    {
+      "parameters": {
+        "jsCode": "// SKELETON_PLACEHOLDER: ORGANIZE_30_60_90_DAYS\n// Group roadmap actions into 30 days, 60 days, and 90 days.\n// TODO: Replace this placeholder with configured production logic.\n// Contract discipline: preserve FACT / INFERENCE / HYPOTHESIS / UNKNOWN boundaries.\nreturn items;\n"
+      },
+      "id": "organize_30_60_90_days",
+      "name": "ORGANIZE_30_60_90_DAYS",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        1460,
+        0
+      ]
+    },
+    {
+      "parameters": {
+        "jsCode": "// TERMINAL_OUTPUT_NODE: OUTPUT_CONTRACT__ROADMAP\n// Return roadmap action records.\n// TODO: Replace this placeholder with configured production logic.\n// Contract discipline: preserve FACT / INFERENCE / HYPOTHESIS / UNKNOWN boundaries.\nreturn items;\n"
+      },
+      "id": "output_contract__roadmap",
+      "name": "OUTPUT_CONTRACT__ROADMAP",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        1760,
+        0
+      ]
+    }
+  ],
+  "connections": {
+    "START__SUB_WORKFLOW_TRIGGER": {
+      "main": [
+        [
+          {
+            "node": "INPUT_CONTRACT__TRANSFORMATION_COMPONENTS",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "INPUT_CONTRACT__TRANSFORMATION_COMPONENTS": {
+      "main": [
+        [
+          {
+            "node": "UNVALIDATED_HYPOTHESIS_GATE",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "UNVALIDATED_HYPOTHESIS_GATE": {
+      "main": [
+        [
+          {
+            "node": "DISCOVERY_ACTION_BUILDER",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "DISCOVERY_ACTION_BUILDER": {
+      "main": [
+        [
+          {
+            "node": "TODO_AGENT__90_DAY_ROADMAP",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "TODO_AGENT__90_DAY_ROADMAP": {
+      "main": [
+        [
+          {
+            "node": "ORGANIZE_30_60_90_DAYS",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "ORGANIZE_30_60_90_DAYS": {
+      "main": [
+        [
+          {
+            "node": "OUTPUT_CONTRACT__ROADMAP",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": false,
+  "settings": {
+    "executionOrder": "v1"
+  },
+  "pinData": {}
+}

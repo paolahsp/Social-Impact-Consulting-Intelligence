@@ -1,0 +1,349 @@
+{
+  "name": "21_WEB_SEARCH",
+  "nodes": [
+    {
+      "parameters": {
+        "content": "PURPOSE\nGeneric public-web discovery using visible n8n HTTP request and branch states.\n\nOWNER\nPAOLA TRACK A\n\nINPUT CONTRACT\norganization/run context plus query\n\nOUTPUT CONTRACT\nsource.schema.json[] plus controlled_state\n\nSTATUS\nPhase 2B repository-ready. Inactive by default. No credentials.",
+        "height": 340,
+        "width": 520,
+        "color": 4
+      },
+      "id": "00_readme__purpose_owner_contracts_status",
+      "name": "00_README__PURPOSE_OWNER_CONTRACTS_STATUS",
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [
+        -420,
+        -320
+      ]
+    },
+    {
+      "parameters": {
+        "content": "PHASE 2B P0 N8N EXECUTION\nRepository-ready n8n implementation for Paola P0 only.\nn8n owns the visible execution path and state passing.\n21 uses an HTTP Request node against DuckDuckGo Lite HTML with no credentials.\nCode nodes are limited to compact deterministic parsing, mapping, retrieval scoring, and validation.\nNo Python runner is called by n8n. No secrets are stored.",
+        "height": 300,
+        "width": 520,
+        "color": 5
+      },
+      "id": "note__phase2b_p0_n8n_execution",
+      "name": "NOTE__PHASE2B_P0_N8N_EXECUTION",
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [
+        -420,
+        60
+      ]
+    },
+    {
+      "parameters": {},
+      "id": "start__sub_workflow_trigger",
+      "name": "START__SUB_WORKFLOW_TRIGGER",
+      "type": "n8n-nodes-base.executeWorkflowTrigger",
+      "typeVersion": 1,
+      "position": [
+        0,
+        0
+      ]
+    },
+    {
+      "parameters": {
+        "jsCode": "return items.map(item => {\n  const payload = item.json || {};\n  const runContext = payload.run_context || {\n    run_id: payload.run_id || 'RUN-N8N-P0-TEST',\n    organization: {\n      name: payload.organization_name || payload.organization?.name,\n      website: payload.website || payload.organization?.website,\n      country: payload.country || payload.organization?.country,\n      mission_area: payload.mission_area || payload.organization?.mission_area || null\n    },\n    current_challenge: payload.current_challenge || null,\n    uploaded_document_refs: payload.uploaded_document_refs || [],\n    status: 'created',\n    started_at: payload.started_at || new Date().toISOString(),\n    errors: []\n  };\n  if (!runContext.organization?.name || !runContext.organization?.website || !runContext.organization?.country) {\n    return { json: { ...payload, run_context: runContext, controlled_state: 'invalid_input', errors: [{ stage: '21_WEB_SEARCH', message: 'organization_name, website, and country are required' }] } };\n  }\n  return { json: { ...payload, run_context: runContext, errors: payload.errors || [] } };\n});\n"
+      },
+      "id": "input_contract__research_task",
+      "name": "INPUT_CONTRACT__RESEARCH_TASK",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        260,
+        0
+      ]
+    },
+    {
+      "parameters": {
+        "jsCode": "return items.map(item => {\n  const org = item.json.run_context.organization;\n  const hint = item.json.query || 'annual report revenue funding grants donations financial statements';\n  const query = `${org.name} ${org.country || ''} ${hint}`.trim();\n  return { json: { ...item.json, search: { provider: 'duckduckgo_lite_html', query, search_url: `https://lite.duckduckgo.com/lite/?q=${encodeURIComponent(query)}` } } };\n});\n"
+      },
+      "id": "build_search_query",
+      "name": "BUILD_SEARCH_QUERY",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        560,
+        0
+      ]
+    },
+    {
+      "parameters": {
+        "method": "GET",
+        "url": "={{ $json.search.search_url }}",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "User-Agent",
+              "value": "Mozilla/5.0 Project3PaolaP0/1.0"
+            },
+            {
+              "name": "Accept",
+              "value": "text/html,application/xhtml+xml"
+            }
+          ]
+        },
+        "options": {
+          "timeout": 15000,
+          "response": {
+            "response": {
+              "responseFormat": "text",
+              "outputPropertyName": "html"
+            }
+          }
+        }
+      },
+      "id": "http_request__duckduckgo_lite",
+      "name": "HTTP_REQUEST__DUCKDUCKGO_LITE",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        860,
+        0
+      ],
+      "continueOnFail": true
+    },
+    {
+      "parameters": {
+        "jsCode": "function stripTags(value) {\n  return String(value || '').replace(/<[^>]+>/g, ' ').replace(/&amp;/g, '&').replace(/&quot;/g, '\"').replace(/&#x27;/g, \"'\").replace(/\\s+/g, ' ').trim();\n}\nfunction decodeDdgUrl(raw) {\n  const value = String(raw || '').replace(/&amp;/g, '&');\n  const match = value.match(/[?&]uddg=([^&]+)/);\n  return match ? decodeURIComponent(match[1]) : value;\n}\nreturn items.map(item => {\n  const baseItems = $items('BUILD_SEARCH_QUERY');\n  const base = baseItems[$itemIndex]?.json || item.json;\n  if (item.json.error || item.json.message?.includes('ECONN') || item.json.statusCode >= 400) {\n    return { json: { ...base, controlled_state: 'request_failure', search: { ...(base.search || {}), raw_result_count: 0, results: [] }, errors: [...(base.errors || []), { stage: '21_WEB_SEARCH', error_type: 'request_failure', message: item.json.error?.message || item.json.message || 'HTTP request failed' }] } };\n  }\n  const html = String(item.json.html || item.json.data || item.json.body || item.json.response || item.json || '');\n  const linkPattern = /<a[^>]+href=\"([^\"]+)\"[^>]*class='result-link'[^>]*>(.*?)<\\/a>/gs;\n  const matches = [...html.matchAll(linkPattern)];\n  const results = [];\n  for (let i = 0; i < matches.length && results.length < 5; i++) {\n    const start = matches[i].index + matches[i][0].length;\n    const end = i + 1 < matches.length ? matches[i + 1].index : html.length;\n    const block = html.slice(start, end);\n    const snippetMatch = block.match(/class='result-snippet'[^>]*>(.*?)<\\/td>/s);\n    const url = decodeDdgUrl(matches[i][1]);\n    if (url.startsWith('http')) {\n      results.push({ title: stripTags(matches[i][2]), url, snippet: stripTags(snippetMatch ? snippetMatch[1] : '') });\n    }\n  }\n  const controlled_state = results.length ? 'search_success' : 'empty_search';\n  return { json: { ...base, controlled_state, search: { ...base.search, raw_result_count: results.length, results } } };\n});\n"
+      },
+      "id": "parse_html_results",
+      "name": "PARSE_HTML_RESULTS",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        1160,
+        0
+      ]
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict"
+          },
+          "conditions": [
+            {
+              "id": "decision__request_failurerequest_failure",
+              "leftValue": "={{ $json.controlled_state }}",
+              "rightValue": "request_failure",
+              "operator": {
+                "type": "string",
+                "operation": "equals"
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "id": "decision__request_failure",
+      "name": "DECISION__REQUEST_FAILURE",
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2,
+      "position": [
+        1460,
+        0
+      ]
+    },
+    {
+      "parameters": {
+        "jsCode": "return items.map(item => ({ json: { run_context: item.json.run_context, sources: [], search: item.json.search, controlled_state: 'request_failure', errors: item.json.errors || [{ stage: '21_WEB_SEARCH', message: 'HTTP request failed' }] } }));\n"
+      },
+      "id": "output_request_failure",
+      "name": "OUTPUT_REQUEST_FAILURE",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        1760,
+        -220
+      ]
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict"
+          },
+          "conditions": [
+            {
+              "id": "decision__empty_searchempty_search",
+              "leftValue": "={{ $json.controlled_state }}",
+              "rightValue": "empty_search",
+              "operator": {
+                "type": "string",
+                "operation": "equals"
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "id": "decision__empty_search",
+      "name": "DECISION__EMPTY_SEARCH",
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2,
+      "position": [
+        1760,
+        80
+      ]
+    },
+    {
+      "parameters": {
+        "jsCode": "return items.map(item => ({ json: { run_context: item.json.run_context, sources: [], search: item.json.search, controlled_state: 'empty_search', errors: item.json.errors || [] } }));\n"
+      },
+      "id": "output_empty_search",
+      "name": "OUTPUT_EMPTY_SEARCH",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        2060,
+        -80
+      ]
+    },
+    {
+      "parameters": {
+        "jsCode": "function domainFromUrl(url) { try { return new URL(url).hostname.replace(/^www\\./, '').toLowerCase(); } catch { return ''; } }\nfunction sourceType(result) {\n  const text = `${result.title} ${result.url} ${result.snippet}`.toLowerCase();\n  if (text.includes('990') || text.includes('registry')) return 'registry';\n  if (text.includes('annual') && text.includes('report')) return 'public_report';\n  if (text.includes('news') || text.includes('press')) return 'media';\n  return 'web_search_result';\n}\nconst revenueTerms = ['annual','report','financial','finance','revenue','funding','grant','grants','donor','donors','donation','donations','fundraising','income','partnership','partners','990'];\nreturn items.map(item => {\n  const org = item.json.run_context.organization;\n  const officialDomain = domainFromUrl(org.website || '');\n  const orgTokens = String(org.name || '').toLowerCase().match(/[a-z0-9]+/g) || [];\n  const relevant = (item.json.search.results || []).filter(result => {\n    const haystack = `${result.title} ${result.url} ${result.snippet}`.toLowerCase();\n    const host = domainFromUrl(result.url);\n    return orgTokens.some(token => token.length > 2 && haystack.includes(token)) || (officialDomain && host.endsWith(officialDomain)) || revenueTerms.some(term => haystack.includes(term));\n  });\n  const retrieved_at = new Date().toISOString();\n  const sources = relevant.map((result, index) => {\n    const host = domainFromUrl(result.url);\n    const is_official = Boolean(officialDomain && host.endsWith(officialDomain));\n    return {\n      source_id: `SRC-${String(index + 1).padStart(3, '0')}`,\n      title: result.title || '',\n      url: result.url,\n      source_type: sourceType(result),\n      publisher: is_official ? org.name : (host || null),\n      publication_date: null,\n      retrieved_at,\n      authority_level: is_official ? 'official' : 'unknown',\n      freshness: 'unknown',\n      is_official,\n      search_snippet: result.snippet || '',\n      search_provider: item.json.search.provider\n    };\n  });\n  return { json: { ...item.json, controlled_state: sources.length ? 'ok' : 'empty_search', sources } };\n});\n"
+      },
+      "id": "normalize_results",
+      "name": "NORMALIZE_RESULTS",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        2060,
+        180
+      ]
+    },
+    {
+      "parameters": {
+        "jsCode": "return items.map(item => ({ json: { run_context: item.json.run_context, sources: item.json.sources || [], search: item.json.search, controlled_state: item.json.controlled_state, errors: item.json.errors || [] } }));\n"
+      },
+      "id": "output_success__sources",
+      "name": "OUTPUT_SUCCESS__SOURCES",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        2360,
+        180
+      ]
+    }
+  ],
+  "connections": {
+    "START__SUB_WORKFLOW_TRIGGER": {
+      "main": [
+        [
+          {
+            "node": "INPUT_CONTRACT__RESEARCH_TASK",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "INPUT_CONTRACT__RESEARCH_TASK": {
+      "main": [
+        [
+          {
+            "node": "BUILD_SEARCH_QUERY",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "BUILD_SEARCH_QUERY": {
+      "main": [
+        [
+          {
+            "node": "HTTP_REQUEST__DUCKDUCKGO_LITE",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "HTTP_REQUEST__DUCKDUCKGO_LITE": {
+      "main": [
+        [
+          {
+            "node": "PARSE_HTML_RESULTS",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "PARSE_HTML_RESULTS": {
+      "main": [
+        [
+          {
+            "node": "DECISION__REQUEST_FAILURE",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "DECISION__REQUEST_FAILURE": {
+      "main": [
+        [
+          {
+            "node": "OUTPUT_REQUEST_FAILURE",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "DECISION__EMPTY_SEARCH",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "DECISION__EMPTY_SEARCH": {
+      "main": [
+        [
+          {
+            "node": "OUTPUT_EMPTY_SEARCH",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "NORMALIZE_RESULTS",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "NORMALIZE_RESULTS": {
+      "main": [
+        [
+          {
+            "node": "OUTPUT_SUCCESS__SOURCES",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": false,
+  "settings": {
+    "executionOrder": "v1"
+  },
+  "pinData": {}
+}

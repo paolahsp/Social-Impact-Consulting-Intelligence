@@ -1,0 +1,308 @@
+{
+  "name": "70_REPORT_QA_DELIVERY",
+  "nodes": [
+    {
+      "parameters": {
+        "content": "PURPOSE\nAssemble and validate the Pre-Engagement Diagnostic Pack.\n\nOWNER\nGRETEL TRACK B\n\nINPUT CONTRACT\nrun_context, evidence, findings, recommendations, KPIs, questions, roadmap\n\nOUTPUT CONTRACT\nfinal_package.schema.json\n\nSTATUS\nSkeleton only. Inactive by default. No credentials. Configure TODO nodes after import.",
+        "height": 340,
+        "width": 520,
+        "color": 4
+      },
+      "id": "00_readme__purpose_owner_contracts_status",
+      "name": "00_README__PURPOSE_OWNER_CONTRACTS_STATUS",
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [
+        -420,
+        -320
+      ]
+    },
+    {
+      "parameters": {},
+      "id": "start__sub_workflow_trigger",
+      "name": "START__SUB_WORKFLOW_TRIGGER",
+      "type": "n8n-nodes-base.executeWorkflowTrigger",
+      "typeVersion": 1,
+      "position": [
+        0,
+        0
+      ]
+    },
+    {
+      "parameters": {
+        "jsCode": "// SKELETON_PLACEHOLDER: INPUT_CONTRACT__REPORT_COMPONENTS\n// Accept all report components.\n// TODO: Replace this placeholder with configured production logic.\n// Contract discipline: preserve FACT / INFERENCE / HYPOTHESIS / UNKNOWN boundaries.\nreturn items;\n"
+      },
+      "id": "input_contract__report_components",
+      "name": "INPUT_CONTRACT__REPORT_COMPONENTS",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        260,
+        0
+      ]
+    },
+    {
+      "parameters": {
+        "jsCode": "// SKELETON_PLACEHOLDER: REPORT_ASSEMBLY\n// Assemble canonical JSON diagnostic pack.\n// TODO: Replace this placeholder with configured production logic.\n// Contract discipline: preserve FACT / INFERENCE / HYPOTHESIS / UNKNOWN boundaries.\nreturn items;\n"
+      },
+      "id": "report_assembly",
+      "name": "REPORT_ASSEMBLY",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        560,
+        0
+      ]
+    },
+    {
+      "parameters": {
+        "jsCode": "// SKELETON_PLACEHOLDER: EVIDENCE_QA\n// Check evidence linkage and confidence/limitations.\n// TODO: Replace this placeholder with configured production logic.\n// Contract discipline: preserve FACT / INFERENCE / HYPOTHESIS / UNKNOWN boundaries.\nreturn items;\n"
+      },
+      "id": "evidence_qa",
+      "name": "EVIDENCE_QA",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        860,
+        0
+      ]
+    },
+    {
+      "parameters": {
+        "jsCode": "// SKELETON_PLACEHOLDER: CHECK_MATERIAL_CLAIMS\n// Ensure material claims cite evidence IDs.\n// TODO: Replace this placeholder with configured production logic.\n// Contract discipline: preserve FACT / INFERENCE / HYPOTHESIS / UNKNOWN boundaries.\nreturn items;\n"
+      },
+      "id": "check_material_claims",
+      "name": "CHECK_MATERIAL_CLAIMS",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        1160,
+        0
+      ]
+    },
+    {
+      "parameters": {
+        "jsCode": "// SKELETON_PLACEHOLDER: CHECK_UNKNOWNS\n// Ensure unknowns remain visible.\n// TODO: Replace this placeholder with configured production logic.\n// Contract discipline: preserve FACT / INFERENCE / HYPOTHESIS / UNKNOWN boundaries.\nreturn items;\n"
+      },
+      "id": "check_unknowns",
+      "name": "CHECK_UNKNOWNS",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        1460,
+        0
+      ]
+    },
+    {
+      "parameters": {
+        "jsCode": "// SKELETON_PLACEHOLDER: CHECK_RECOMMENDATION_TRACEABILITY\n// Ensure recommendations trace to findings/evidence.\n// TODO: Replace this placeholder with configured production logic.\n// Contract discipline: preserve FACT / INFERENCE / HYPOTHESIS / UNKNOWN boundaries.\nreturn items;\n"
+      },
+      "id": "check_recommendation_traceability",
+      "name": "CHECK_RECOMMENDATION_TRACEABILITY",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        1760,
+        0
+      ]
+    },
+    {
+      "parameters": {
+        "jsCode": "// SKELETON_PLACEHOLDER: DECISION__PASS_QA\n// Branch based on QA result.\n// TODO: Replace this placeholder with configured production logic.\n// Contract discipline: preserve FACT / INFERENCE / HYPOTHESIS / UNKNOWN boundaries.\nreturn items;\n"
+      },
+      "id": "decision__pass_qa",
+      "name": "DECISION__PASS_QA",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        2060,
+        0
+      ]
+    },
+    {
+      "parameters": {
+        "jsCode": "// SKELETON_PLACEHOLDER: CORRECTION_PLACEHOLDER\n// Placeholder for correction loop; no final reasoning implementation yet.\n// TODO: Replace this placeholder with configured production logic.\n// Contract discipline: preserve FACT / INFERENCE / HYPOTHESIS / UNKNOWN boundaries.\nreturn items;\n"
+      },
+      "id": "correction_placeholder",
+      "name": "CORRECTION_PLACEHOLDER",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        2360,
+        0
+      ]
+    },
+    {
+      "parameters": {
+        "jsCode": "// SKELETON_PLACEHOLDER: TODO_STORAGE__FINAL_RUN\n// Placeholder for saving canonical output.\n// TODO: Replace this placeholder with configured production logic.\n// Contract discipline: preserve FACT / INFERENCE / HYPOTHESIS / UNKNOWN boundaries.\nreturn items;\n"
+      },
+      "id": "todo_storage__final_run",
+      "name": "TODO_STORAGE__FINAL_RUN",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        2660,
+        0
+      ]
+    },
+    {
+      "parameters": {
+        "jsCode": "// SKELETON_PLACEHOLDER: EXPORT_PLACEHOLDER\n// Future exports: JSON, Markdown, HTML, PDF. JSON is canonical.\n// TODO: Replace this placeholder with configured production logic.\n// Contract discipline: preserve FACT / INFERENCE / HYPOTHESIS / UNKNOWN boundaries.\nreturn items;\n"
+      },
+      "id": "export_placeholder",
+      "name": "EXPORT_PLACEHOLDER",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        2960,
+        0
+      ]
+    },
+    {
+      "parameters": {
+        "jsCode": "// TERMINAL_OUTPUT_NODE: RETURN_FINAL_PACKAGE\n// Return final pre-engagement diagnostic pack.\n// TODO: Replace this placeholder with configured production logic.\n// Contract discipline: preserve FACT / INFERENCE / HYPOTHESIS / UNKNOWN boundaries.\nreturn items;\n"
+      },
+      "id": "return_final_package",
+      "name": "RETURN_FINAL_PACKAGE",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        3260,
+        0
+      ]
+    }
+  ],
+  "connections": {
+    "START__SUB_WORKFLOW_TRIGGER": {
+      "main": [
+        [
+          {
+            "node": "INPUT_CONTRACT__REPORT_COMPONENTS",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "INPUT_CONTRACT__REPORT_COMPONENTS": {
+      "main": [
+        [
+          {
+            "node": "REPORT_ASSEMBLY",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "REPORT_ASSEMBLY": {
+      "main": [
+        [
+          {
+            "node": "EVIDENCE_QA",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "EVIDENCE_QA": {
+      "main": [
+        [
+          {
+            "node": "CHECK_MATERIAL_CLAIMS",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "CHECK_MATERIAL_CLAIMS": {
+      "main": [
+        [
+          {
+            "node": "CHECK_UNKNOWNS",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "CHECK_UNKNOWNS": {
+      "main": [
+        [
+          {
+            "node": "CHECK_RECOMMENDATION_TRACEABILITY",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "CHECK_RECOMMENDATION_TRACEABILITY": {
+      "main": [
+        [
+          {
+            "node": "DECISION__PASS_QA",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "DECISION__PASS_QA": {
+      "main": [
+        [
+          {
+            "node": "TODO_STORAGE__FINAL_RUN",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "CORRECTION_PLACEHOLDER",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "CORRECTION_PLACEHOLDER": {
+      "main": [
+        [
+          {
+            "node": "REPORT_ASSEMBLY",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "TODO_STORAGE__FINAL_RUN": {
+      "main": [
+        [
+          {
+            "node": "EXPORT_PLACEHOLDER",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "EXPORT_PLACEHOLDER": {
+      "main": [
+        [
+          {
+            "node": "RETURN_FINAL_PACKAGE",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": false,
+  "settings": {
+    "executionOrder": "v1"
+  },
+  "pinData": {}
+}

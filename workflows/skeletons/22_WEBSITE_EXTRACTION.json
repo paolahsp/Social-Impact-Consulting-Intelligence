@@ -1,0 +1,183 @@
+{
+  "name": "22_WEBSITE_EXTRACTION",
+  "nodes": [
+    {
+      "parameters": {
+        "content": "PURPOSE\nExtract useful information from official organization pages.\n\nOWNER\nPAOLA TRACK A\n\nINPUT CONTRACT\nofficial_url plus run_context\n\nOUTPUT CONTRACT\nsource.schema.json[] plus extracted useful_content\n\nSTATUS\nSkeleton only. Inactive by default. No credentials. Configure TODO nodes after import.",
+        "height": 340,
+        "width": 520,
+        "color": 4
+      },
+      "id": "00_readme__purpose_owner_contracts_status",
+      "name": "00_README__PURPOSE_OWNER_CONTRACTS_STATUS",
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [
+        -420,
+        -320
+      ]
+    },
+    {
+      "parameters": {},
+      "id": "start__sub_workflow_trigger",
+      "name": "START__SUB_WORKFLOW_TRIGGER",
+      "type": "n8n-nodes-base.executeWorkflowTrigger",
+      "typeVersion": 1,
+      "position": [
+        0,
+        0
+      ]
+    },
+    {
+      "parameters": {
+        "jsCode": "// SKELETON_PLACEHOLDER: INPUT_CONTRACT__OFFICIAL_URL\n// Accept official URL and extraction scope.\n// TODO: Replace this placeholder with configured production logic.\n// Contract discipline: preserve FACT / INFERENCE / HYPOTHESIS / UNKNOWN boundaries.\nreturn items;\n"
+      },
+      "id": "input_contract__official_url",
+      "name": "INPUT_CONTRACT__OFFICIAL_URL",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        260,
+        0
+      ]
+    },
+    {
+      "parameters": {
+        "jsCode": "// SKELETON_PLACEHOLDER: TODO_API__WEBSITE_EXTRACTION\n// Placeholder for Firecrawl, Jina, or direct extraction.\n// TODO: Replace this placeholder with configured production logic.\n// Contract discipline: preserve FACT / INFERENCE / HYPOTHESIS / UNKNOWN boundaries.\nreturn items;\n"
+      },
+      "id": "todo_api__website_extraction",
+      "name": "TODO_API__WEBSITE_EXTRACTION",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        560,
+        0
+      ]
+    },
+    {
+      "parameters": {
+        "jsCode": "// SKELETON_PLACEHOLDER: PAGE_RESULT_VALIDATION\n// Validate page fetch/extraction status and URL match.\n// TODO: Replace this placeholder with configured production logic.\n// Contract discipline: preserve FACT / INFERENCE / HYPOTHESIS / UNKNOWN boundaries.\nreturn items;\n"
+      },
+      "id": "page_result_validation",
+      "name": "PAGE_RESULT_VALIDATION",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        860,
+        0
+      ]
+    },
+    {
+      "parameters": {
+        "jsCode": "// SKELETON_PLACEHOLDER: USEFUL_CONTENT\n// Keep useful text, headings, and page signals.\n// TODO: Replace this placeholder with configured production logic.\n// Contract discipline: preserve FACT / INFERENCE / HYPOTHESIS / UNKNOWN boundaries.\nreturn items;\n"
+      },
+      "id": "useful_content",
+      "name": "USEFUL_CONTENT",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        1160,
+        0
+      ]
+    },
+    {
+      "parameters": {
+        "jsCode": "// SKELETON_PLACEHOLDER: SOURCE_METADATA\n// Attach source metadata and retrieval timestamp.\n// TODO: Replace this placeholder with configured production logic.\n// Contract discipline: preserve FACT / INFERENCE / HYPOTHESIS / UNKNOWN boundaries.\nreturn items;\n"
+      },
+      "id": "source_metadata",
+      "name": "SOURCE_METADATA",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        1460,
+        0
+      ]
+    },
+    {
+      "parameters": {
+        "jsCode": "// TERMINAL_OUTPUT_NODE: RETURN_SOURCES\n// Return official website source records.\n// TODO: Replace this placeholder with configured production logic.\n// Contract discipline: preserve FACT / INFERENCE / HYPOTHESIS / UNKNOWN boundaries.\nreturn items;\n"
+      },
+      "id": "return_sources",
+      "name": "RETURN_SOURCES",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        1760,
+        0
+      ]
+    }
+  ],
+  "connections": {
+    "START__SUB_WORKFLOW_TRIGGER": {
+      "main": [
+        [
+          {
+            "node": "INPUT_CONTRACT__OFFICIAL_URL",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "INPUT_CONTRACT__OFFICIAL_URL": {
+      "main": [
+        [
+          {
+            "node": "TODO_API__WEBSITE_EXTRACTION",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "TODO_API__WEBSITE_EXTRACTION": {
+      "main": [
+        [
+          {
+            "node": "PAGE_RESULT_VALIDATION",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "PAGE_RESULT_VALIDATION": {
+      "main": [
+        [
+          {
+            "node": "USEFUL_CONTENT",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "USEFUL_CONTENT": {
+      "main": [
+        [
+          {
+            "node": "SOURCE_METADATA",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "SOURCE_METADATA": {
+      "main": [
+        [
+          {
+            "node": "RETURN_SOURCES",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": false,
+  "settings": {
+    "executionOrder": "v1"
+  },
+  "pinData": {}
+}

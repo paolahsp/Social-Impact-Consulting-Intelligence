@@ -1,0 +1,265 @@
+{
+  "name": "23_DOCUMENT_PUBLIC_DATA_RESEARCH",
+  "nodes": [
+    {
+      "parameters": {
+        "content": "PURPOSE\nHandle public reports, PDFs, registries, and structured public data.\n\nOWNER\nPAOLA TRACK A\n\nINPUT CONTRACT\ndocument/public_data research_task\n\nOUTPUT CONTRACT\nsource.schema.json[] plus document metadata\n\nSTATUS\nSkeleton only. Inactive by default. No credentials. Configure TODO nodes after import.",
+        "height": 340,
+        "width": 520,
+        "color": 4
+      },
+      "id": "00_readme__purpose_owner_contracts_status",
+      "name": "00_README__PURPOSE_OWNER_CONTRACTS_STATUS",
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [
+        -420,
+        -320
+      ]
+    },
+    {
+      "parameters": {},
+      "id": "start__sub_workflow_trigger",
+      "name": "START__SUB_WORKFLOW_TRIGGER",
+      "type": "n8n-nodes-base.executeWorkflowTrigger",
+      "typeVersion": 1,
+      "position": [
+        0,
+        0
+      ]
+    },
+    {
+      "parameters": {
+        "jsCode": "// SKELETON_PLACEHOLDER: INPUT_CONTRACT__DOCUMENT_PUBLIC_DATA_TASK\n// Accept report, registry, or public data task.\n// TODO: Replace this placeholder with configured production logic.\n// Contract discipline: preserve FACT / INFERENCE / HYPOTHESIS / UNKNOWN boundaries.\nreturn items;\n"
+      },
+      "id": "input_contract__document_public_data_task",
+      "name": "INPUT_CONTRACT__DOCUMENT_PUBLIC_DATA_TASK",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        260,
+        0
+      ]
+    },
+    {
+      "parameters": {
+        "jsCode": "// SKELETON_PLACEHOLDER: LOCATE_SOURCE\n// Locate likely public source without assuming access.\n// TODO: Replace this placeholder with configured production logic.\n// Contract discipline: preserve FACT / INFERENCE / HYPOTHESIS / UNKNOWN boundaries.\nreturn items;\n"
+      },
+      "id": "locate_source",
+      "name": "LOCATE_SOURCE",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        560,
+        0
+      ]
+    },
+    {
+      "parameters": {
+        "jsCode": "// SKELETON_PLACEHOLDER: TODO_API__FETCH_PUBLIC_DOCUMENT_OR_DATA\n// Placeholder for fetch/download provider.\n// TODO: Replace this placeholder with configured production logic.\n// Contract discipline: preserve FACT / INFERENCE / HYPOTHESIS / UNKNOWN boundaries.\nreturn items;\n"
+      },
+      "id": "todo_api__fetch_public_document_or_data",
+      "name": "TODO_API__FETCH_PUBLIC_DOCUMENT_OR_DATA",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        860,
+        0
+      ]
+    },
+    {
+      "parameters": {
+        "jsCode": "// SKELETON_PLACEHOLDER: DECISION__FILE_TYPE_BRANCH\n// Branch by PDF, HTML, or structured data.\n// TODO: Replace this placeholder with configured production logic.\n// Contract discipline: preserve FACT / INFERENCE / HYPOTHESIS / UNKNOWN boundaries.\nreturn items;\n"
+      },
+      "id": "decision__file_type_branch",
+      "name": "DECISION__FILE_TYPE_BRANCH",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        1160,
+        0
+      ]
+    },
+    {
+      "parameters": {
+        "jsCode": "// SKELETON_PLACEHOLDER: EXTRACT_PLACEHOLDER__PDF\n// Placeholder for PDF extraction.\n// TODO: Replace this placeholder with configured production logic.\n// Contract discipline: preserve FACT / INFERENCE / HYPOTHESIS / UNKNOWN boundaries.\nreturn items;\n"
+      },
+      "id": "extract_placeholder__pdf",
+      "name": "EXTRACT_PLACEHOLDER__PDF",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        1460,
+        0
+      ]
+    },
+    {
+      "parameters": {
+        "jsCode": "// SKELETON_PLACEHOLDER: EXTRACT_PLACEHOLDER__HTML\n// Placeholder for HTML extraction.\n// TODO: Replace this placeholder with configured production logic.\n// Contract discipline: preserve FACT / INFERENCE / HYPOTHESIS / UNKNOWN boundaries.\nreturn items;\n"
+      },
+      "id": "extract_placeholder__html",
+      "name": "EXTRACT_PLACEHOLDER__HTML",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        1760,
+        0
+      ]
+    },
+    {
+      "parameters": {
+        "jsCode": "// SKELETON_PLACEHOLDER: EXTRACT_PLACEHOLDER__STRUCTURED_DATA\n// Placeholder for CSV/JSON/registry extraction.\n// TODO: Replace this placeholder with configured production logic.\n// Contract discipline: preserve FACT / INFERENCE / HYPOTHESIS / UNKNOWN boundaries.\nreturn items;\n"
+      },
+      "id": "extract_placeholder__structured_data",
+      "name": "EXTRACT_PLACEHOLDER__STRUCTURED_DATA",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        2060,
+        0
+      ]
+    },
+    {
+      "parameters": {
+        "jsCode": "// SKELETON_PLACEHOLDER: NORMALIZE_DOCUMENT_SOURCE\n// Normalize extracted metadata and source records.\n// TODO: Replace this placeholder with configured production logic.\n// Contract discipline: preserve FACT / INFERENCE / HYPOTHESIS / UNKNOWN boundaries.\nreturn items;\n"
+      },
+      "id": "normalize_document_source",
+      "name": "NORMALIZE_DOCUMENT_SOURCE",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        2360,
+        0
+      ]
+    },
+    {
+      "parameters": {
+        "jsCode": "// TERMINAL_OUTPUT_NODE: RETURN_SOURCES_DOCUMENTS\n// Return source/document records.\n// TODO: Replace this placeholder with configured production logic.\n// Contract discipline: preserve FACT / INFERENCE / HYPOTHESIS / UNKNOWN boundaries.\nreturn items;\n"
+      },
+      "id": "return_sources_documents",
+      "name": "RETURN_SOURCES_DOCUMENTS",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        2660,
+        0
+      ]
+    }
+  ],
+  "connections": {
+    "START__SUB_WORKFLOW_TRIGGER": {
+      "main": [
+        [
+          {
+            "node": "INPUT_CONTRACT__DOCUMENT_PUBLIC_DATA_TASK",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "INPUT_CONTRACT__DOCUMENT_PUBLIC_DATA_TASK": {
+      "main": [
+        [
+          {
+            "node": "LOCATE_SOURCE",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "LOCATE_SOURCE": {
+      "main": [
+        [
+          {
+            "node": "TODO_API__FETCH_PUBLIC_DOCUMENT_OR_DATA",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "TODO_API__FETCH_PUBLIC_DOCUMENT_OR_DATA": {
+      "main": [
+        [
+          {
+            "node": "DECISION__FILE_TYPE_BRANCH",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "DECISION__FILE_TYPE_BRANCH": {
+      "main": [
+        [
+          {
+            "node": "EXTRACT_PLACEHOLDER__PDF",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "EXTRACT_PLACEHOLDER__HTML",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "EXTRACT_PLACEHOLDER__STRUCTURED_DATA",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "EXTRACT_PLACEHOLDER__PDF": {
+      "main": [
+        [
+          {
+            "node": "NORMALIZE_DOCUMENT_SOURCE",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "EXTRACT_PLACEHOLDER__HTML": {
+      "main": [
+        [
+          {
+            "node": "NORMALIZE_DOCUMENT_SOURCE",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "EXTRACT_PLACEHOLDER__STRUCTURED_DATA": {
+      "main": [
+        [
+          {
+            "node": "NORMALIZE_DOCUMENT_SOURCE",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "NORMALIZE_DOCUMENT_SOURCE": {
+      "main": [
+        [
+          {
+            "node": "RETURN_SOURCES_DOCUMENTS",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": false,
+  "settings": {
+    "executionOrder": "v1"
+  },
+  "pinData": {}
+}

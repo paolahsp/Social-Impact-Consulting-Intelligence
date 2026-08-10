@@ -1,0 +1,107 @@
+{
+  "hypotheses": [
+    {
+      "hypothesis_id": "HYP-001",
+      "run_id": "RUN-FICTIONAL-001",
+      "domain": "operations_cx",
+      "evidence_ids": [
+        "EV-001",
+        "EV-003"
+      ],
+      "finding_ids": [
+        "F-001"
+      ],
+      "hypothesis": "Volunteer follow-up may rely on manual handoffs after form submission.",
+      "confidence": 0.48,
+      "requires_validation": true,
+      "validation_gap": "Public sources do not describe the internal follow-up process."
+    }
+  ],
+  "diagnoses": [
+    {
+      "diagnosis_id": "DX-001",
+      "domain": "operations_cx",
+      "diagnosis_type": "likely_cause",
+      "statement": "The volunteer journey may contain manual coordination steps that should be validated with staff.",
+      "finding_ids": [
+        "F-001"
+      ],
+      "hypothesis_ids": [
+        "HYP-001"
+      ],
+      "evidence_ids": [
+        "EV-001",
+        "EV-003"
+      ],
+      "confidence": 0.45,
+      "requires_validation": true
+    }
+  ],
+  "recommendations": [
+    {
+      "recommendation_id": "REC-001",
+      "finding_ids": [
+        "F-001"
+      ],
+      "diagnosis_ids": [
+        "DX-001"
+      ],
+      "diagnosis": "Volunteer follow-up may depend on manual handoffs.",
+      "action": "Map the volunteer intake handoff during the first client workshop before recommending automation.",
+      "priority": "medium",
+      "kpi": {
+        "name": "Volunteer follow-up time",
+        "baseline": null,
+        "baseline_status": "unknown",
+        "target": null,
+        "timeframe": "After baseline is confirmed",
+        "measurement_method": "Review timestamp from form submission to first staff response"
+      },
+      "confidence": 0.46,
+      "requires_human_review": true
+    }
+  ],
+  "kpis": [
+    {
+      "name": "Volunteer follow-up time",
+      "baseline": null,
+      "baseline_status": "unknown",
+      "target": null,
+      "timeframe": "After baseline is confirmed",
+      "measurement_method": "Review timestamp from form submission to first staff response"
+    }
+  ],
+  "validation_questions": [
+    {
+      "question_id": "Q-001",
+      "finding_ids": [
+        "F-001"
+      ],
+      "hypothesis_ids": [
+        "HYP-001"
+      ],
+      "question": "What happens internally after someone submits the volunteer form?",
+      "purpose": "Validate whether follow-up depends on manual handoffs.",
+      "domain": "operations_cx",
+      "priority": "high"
+    }
+  ],
+  "roadmap_actions": [
+    {
+      "roadmap_action_id": "RA-001",
+      "time_bucket": "30_days",
+      "action": "Validate the volunteer follow-up process during the client workshop.",
+      "action_type": "validation",
+      "recommendation_ids": [
+        "REC-001"
+      ],
+      "hypothesis_ids": [
+        "HYP-001"
+      ],
+      "validation_question_ids": [
+        "Q-001"
+      ]
+    }
+  ]
+}
+

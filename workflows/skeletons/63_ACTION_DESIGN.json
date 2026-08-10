@@ -1,0 +1,183 @@
+{
+  "name": "63_ACTION_DESIGN",
+  "nodes": [
+    {
+      "parameters": {
+        "content": "PURPOSE\nGenerate concrete actions only where evidence and diagnosis justify action.\n\nOWNER\nGRETEL TRACK B\n\nINPUT CONTRACT\ndiagnosis records plus prioritized findings/hypotheses\n\nOUTPUT CONTRACT\naction recommendations suitable for recommendation.schema.json\n\nSTATUS\nSkeleton only. Inactive by default. No credentials. Configure TODO nodes after import.",
+        "height": 340,
+        "width": 520,
+        "color": 4
+      },
+      "id": "00_readme__purpose_owner_contracts_status",
+      "name": "00_README__PURPOSE_OWNER_CONTRACTS_STATUS",
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [
+        -420,
+        -320
+      ]
+    },
+    {
+      "parameters": {},
+      "id": "start__sub_workflow_trigger",
+      "name": "START__SUB_WORKFLOW_TRIGGER",
+      "type": "n8n-nodes-base.executeWorkflowTrigger",
+      "typeVersion": 1,
+      "position": [
+        0,
+        0
+      ]
+    },
+    {
+      "parameters": {
+        "jsCode": "// SKELETON_PLACEHOLDER: INPUT_CONTRACT__DIAGNOSIS_PRIORITY\n// Accept diagnosis and prioritization context.\n// TODO: Replace this placeholder with configured production logic.\n// Contract discipline: preserve FACT / INFERENCE / HYPOTHESIS / UNKNOWN boundaries.\nreturn items;\n"
+      },
+      "id": "input_contract__diagnosis_priority",
+      "name": "INPUT_CONTRACT__DIAGNOSIS_PRIORITY",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        260,
+        0
+      ]
+    },
+    {
+      "parameters": {
+        "jsCode": "// SKELETON_PLACEHOLDER: ACTION_JUSTIFICATION_GATE\n// Block implementation actions for weak or unvalidated hypotheses.\n// TODO: Replace this placeholder with configured production logic.\n// Contract discipline: preserve FACT / INFERENCE / HYPOTHESIS / UNKNOWN boundaries.\nreturn items;\n"
+      },
+      "id": "action_justification_gate",
+      "name": "ACTION_JUSTIFICATION_GATE",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        560,
+        0
+      ]
+    },
+    {
+      "parameters": {
+        "jsCode": "// SKELETON_PLACEHOLDER: TODO_AGENT__ACTION_DESIGN\n// AGENT_INTERFACE__ACTION_DESIGN.\n// TODO: Replace this placeholder with configured production logic.\n// Contract discipline: preserve FACT / INFERENCE / HYPOTHESIS / UNKNOWN boundaries.\nreturn items;\n"
+      },
+      "id": "todo_agent__action_design",
+      "name": "TODO_AGENT__ACTION_DESIGN",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        860,
+        0
+      ]
+    },
+    {
+      "parameters": {
+        "jsCode": "// SKELETON_PLACEHOLDER: STRUCTURE_ACTIONS\n// Tie each action to diagnosis, finding_ids, and evidence/hypothesis support.\n// TODO: Replace this placeholder with configured production logic.\n// Contract discipline: preserve FACT / INFERENCE / HYPOTHESIS / UNKNOWN boundaries.\nreturn items;\n"
+      },
+      "id": "structure_actions",
+      "name": "STRUCTURE_ACTIONS",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        1160,
+        0
+      ]
+    },
+    {
+      "parameters": {
+        "jsCode": "// SKELETON_PLACEHOLDER: HUMAN_REVIEW_FLAG\n// Mark sensitive or low-confidence actions for human review.\n// TODO: Replace this placeholder with configured production logic.\n// Contract discipline: preserve FACT / INFERENCE / HYPOTHESIS / UNKNOWN boundaries.\nreturn items;\n"
+      },
+      "id": "human_review_flag",
+      "name": "HUMAN_REVIEW_FLAG",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        1460,
+        0
+      ]
+    },
+    {
+      "parameters": {
+        "jsCode": "// TERMINAL_OUTPUT_NODE: OUTPUT_CONTRACT__ACTIONS\n// Return justified action records.\n// TODO: Replace this placeholder with configured production logic.\n// Contract discipline: preserve FACT / INFERENCE / HYPOTHESIS / UNKNOWN boundaries.\nreturn items;\n"
+      },
+      "id": "output_contract__actions",
+      "name": "OUTPUT_CONTRACT__ACTIONS",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        1760,
+        0
+      ]
+    }
+  ],
+  "connections": {
+    "START__SUB_WORKFLOW_TRIGGER": {
+      "main": [
+        [
+          {
+            "node": "INPUT_CONTRACT__DIAGNOSIS_PRIORITY",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "INPUT_CONTRACT__DIAGNOSIS_PRIORITY": {
+      "main": [
+        [
+          {
+            "node": "ACTION_JUSTIFICATION_GATE",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "ACTION_JUSTIFICATION_GATE": {
+      "main": [
+        [
+          {
+            "node": "TODO_AGENT__ACTION_DESIGN",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "TODO_AGENT__ACTION_DESIGN": {
+      "main": [
+        [
+          {
+            "node": "STRUCTURE_ACTIONS",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "STRUCTURE_ACTIONS": {
+      "main": [
+        [
+          {
+            "node": "HUMAN_REVIEW_FLAG",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "HUMAN_REVIEW_FLAG": {
+      "main": [
+        [
+          {
+            "node": "OUTPUT_CONTRACT__ACTIONS",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": false,
+  "settings": {
+    "executionOrder": "v1"
+  },
+  "pinData": {}
+}

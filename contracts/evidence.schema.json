@@ -1,0 +1,75 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://example.local/contracts/evidence.schema.json",
+  "title": "Evidence",
+  "type": "object",
+  "required": [
+    "evidence_id",
+    "run_id",
+    "claim",
+    "source_ids",
+    "domain",
+    "evidence_type",
+    "confidence",
+    "status",
+    "contradiction_ids",
+    "requires_validation"
+  ],
+  "additionalProperties": true,
+  "properties": {
+    "evidence_id": {
+      "type": "string",
+      "pattern": "^EV-"
+    },
+    "run_id": {
+      "type": "string"
+    },
+    "claim": {
+      "type": "string"
+    },
+    "source_ids": {
+      "type": "array",
+      "items": {
+        "type": "string",
+        "pattern": "^SRC-"
+      }
+    },
+    "domain": {
+      "type": "string"
+    },
+    "evidence_type": {
+      "type": "string",
+      "enum": [
+        "fact",
+        "inference",
+        "hypothesis",
+        "unknown"
+      ]
+    },
+    "confidence": {
+      "type": "number",
+      "minimum": 0,
+      "maximum": 1
+    },
+    "status": {
+      "type": "string",
+      "enum": [
+        "supported",
+        "partially_supported",
+        "contradicted",
+        "insufficient_evidence",
+        "unknown"
+      ]
+    },
+    "contradiction_ids": {
+      "type": "array",
+      "items": {
+        "type": "string",
+        "pattern": "^EV-"
+      }
+    },
+    "requires_validation": {
+      "type": "boolean"
+    }
+  }
+}

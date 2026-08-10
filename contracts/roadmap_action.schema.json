@@ -1,0 +1,62 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://example.local/contracts/roadmap_action.schema.json",
+  "title": "Roadmap Action",
+  "type": "object",
+  "required": [
+    "roadmap_action_id",
+    "time_bucket",
+    "action",
+    "action_type",
+    "recommendation_ids",
+    "hypothesis_ids",
+    "validation_question_ids"
+  ],
+  "additionalProperties": true,
+  "properties": {
+    "roadmap_action_id": {
+      "type": "string",
+      "pattern": "^RA-"
+    },
+    "time_bucket": {
+      "type": "string",
+      "enum": [
+        "30_days",
+        "60_days",
+        "90_days"
+      ]
+    },
+    "action": {
+      "type": "string"
+    },
+    "action_type": {
+      "type": "string",
+      "enum": [
+        "implementation",
+        "validation",
+        "discovery"
+      ]
+    },
+    "recommendation_ids": {
+      "type": "array",
+      "items": {
+        "type": "string",
+        "pattern": "^REC-"
+      }
+    },
+    "hypothesis_ids": {
+      "type": "array",
+      "items": {
+        "type": "string",
+        "pattern": "^HYP-"
+      }
+    },
+    "validation_question_ids": {
+      "type": "array",
+      "items": {
+        "type": "string",
+        "pattern": "^Q-"
+      }
+    }
+  }
+}

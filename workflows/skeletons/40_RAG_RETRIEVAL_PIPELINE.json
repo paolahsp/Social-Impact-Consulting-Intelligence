@@ -1,0 +1,215 @@
+{
+  "name": "40_RAG_RETRIEVAL_PIPELINE",
+  "nodes": [
+    {
+      "parameters": {
+        "content": "PURPOSE\nRetrieve Revenue Resilience framework context from a transparent local P0 corpus.\n\nOWNER\nPAOLA TRACK A\n\nINPUT CONTRACT\norganization evidence plus domain/query\n\nOUTPUT CONTRACT\nrag_context with framework contexts\n\nSTATUS\nPhase 2B repository-ready. Inactive by default. No credentials.",
+        "height": 340,
+        "width": 520,
+        "color": 4
+      },
+      "id": "00_readme__purpose_owner_contracts_status",
+      "name": "00_README__PURPOSE_OWNER_CONTRACTS_STATUS",
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [
+        -420,
+        -320
+      ]
+    },
+    {
+      "parameters": {
+        "content": "PHASE 2B P0 N8N EXECUTION\nRepository-ready n8n implementation for Paola P0 only.\nn8n owns the visible execution path and state passing.\n21 uses an HTTP Request node against DuckDuckGo Lite HTML with no credentials.\nCode nodes are limited to compact deterministic parsing, mapping, retrieval scoring, and validation.\nNo Python runner is called by n8n. No secrets are stored.",
+        "height": 300,
+        "width": 520,
+        "color": 5
+      },
+      "id": "note__phase2b_p0_n8n_execution",
+      "name": "NOTE__PHASE2B_P0_N8N_EXECUTION",
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [
+        -420,
+        60
+      ]
+    },
+    {
+      "parameters": {
+        "content": "P0 RETRIEVAL IMPLEMENTATION\nThis is local JSON corpus retrieval, not Pinecone or a production vector store.\nOrganization evidence and framework knowledge remain separate.",
+        "height": 220,
+        "width": 520,
+        "color": 6
+      },
+      "id": "note__p0_local_corpus",
+      "name": "NOTE__P0_LOCAL_CORPUS",
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [
+        -420,
+        400
+      ]
+    },
+    {
+      "parameters": {},
+      "id": "start__sub_workflow_trigger",
+      "name": "START__SUB_WORKFLOW_TRIGGER",
+      "type": "n8n-nodes-base.executeWorkflowTrigger",
+      "typeVersion": 1,
+      "position": [
+        0,
+        0
+      ]
+    },
+    {
+      "parameters": {
+        "jsCode": "return items.map(item => ({ json: { ...item.json, organization_evidence: (item.json.evidence || []).filter(ev => ev.domain === 'revenue_resilience') } }));\n"
+      },
+      "id": "organization_evidence_input",
+      "name": "ORGANIZATION_EVIDENCE_INPUT",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        260,
+        0
+      ]
+    },
+    {
+      "parameters": {
+        "jsCode": "return items.map(item => {\n  const query = (item.json.organization_evidence || []).map(ev => ev.claim).join(' ');\n  return { json: { ...item.json, retrieval_query: `${query} funding concentration revenue diversification recurring financial resilience limitations`.trim() } };\n});\n"
+      },
+      "id": "build_retrieval_query",
+      "name": "BUILD_RETRIEVAL_QUERY",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        560,
+        0
+      ]
+    },
+    {
+      "parameters": {
+        "jsCode": "const framework_corpus = [\n  { context_id: 'FRAMEWORK-REV-001', domain: 'revenue_resilience', title: 'Funding Concentration', content: 'Revenue resilience assessment should check whether an organization depends heavily on one grant, donor, contract, or funder. Public evidence may reveal named funding sources, but concentration percentages are often unknown without internal financial data.', evaluation_use: 'Use this when evidence mentions grants, funders, annual reports, or revenue sources. Do not infer concentration unless amounts or proportions are available.' },\n  { context_id: 'FRAMEWORK-REV-002', domain: 'revenue_resilience', title: 'Revenue Diversification', content: 'Diversification considers whether public signals show multiple revenue types such as individual donations, grants, corporate partnerships, government contracts, memberships, or earned income. Public signals can support an observed finding that multiple revenue channels are described, but cannot prove resilience by themselves.', evaluation_use: 'Use this when evidence mentions donations, grants, partnerships, fundraising, revenue, or financial reports.' },\n  { context_id: 'FRAMEWORK-REV-003', domain: 'revenue_resilience', title: 'Recurring Revenue', content: 'Recurring revenue signals include monthly giving, memberships, multi-year grants, subscriptions, retained service contracts, or repeat government funding. If these signals are not public, the correct result is an unknown or validation question, not a negative finding.', evaluation_use: 'Use this when public evidence mentions recurring donors, monthly giving, memberships, or multi-year funding.' },\n  { context_id: 'FRAMEWORK-REV-004', domain: 'revenue_resilience', title: 'Financial Resilience Limitations', content: 'Public-data-first diagnostics must separate facts from hypotheses. Missing financial evidence should remain unknown. Do not invent revenue numbers, donor concentration, cash runway, operating reserves, or growth rates.', evaluation_use: 'Use this as a guardrail for all revenue resilience findings.' }\n];\nreturn items.map(item => ({ json: { ...item.json, framework_corpus } }));\n"
+      },
+      "id": "load_local_framework_corpus",
+      "name": "LOAD_LOCAL_FRAMEWORK_CORPUS",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        860,
+        0
+      ]
+    },
+    {
+      "parameters": {
+        "jsCode": "function tokens(text) { return new Set(String(text || '').toLowerCase().match(/[a-z0-9]+/g) || []); }\nreturn items.map(item => {\n  const q = tokens(item.json.retrieval_query);\n  const contexts = (item.json.framework_corpus || []).map(doc => {\n    const d = tokens(`${doc.title} ${doc.content} ${doc.evaluation_use}`);\n    const score = [...q].filter(token => d.has(token)).length;\n    return { ...doc, retrieval_score: score };\n  }).filter(doc => doc.retrieval_score > 0).sort((a, b) => b.retrieval_score - a.retrieval_score).slice(0, 3);\n  return { json: { ...item.json, rag_context: { retrieval_run_id: 'RAG-P0-N8N-001', domain: 'revenue_resilience', query: item.json.retrieval_query, contexts } } };\n});\n"
+      },
+      "id": "score_and_select_contexts",
+      "name": "SCORE_AND_SELECT_CONTEXTS",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        1160,
+        0
+      ]
+    },
+    {
+      "parameters": {
+        "jsCode": "return items.map(item => ({ json: { ...item.json, rag_context: { ...item.json.rag_context, organization_evidence_count: (item.json.organization_evidence || []).length, framework_context_count: (item.json.rag_context?.contexts || []).length } } }));\n"
+      },
+      "id": "validate_retrieval",
+      "name": "VALIDATE_RETRIEVAL",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        1460,
+        0
+      ]
+    },
+    {
+      "parameters": {
+        "jsCode": "return items;\n"
+      },
+      "id": "output_contract__rag_context",
+      "name": "OUTPUT_CONTRACT__RAG_CONTEXT",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        1760,
+        0
+      ]
+    }
+  ],
+  "connections": {
+    "START__SUB_WORKFLOW_TRIGGER": {
+      "main": [
+        [
+          {
+            "node": "ORGANIZATION_EVIDENCE_INPUT",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "ORGANIZATION_EVIDENCE_INPUT": {
+      "main": [
+        [
+          {
+            "node": "BUILD_RETRIEVAL_QUERY",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "BUILD_RETRIEVAL_QUERY": {
+      "main": [
+        [
+          {
+            "node": "LOAD_LOCAL_FRAMEWORK_CORPUS",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "LOAD_LOCAL_FRAMEWORK_CORPUS": {
+      "main": [
+        [
+          {
+            "node": "SCORE_AND_SELECT_CONTEXTS",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "SCORE_AND_SELECT_CONTEXTS": {
+      "main": [
+        [
+          {
+            "node": "VALIDATE_RETRIEVAL",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "VALIDATE_RETRIEVAL": {
+      "main": [
+        [
+          {
+            "node": "OUTPUT_CONTRACT__RAG_CONTEXT",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": false,
+  "settings": {
+    "executionOrder": "v1"
+  },
+  "pinData": {}
+}

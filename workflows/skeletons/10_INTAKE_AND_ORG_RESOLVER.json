@@ -1,0 +1,207 @@
+{
+  "name": "10_INTAKE_AND_ORG_RESOLVER",
+  "nodes": [
+    {
+      "parameters": {
+        "content": "PURPOSE\nReceive and normalize initial organization information.\n\nOWNER\nSHARED\n\nINPUT CONTRACT\norganization_name, website, country; optional mission_area, current_challenge, uploaded_document_refs\n\nOUTPUT CONTRACT\nrun_context.schema.json\n\nSTATUS\nSkeleton only. Inactive by default. No credentials. Configure TODO nodes after import.",
+        "height": 340,
+        "width": 520,
+        "color": 4
+      },
+      "id": "00_readme__purpose_owner_contracts_status",
+      "name": "00_README__PURPOSE_OWNER_CONTRACTS_STATUS",
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [
+        -420,
+        -320
+      ]
+    },
+    {
+      "parameters": {},
+      "id": "start__sub_workflow_trigger",
+      "name": "START__SUB_WORKFLOW_TRIGGER",
+      "type": "n8n-nodes-base.executeWorkflowTrigger",
+      "typeVersion": 1,
+      "position": [
+        0,
+        0
+      ]
+    },
+    {
+      "parameters": {
+        "jsCode": "// SKELETON_PLACEHOLDER: INPUT_CONTRACT__ORG_REQUEST\n// Check payload shape for public-data-first diagnostic intake.\n// TODO: Replace this placeholder with configured production logic.\n// Contract discipline: preserve FACT / INFERENCE / HYPOTHESIS / UNKNOWN boundaries.\nreturn items;\n"
+      },
+      "id": "input_contract__org_request",
+      "name": "INPUT_CONTRACT__ORG_REQUEST",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        260,
+        0
+      ]
+    },
+    {
+      "parameters": {
+        "jsCode": "// SKELETON_PLACEHOLDER: VALIDATE_REQUIRED_FIELDS\n// Require organization_name, website, and country.\n// TODO: Replace this placeholder with configured production logic.\n// Contract discipline: preserve FACT / INFERENCE / HYPOTHESIS / UNKNOWN boundaries.\nreturn items;\n"
+      },
+      "id": "validate_required_fields",
+      "name": "VALIDATE_REQUIRED_FIELDS",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        560,
+        0
+      ]
+    },
+    {
+      "parameters": {
+        "jsCode": "// SKELETON_PLACEHOLDER: NORMALIZE_URL_COUNTRY_NAME\n// Normalize website URL, country label, and organization name.\n// TODO: Replace this placeholder with configured production logic.\n// Contract discipline: preserve FACT / INFERENCE / HYPOTHESIS / UNKNOWN boundaries.\nreturn items;\n"
+      },
+      "id": "normalize_url_country_name",
+      "name": "NORMALIZE_URL_COUNTRY_NAME",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        860,
+        0
+      ]
+    },
+    {
+      "parameters": {
+        "jsCode": "// SKELETON_PLACEHOLDER: TODO_AGENT_OR_SERVICE__ORGANIZATION_RESOLVER\n// Placeholder for later entity resolution and disambiguation.\n// TODO: Replace this placeholder with configured production logic.\n// Contract discipline: preserve FACT / INFERENCE / HYPOTHESIS / UNKNOWN boundaries.\nreturn items;\n"
+      },
+      "id": "todo_agent_or_service__organization_resolver",
+      "name": "TODO_AGENT_OR_SERVICE__ORGANIZATION_RESOLVER",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        1160,
+        0
+      ]
+    },
+    {
+      "parameters": {
+        "jsCode": "// SKELETON_PLACEHOLDER: CREATE_RUN_ID\n// Create deterministic run context structure; final ID strategy TBD.\n// TODO: Replace this placeholder with configured production logic.\n// Contract discipline: preserve FACT / INFERENCE / HYPOTHESIS / UNKNOWN boundaries.\nreturn items;\n"
+      },
+      "id": "create_run_id",
+      "name": "CREATE_RUN_ID",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        1460,
+        0
+      ]
+    },
+    {
+      "parameters": {
+        "jsCode": "// SKELETON_PLACEHOLDER: INITIAL_RUN_STATE\n// Initialize status, timestamps, and empty errors array.\n// TODO: Replace this placeholder with configured production logic.\n// Contract discipline: preserve FACT / INFERENCE / HYPOTHESIS / UNKNOWN boundaries.\nreturn items;\n"
+      },
+      "id": "initial_run_state",
+      "name": "INITIAL_RUN_STATE",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        1760,
+        0
+      ]
+    },
+    {
+      "parameters": {
+        "jsCode": "// TERMINAL_OUTPUT_NODE: OUTPUT_CONTRACT__RUN_CONTEXT\n// Return run context for downstream orchestration.\n// TODO: Replace this placeholder with configured production logic.\n// Contract discipline: preserve FACT / INFERENCE / HYPOTHESIS / UNKNOWN boundaries.\nreturn items;\n"
+      },
+      "id": "output_contract__run_context",
+      "name": "OUTPUT_CONTRACT__RUN_CONTEXT",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        2060,
+        0
+      ]
+    }
+  ],
+  "connections": {
+    "START__SUB_WORKFLOW_TRIGGER": {
+      "main": [
+        [
+          {
+            "node": "INPUT_CONTRACT__ORG_REQUEST",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "INPUT_CONTRACT__ORG_REQUEST": {
+      "main": [
+        [
+          {
+            "node": "VALIDATE_REQUIRED_FIELDS",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "VALIDATE_REQUIRED_FIELDS": {
+      "main": [
+        [
+          {
+            "node": "NORMALIZE_URL_COUNTRY_NAME",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "NORMALIZE_URL_COUNTRY_NAME": {
+      "main": [
+        [
+          {
+            "node": "TODO_AGENT_OR_SERVICE__ORGANIZATION_RESOLVER",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "TODO_AGENT_OR_SERVICE__ORGANIZATION_RESOLVER": {
+      "main": [
+        [
+          {
+            "node": "CREATE_RUN_ID",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "CREATE_RUN_ID": {
+      "main": [
+        [
+          {
+            "node": "INITIAL_RUN_STATE",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "INITIAL_RUN_STATE": {
+      "main": [
+        [
+          {
+            "node": "OUTPUT_CONTRACT__RUN_CONTEXT",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": false,
+  "settings": {
+    "executionOrder": "v1"
+  },
+  "pinData": {}
+}

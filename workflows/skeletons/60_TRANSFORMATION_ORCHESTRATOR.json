@@ -1,0 +1,287 @@
+{
+  "name": "60_TRANSFORMATION_ORCHESTRATOR",
+  "nodes": [
+    {
+      "parameters": {
+        "content": "PURPOSE\nCoordinate transformation child workflows from hypotheses through roadmap.\n\nOWNER\nGRETEL TRACK B\n\nINPUT CONTRACT\nfinding.schema.json[] plus evidence ledger\n\nOUTPUT CONTRACT\nrecommendation.schema.json[] plus roadmap and validation questions\n\nSTATUS\nSkeleton only. Inactive by default. No credentials. Configure TODO nodes after import.",
+        "height": 340,
+        "width": 520,
+        "color": 4
+      },
+      "id": "00_readme__purpose_owner_contracts_status",
+      "name": "00_README__PURPOSE_OWNER_CONTRACTS_STATUS",
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [
+        -420,
+        -320
+      ]
+    },
+    {
+      "parameters": {
+        "content": "TARGET FLOW\nMerged specialist findings -> 61 Hypothesis Builder -> 62 Root Cause / Diagnosis -> Prioritization -> 63 Action Design -> 64 KPI Design -> 65 Client Validation Questions -> 66 90-Day Roadmap -> Transformation Output Contract",
+        "height": 200,
+        "width": 520,
+        "color": 4
+      },
+      "id": "note__1",
+      "name": "NOTE__1",
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [
+        -420,
+        60
+      ]
+    },
+    {
+      "parameters": {
+        "content": "LINK SUB-WORKFLOW AFTER IMPORT\nReplace transformation TODO_LINK nodes after 61, 62, 63, 64, 65, and 66 have real n8n workflow IDs.",
+        "height": 200,
+        "width": 520,
+        "color": 4
+      },
+      "id": "note__2",
+      "name": "NOTE__2",
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [
+        -420,
+        280
+      ]
+    },
+    {
+      "parameters": {},
+      "id": "start__sub_workflow_trigger",
+      "name": "START__SUB_WORKFLOW_TRIGGER",
+      "type": "n8n-nodes-base.executeWorkflowTrigger",
+      "typeVersion": 1,
+      "position": [
+        0,
+        0
+      ]
+    },
+    {
+      "parameters": {
+        "jsCode": "// SKELETON_PLACEHOLDER: INPUT_CONTRACT__MERGED_FINDINGS\n// Accept merged specialist findings.\n// TODO: Replace this placeholder with configured production logic.\n// Contract discipline: preserve FACT / INFERENCE / HYPOTHESIS / UNKNOWN boundaries.\nreturn items;\n"
+      },
+      "id": "input_contract__merged_findings",
+      "name": "INPUT_CONTRACT__MERGED_FINDINGS",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        260,
+        0
+      ]
+    },
+    {
+      "parameters": {
+        "jsCode": "// SKELETON_PLACEHOLDER: TODO_LINK_SUBWORKFLOW__61_HYPOTHESIS_BUILDER\n// LINK SUB-WORKFLOW AFTER IMPORT: 61_HYPOTHESIS_BUILDER.\n// TODO: Replace this placeholder with configured production logic.\n// Contract discipline: preserve FACT / INFERENCE / HYPOTHESIS / UNKNOWN boundaries.\nreturn items;\n"
+      },
+      "id": "todo_link_subworkflow__61_hypothesis_builder",
+      "name": "TODO_LINK_SUBWORKFLOW__61_HYPOTHESIS_BUILDER",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        560,
+        0
+      ]
+    },
+    {
+      "parameters": {
+        "jsCode": "// SKELETON_PLACEHOLDER: TODO_LINK_SUBWORKFLOW__62_ROOT_CAUSE_DIAGNOSIS\n// LINK SUB-WORKFLOW AFTER IMPORT: 62_ROOT_CAUSE_DIAGNOSIS.\n// TODO: Replace this placeholder with configured production logic.\n// Contract discipline: preserve FACT / INFERENCE / HYPOTHESIS / UNKNOWN boundaries.\nreturn items;\n"
+      },
+      "id": "todo_link_subworkflow__62_root_cause_diagnosis",
+      "name": "TODO_LINK_SUBWORKFLOW__62_ROOT_CAUSE_DIAGNOSIS",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        860,
+        0
+      ]
+    },
+    {
+      "parameters": {
+        "jsCode": "// SKELETON_PLACEHOLDER: PRIORITIZATION\n// Prioritize by evidence strength, client relevance, and feasibility.\n// TODO: Replace this placeholder with configured production logic.\n// Contract discipline: preserve FACT / INFERENCE / HYPOTHESIS / UNKNOWN boundaries.\nreturn items;\n"
+      },
+      "id": "prioritization",
+      "name": "PRIORITIZATION",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        1160,
+        0
+      ]
+    },
+    {
+      "parameters": {
+        "jsCode": "// SKELETON_PLACEHOLDER: TODO_LINK_SUBWORKFLOW__63_ACTION_DESIGN\n// LINK SUB-WORKFLOW AFTER IMPORT: 63_ACTION_DESIGN.\n// TODO: Replace this placeholder with configured production logic.\n// Contract discipline: preserve FACT / INFERENCE / HYPOTHESIS / UNKNOWN boundaries.\nreturn items;\n"
+      },
+      "id": "todo_link_subworkflow__63_action_design",
+      "name": "TODO_LINK_SUBWORKFLOW__63_ACTION_DESIGN",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        1460,
+        0
+      ]
+    },
+    {
+      "parameters": {
+        "jsCode": "// SKELETON_PLACEHOLDER: TODO_LINK_SUBWORKFLOW__64_KPI_DESIGN\n// LINK SUB-WORKFLOW AFTER IMPORT: 64_KPI_DESIGN.\n// TODO: Replace this placeholder with configured production logic.\n// Contract discipline: preserve FACT / INFERENCE / HYPOTHESIS / UNKNOWN boundaries.\nreturn items;\n"
+      },
+      "id": "todo_link_subworkflow__64_kpi_design",
+      "name": "TODO_LINK_SUBWORKFLOW__64_KPI_DESIGN",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        1760,
+        0
+      ]
+    },
+    {
+      "parameters": {
+        "jsCode": "// SKELETON_PLACEHOLDER: TODO_LINK_SUBWORKFLOW__65_CLIENT_VALIDATION_QUESTIONS\n// LINK SUB-WORKFLOW AFTER IMPORT: 65_CLIENT_VALIDATION_QUESTIONS.\n// TODO: Replace this placeholder with configured production logic.\n// Contract discipline: preserve FACT / INFERENCE / HYPOTHESIS / UNKNOWN boundaries.\nreturn items;\n"
+      },
+      "id": "todo_link_subworkflow__65_client_validation_questions",
+      "name": "TODO_LINK_SUBWORKFLOW__65_CLIENT_VALIDATION_QUESTIONS",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        2060,
+        0
+      ]
+    },
+    {
+      "parameters": {
+        "jsCode": "// SKELETON_PLACEHOLDER: TODO_LINK_SUBWORKFLOW__66_90_DAY_ROADMAP\n// LINK SUB-WORKFLOW AFTER IMPORT: 66_90_DAY_ROADMAP.\n// TODO: Replace this placeholder with configured production logic.\n// Contract discipline: preserve FACT / INFERENCE / HYPOTHESIS / UNKNOWN boundaries.\nreturn items;\n"
+      },
+      "id": "todo_link_subworkflow__66_90_day_roadmap",
+      "name": "TODO_LINK_SUBWORKFLOW__66_90_DAY_ROADMAP",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        2360,
+        0
+      ]
+    },
+    {
+      "parameters": {
+        "jsCode": "// TERMINAL_OUTPUT_NODE: OUTPUT_CONTRACT__TRANSFORMATION_PACKAGE\n// Return diagnosis-action-KPI-validation chain.\n// TODO: Replace this placeholder with configured production logic.\n// Contract discipline: preserve FACT / INFERENCE / HYPOTHESIS / UNKNOWN boundaries.\nreturn items;\n"
+      },
+      "id": "output_contract__transformation_package",
+      "name": "OUTPUT_CONTRACT__TRANSFORMATION_PACKAGE",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        2660,
+        0
+      ]
+    }
+  ],
+  "connections": {
+    "START__SUB_WORKFLOW_TRIGGER": {
+      "main": [
+        [
+          {
+            "node": "INPUT_CONTRACT__MERGED_FINDINGS",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "INPUT_CONTRACT__MERGED_FINDINGS": {
+      "main": [
+        [
+          {
+            "node": "TODO_LINK_SUBWORKFLOW__61_HYPOTHESIS_BUILDER",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "TODO_LINK_SUBWORKFLOW__61_HYPOTHESIS_BUILDER": {
+      "main": [
+        [
+          {
+            "node": "TODO_LINK_SUBWORKFLOW__62_ROOT_CAUSE_DIAGNOSIS",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "TODO_LINK_SUBWORKFLOW__62_ROOT_CAUSE_DIAGNOSIS": {
+      "main": [
+        [
+          {
+            "node": "PRIORITIZATION",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "PRIORITIZATION": {
+      "main": [
+        [
+          {
+            "node": "TODO_LINK_SUBWORKFLOW__63_ACTION_DESIGN",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "TODO_LINK_SUBWORKFLOW__63_ACTION_DESIGN": {
+      "main": [
+        [
+          {
+            "node": "TODO_LINK_SUBWORKFLOW__64_KPI_DESIGN",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "TODO_LINK_SUBWORKFLOW__64_KPI_DESIGN": {
+      "main": [
+        [
+          {
+            "node": "TODO_LINK_SUBWORKFLOW__65_CLIENT_VALIDATION_QUESTIONS",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "TODO_LINK_SUBWORKFLOW__65_CLIENT_VALIDATION_QUESTIONS": {
+      "main": [
+        [
+          {
+            "node": "TODO_LINK_SUBWORKFLOW__66_90_DAY_ROADMAP",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "TODO_LINK_SUBWORKFLOW__66_90_DAY_ROADMAP": {
+      "main": [
+        [
+          {
+            "node": "OUTPUT_CONTRACT__TRANSFORMATION_PACKAGE",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": false,
+  "settings": {
+    "executionOrder": "v1"
+  },
+  "pinData": {}
+}

@@ -1,0 +1,183 @@
+{
+  "name": "62_ROOT_CAUSE_DIAGNOSIS",
+  "nodes": [
+    {
+      "parameters": {
+        "content": "PURPOSE\nDistinguish observed problems, likely causes, validated causes, and unknowns.\n\nOWNER\nGRETEL TRACK B\n\nINPUT CONTRACT\nfinding.schema.json[] plus hypothesis.schema.json[]\n\nOUTPUT CONTRACT\ndiagnosis records with diagnosis_type\n\nSTATUS\nSkeleton only. Inactive by default. No credentials. Configure TODO nodes after import.",
+        "height": 340,
+        "width": 520,
+        "color": 4
+      },
+      "id": "00_readme__purpose_owner_contracts_status",
+      "name": "00_README__PURPOSE_OWNER_CONTRACTS_STATUS",
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [
+        -420,
+        -320
+      ]
+    },
+    {
+      "parameters": {},
+      "id": "start__sub_workflow_trigger",
+      "name": "START__SUB_WORKFLOW_TRIGGER",
+      "type": "n8n-nodes-base.executeWorkflowTrigger",
+      "typeVersion": 1,
+      "position": [
+        0,
+        0
+      ]
+    },
+    {
+      "parameters": {
+        "jsCode": "// SKELETON_PLACEHOLDER: INPUT_CONTRACT__FINDINGS_HYPOTHESES\n// Accept findings and hypotheses.\n// TODO: Replace this placeholder with configured production logic.\n// Contract discipline: preserve FACT / INFERENCE / HYPOTHESIS / UNKNOWN boundaries.\nreturn items;\n"
+      },
+      "id": "input_contract__findings_hypotheses",
+      "name": "INPUT_CONTRACT__FINDINGS_HYPOTHESES",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        260,
+        0
+      ]
+    },
+    {
+      "parameters": {
+        "jsCode": "// SKELETON_PLACEHOLDER: CLASSIFY_DIAGNOSIS_TYPE\n// Use observed_problem, likely_cause, validated_cause, or unknown.\n// TODO: Replace this placeholder with configured production logic.\n// Contract discipline: preserve FACT / INFERENCE / HYPOTHESIS / UNKNOWN boundaries.\nreturn items;\n"
+      },
+      "id": "classify_diagnosis_type",
+      "name": "CLASSIFY_DIAGNOSIS_TYPE",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        560,
+        0
+      ]
+    },
+    {
+      "parameters": {
+        "jsCode": "// SKELETON_PLACEHOLDER: TODO_AGENT__ROOT_CAUSE\n// AGENT_INTERFACE__ROOT_CAUSE_DIAGNOSIS.\n// TODO: Replace this placeholder with configured production logic.\n// Contract discipline: preserve FACT / INFERENCE / HYPOTHESIS / UNKNOWN boundaries.\nreturn items;\n"
+      },
+      "id": "todo_agent__root_cause",
+      "name": "TODO_AGENT__ROOT_CAUSE",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        860,
+        0
+      ]
+    },
+    {
+      "parameters": {
+        "jsCode": "// SKELETON_PLACEHOLDER: EVIDENCE_SUPPORT_CHECK\n// Public evidence normally produces likely_cause, not validated_cause.\n// TODO: Replace this placeholder with configured production logic.\n// Contract discipline: preserve FACT / INFERENCE / HYPOTHESIS / UNKNOWN boundaries.\nreturn items;\n"
+      },
+      "id": "evidence_support_check",
+      "name": "EVIDENCE_SUPPORT_CHECK",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        1160,
+        0
+      ]
+    },
+    {
+      "parameters": {
+        "jsCode": "// SKELETON_PLACEHOLDER: VALIDATION_BOUNDARY_CHECK\n// Require clear evidence before validated_cause.\n// TODO: Replace this placeholder with configured production logic.\n// Contract discipline: preserve FACT / INFERENCE / HYPOTHESIS / UNKNOWN boundaries.\nreturn items;\n"
+      },
+      "id": "validation_boundary_check",
+      "name": "VALIDATION_BOUNDARY_CHECK",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        1460,
+        0
+      ]
+    },
+    {
+      "parameters": {
+        "jsCode": "// TERMINAL_OUTPUT_NODE: OUTPUT_CONTRACT__DIAGNOSIS\n// Return structured diagnosis records.\n// TODO: Replace this placeholder with configured production logic.\n// Contract discipline: preserve FACT / INFERENCE / HYPOTHESIS / UNKNOWN boundaries.\nreturn items;\n"
+      },
+      "id": "output_contract__diagnosis",
+      "name": "OUTPUT_CONTRACT__DIAGNOSIS",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        1760,
+        0
+      ]
+    }
+  ],
+  "connections": {
+    "START__SUB_WORKFLOW_TRIGGER": {
+      "main": [
+        [
+          {
+            "node": "INPUT_CONTRACT__FINDINGS_HYPOTHESES",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "INPUT_CONTRACT__FINDINGS_HYPOTHESES": {
+      "main": [
+        [
+          {
+            "node": "CLASSIFY_DIAGNOSIS_TYPE",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "CLASSIFY_DIAGNOSIS_TYPE": {
+      "main": [
+        [
+          {
+            "node": "TODO_AGENT__ROOT_CAUSE",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "TODO_AGENT__ROOT_CAUSE": {
+      "main": [
+        [
+          {
+            "node": "EVIDENCE_SUPPORT_CHECK",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "EVIDENCE_SUPPORT_CHECK": {
+      "main": [
+        [
+          {
+            "node": "VALIDATION_BOUNDARY_CHECK",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "VALIDATION_BOUNDARY_CHECK": {
+      "main": [
+        [
+          {
+            "node": "OUTPUT_CONTRACT__DIAGNOSIS",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": false,
+  "settings": {
+    "executionOrder": "v1"
+  },
+  "pinData": {}
+}

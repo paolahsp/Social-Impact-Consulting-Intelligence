@@ -1,0 +1,15 @@
+{
+  "evidence_id": "EV-001",
+  "run_id": "RUN-FICTIONAL-001",
+  "claim": "Volunteer applications are collected through a public website form.",
+  "source_ids": [
+    "SRC-001"
+  ],
+  "domain": "operations_cx",
+  "evidence_type": "fact",
+  "confidence": 0.86,
+  "status": "supported",
+  "contradiction_ids": [],
+  "requires_validation": false
+}
+

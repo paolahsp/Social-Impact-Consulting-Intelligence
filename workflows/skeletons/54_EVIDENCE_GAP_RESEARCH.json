@@ -1,0 +1,252 @@
+{
+  "name": "54_EVIDENCE_GAP_RESEARCH",
+  "nodes": [
+    {
+      "parameters": {
+        "content": "PURPOSE\nPerform targeted research only when an important evidence gap exists.\n\nOWNER\nPAOLA TRACK A\n\nINPUT CONTRACT\nmissing_evidence_request with retry_count, max_retries, reason_for_retry\n\nOUTPUT CONTRACT\nnew evidence or UNKNOWN marker\n\nSTATUS\nSkeleton only. Inactive by default. No credentials. Configure TODO nodes after import.",
+        "height": 340,
+        "width": 520,
+        "color": 4
+      },
+      "id": "00_readme__purpose_owner_contracts_status",
+      "name": "00_README__PURPOSE_OWNER_CONTRACTS_STATUS",
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [
+        -420,
+        -320
+      ]
+    },
+    {
+      "parameters": {},
+      "id": "start__sub_workflow_trigger",
+      "name": "START__SUB_WORKFLOW_TRIGGER",
+      "type": "n8n-nodes-base.executeWorkflowTrigger",
+      "typeVersion": 1,
+      "position": [
+        0,
+        0
+      ]
+    },
+    {
+      "parameters": {
+        "jsCode": "// SKELETON_PLACEHOLDER: INPUT_CONTRACT__MISSING_EVIDENCE_REQUEST\n// Accept missing evidence request and retry metadata.\n// TODO: Replace this placeholder with configured production logic.\n// Contract discipline: preserve FACT / INFERENCE / HYPOTHESIS / UNKNOWN boundaries.\nreturn items;\n"
+      },
+      "id": "input_contract__missing_evidence_request",
+      "name": "INPUT_CONTRACT__MISSING_EVIDENCE_REQUEST",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        260,
+        0
+      ]
+    },
+    {
+      "parameters": {
+        "jsCode": "// SKELETON_PLACEHOLDER: DECISION__CAN_PUBLIC_RESEARCH_ANSWER\n// Decide whether public research can answer the gap.\n// TODO: Replace this placeholder with configured production logic.\n// Contract discipline: preserve FACT / INFERENCE / HYPOTHESIS / UNKNOWN boundaries.\nreturn items;\n"
+      },
+      "id": "decision__can_public_research_answer",
+      "name": "DECISION__CAN_PUBLIC_RESEARCH_ANSWER",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        560,
+        0
+      ]
+    },
+    {
+      "parameters": {
+        "jsCode": "// SKELETON_PLACEHOLDER: MARK_UNKNOWN\n// When public research cannot answer, mark UNKNOWN for client validation.\n// TODO: Replace this placeholder with configured production logic.\n// Contract discipline: preserve FACT / INFERENCE / HYPOTHESIS / UNKNOWN boundaries.\nreturn items;\n"
+      },
+      "id": "mark_unknown",
+      "name": "MARK_UNKNOWN",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        860,
+        0
+      ]
+    },
+    {
+      "parameters": {
+        "jsCode": "// SKELETON_PLACEHOLDER: BUILD_TARGETED_QUERY\n// Build a focused query for answerable public gaps.\n// TODO: Replace this placeholder with configured production logic.\n// Contract discipline: preserve FACT / INFERENCE / HYPOTHESIS / UNKNOWN boundaries.\nreturn items;\n"
+      },
+      "id": "build_targeted_query",
+      "name": "BUILD_TARGETED_QUERY",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        1160,
+        0
+      ]
+    },
+    {
+      "parameters": {
+        "jsCode": "// SKELETON_PLACEHOLDER: TODO_API__TARGETED_RESEARCH\n// Placeholder for targeted public research provider.\n// TODO: Replace this placeholder with configured production logic.\n// Contract discipline: preserve FACT / INFERENCE / HYPOTHESIS / UNKNOWN boundaries.\nreturn items;\n"
+      },
+      "id": "todo_api__targeted_research",
+      "name": "TODO_API__TARGETED_RESEARCH",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        1460,
+        0
+      ]
+    },
+    {
+      "parameters": {
+        "jsCode": "// SKELETON_PLACEHOLDER: VALIDATE_NEW_SOURCE\n// Validate relevance and source quality.\n// TODO: Replace this placeholder with configured production logic.\n// Contract discipline: preserve FACT / INFERENCE / HYPOTHESIS / UNKNOWN boundaries.\nreturn items;\n"
+      },
+      "id": "validate_new_source",
+      "name": "VALIDATE_NEW_SOURCE",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        1760,
+        0
+      ]
+    },
+    {
+      "parameters": {
+        "jsCode": "// SKELETON_PLACEHOLDER: NEW_EVIDENCE\n// Normalize new evidence for re-evaluation.\n// TODO: Replace this placeholder with configured production logic.\n// Contract discipline: preserve FACT / INFERENCE / HYPOTHESIS / UNKNOWN boundaries.\nreturn items;\n"
+      },
+      "id": "new_evidence",
+      "name": "NEW_EVIDENCE",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        2060,
+        0
+      ]
+    },
+    {
+      "parameters": {
+        "jsCode": "// TERMINAL_OUTPUT_NODE: RETURN_TO_EVALUATION\n// Return evidence or UNKNOWN marker to caller.\n// TODO: Replace this placeholder with configured production logic.\n// Contract discipline: preserve FACT / INFERENCE / HYPOTHESIS / UNKNOWN boundaries.\nreturn items;\n"
+      },
+      "id": "return_to_evaluation",
+      "name": "RETURN_TO_EVALUATION",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        2360,
+        0
+      ]
+    },
+    {
+      "parameters": {
+        "content": "RETRY CONTROL\nRequired fields: retry_count, max_retries, reason_for_retry.\nNo infinite loops. Parent workflow must stop retrying when retry_count >= max_retries.",
+        "height": 190,
+        "width": 420,
+        "color": 4
+      },
+      "id": "note__retry_limits",
+      "name": "NOTE__RETRY_LIMITS",
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [
+        460,
+        -260
+      ]
+    }
+  ],
+  "connections": {
+    "START__SUB_WORKFLOW_TRIGGER": {
+      "main": [
+        [
+          {
+            "node": "INPUT_CONTRACT__MISSING_EVIDENCE_REQUEST",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "INPUT_CONTRACT__MISSING_EVIDENCE_REQUEST": {
+      "main": [
+        [
+          {
+            "node": "DECISION__CAN_PUBLIC_RESEARCH_ANSWER",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "DECISION__CAN_PUBLIC_RESEARCH_ANSWER": {
+      "main": [
+        [
+          {
+            "node": "BUILD_TARGETED_QUERY",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "MARK_UNKNOWN",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "BUILD_TARGETED_QUERY": {
+      "main": [
+        [
+          {
+            "node": "TODO_API__TARGETED_RESEARCH",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "TODO_API__TARGETED_RESEARCH": {
+      "main": [
+        [
+          {
+            "node": "VALIDATE_NEW_SOURCE",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "VALIDATE_NEW_SOURCE": {
+      "main": [
+        [
+          {
+            "node": "NEW_EVIDENCE",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "NEW_EVIDENCE": {
+      "main": [
+        [
+          {
+            "node": "RETURN_TO_EVALUATION",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "MARK_UNKNOWN": {
+      "main": [
+        [
+          {
+            "node": "RETURN_TO_EVALUATION",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": false,
+  "settings": {
+    "executionOrder": "v1"
+  },
+  "pinData": {}
+}
