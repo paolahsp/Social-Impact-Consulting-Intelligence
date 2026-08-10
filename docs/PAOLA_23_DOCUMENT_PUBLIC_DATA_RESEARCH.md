@@ -134,7 +134,24 @@ python scripts/validate_paola_23_output.py runs/paola_23_givedirectly.json runs/
 
 ## Live verification status
 
-Repository-ready. Live n8n workflow IDs, execution IDs, exact results, and final verification status will be recorded after import and execution.
+LIVE n8n VERIFIED on 2026-08-10.
+
+| Item | n8n ID |
+| --- | --- |
+| `23_DOCUMENT_PUBLIC_DATA_RESEARCH` | `bNt57WU9v9dewoUY` |
+| `DEV_PAOLA_23_DOCUMENT_RESEARCH_TEST` | `57ipCHY4PPPvZYiP` |
+| Final DEV execution | `1396` |
+
+| Scenario | Execution | State | Candidates | Documents | Sources | Useful sections | Errors |
+| --- | --- | --- | ---: | ---: | ---: | ---: | ---: |
+| GiveDirectly FY2023 audit | `1397` | `success` | 1 | 1 | 1 | 8 | 0 |
+| MSF Financial Report 2023 | `1398` | `success` | 1 | 1 | 1 | 8 | 0 |
+| GiveDirectly valid + missing document | `1399` | `partial_success` | 2 | 1 | 1 | 8 | 1 |
+| GiveDirectly `/about` | `1400` | `unsupported_document` | 1 | 0 | 0 | 0 | 1 |
+
+Both successful documents were classified as `audited_financial_statement`, matched the official organization domain, and retained eight bounded sections. The partial run preserved the valid document and emitted one `DOCUMENT_FETCH` / `request_failure` error for the intentionally missing URL. The unsupported run made no external document claim and emitted one `DOCUMENT_RELEVANCE_FILTER` / `unsupported_document` error.
+
+Exact aggregate-node outputs are stored in `runs/paola_23_*.json` and pass `scripts/validate_paola_23_output.py`.
 
 ## Limitations
 

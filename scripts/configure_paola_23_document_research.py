@@ -104,11 +104,10 @@ JS_INPUT_VALIDATION = r"""
 function normalizeWebsite(value) {
   const raw = String(value || '').trim();
   if (!raw) return null;
-  try {
-    const parsed = new URL(/^https?:\/\//i.test(raw) ? raw : `https://${raw}`);
-    if (!parsed.hostname.includes('.')) return null;
-    return `${parsed.protocol}//${parsed.hostname.toLowerCase()}`;
-  } catch { return null; }
+  const candidate = /^https?:\/\//i.test(raw) ? raw : `https://${raw}`;
+  const match = candidate.match(/^(https?):\/\/([^\/?#]+)(?:[\/?#]|$)/i);
+  if (!match || !match[2].includes('.') || /\s/.test(match[2])) return null;
+  return `${match[1].toLowerCase()}://${match[2].toLowerCase()}`;
 }
 
 return items.map(item => {
@@ -172,11 +171,7 @@ for (const item of items) {
   for (let index = 0; index < base.document_candidates.length; index++) {
     const supplied = base.document_candidates[index] || {};
     const url = String(supplied.url || '').trim();
-    let validUrl = null;
-    try {
-      const parsed = new URL(url);
-      if (['http:', 'https:'].includes(parsed.protocol)) validUrl = parsed.toString();
-    } catch {}
+    const validUrl = /^https?:\/\/[^\s\/?#]+\.[^\s\/?#]+(?:[\/?#]|$)/i.test(url) ? url : null;
     output.push({
       json: {
         ...base,
@@ -230,8 +225,8 @@ return items.map(item => {
 
 JS_ORGANIZATION_MATCH = r"""
 function host(value) {
-  try { return new URL(value).hostname.replace(/^www\./, '').toLowerCase(); }
-  catch { return ''; }
+  const match = String(value || '').match(/^https?:\/\/([^\/?#]+)/i);
+  return match ? match[1].replace(/^www\./, '').toLowerCase() : '';
 }
 function tokens(value) {
   return String(value || '').toLowerCase().match(/[a-z0-9]+/g) || [];
@@ -396,7 +391,7 @@ function fileType(value, hint) {
 }
 function fallbackTitle(url) {
   try {
-    const last = new URL(url).pathname.split('/').filter(Boolean).pop() || 'Public document';
+    const last = String(url || '').split(/[?#]/)[0].split('/').filter(Boolean).pop() || 'Public document';
     return decodeURIComponent(last).replace(/[-_]+/g, ' ').replace(/\.[a-z0-9]{2,5}$/i, '').trim() || 'Public document';
   } catch { return 'Public document'; }
 }
@@ -515,7 +510,7 @@ const runContext = rows.find(row => row.run_context)?.run_context || null;
 const documents = rows.filter(row => row.result_type === 'document').map(row => row.document).sort((a, b) => a.document_id.localeCompare(b.document_id));
 const sources = rows.filter(row => row.result_type === 'document').map(row => row.source).sort((a, b) => a.source_id.localeCompare(b.source_id));
 const errors = rows.filter(row => row.result_type === 'error').map(row => row.error);
-const candidatesAttempted = rows.filter(row => row.candidate?.url).length;
+const candidatesAttempted = rows.filter(row => row.result_type === 'document' || row.error?.url).length;
 let controlledState = 'success';
 if (documents.length && errors.length) controlledState = 'partial_success';
 else if (documents.length) controlledState = 'success';

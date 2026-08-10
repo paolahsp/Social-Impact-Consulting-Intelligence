@@ -1,0 +1,146 @@
+{
+  "live_n8n_evidence": {
+    "verified_at": "2026-08-10T15:39:20Z",
+    "dev_execution_id": "1396",
+    "subworkflow_execution_id": "1398",
+    "workflow_id": "bNt57WU9v9dewoUY",
+    "dev_workflow_id": "57ipCHY4PPPvZYiP",
+    "snapshot_note": "Exact single-item output copied from the live n8n aggregate node."
+  },
+  "run_context": {
+    "run_id": "RUN-N8N-23-MSF",
+    "organization": {
+      "name": "Médecins Sans Frontières",
+      "website": "https://www.msf.org",
+      "country": "Switzerland",
+      "mission_area": null
+    },
+    "current_challenge": null,
+    "uploaded_document_refs": [],
+    "status": "created",
+    "started_at": "2026-08-10T15:39:18.317Z",
+    "errors": []
+  },
+  "controlled_state": "success",
+  "extraction_provider": "jina_reader",
+  "provider": {
+    "name": "Jina Reader",
+    "credential_required": false,
+    "integration": "n8n HTTP Request",
+    "endpoint_pattern": "https://r.jina.ai/{public_document_url}"
+  },
+  "candidates_attempted": 1,
+  "documents": [
+    {
+      "document_id": "DOC-001",
+      "source_id": "SRC-DOC-001",
+      "title": "MSF_Financial_Report_2023_FINAL_APPROVED_030724.pdf",
+      "url": "https://www.msf.org/sites/default/files/2024-07/MSF_Financial_Report_2023_FINAL_APPROVED_030724.pdf",
+      "document_type": "audited_financial_statement",
+      "publisher": "Médecins Sans Frontières",
+      "publication_date": null,
+      "retrieved_at": "2026-08-10T15:39:19.007Z",
+      "authority_level": "official",
+      "is_official": true,
+      "file_type": "pdf",
+      "discovered_by": "web_search",
+      "organization_match": {
+        "matched": true,
+        "official_domain_match": true,
+        "organization_name_match": false,
+        "method": "official_domain"
+      },
+      "sections": [
+        {
+          "section_type": "financial",
+          "text": "MSF offers humanitarian assistance to people based on need and irrespective of race, religion, gender or political affiliation. We work to save lives, alleviate suffering and restore dignity. Our actions are guided by medical ethics and the principles of neutrality and impartiality. In order to be able to access and assist people in need, our operational policies must be scrupulously independent of governments, as well as religious and economic powers. We conduct our own assessments, manage our projects directly and monitor the impact of our assistance. We do not accept funds from governments or other parties who are directly involved in the conflicts to which MSF is responding. We rely on the generosity of private individuals for the majority of our funding. In 2023, 4,116* health professionals, logistics specialists and administrative staff of all nationalities were assigned in medical programmes, to work with 42,149 locally hired staff* in over 74 countries. MSF is constantly seeking to improve the quality, relevance and extent of its assistance. The Access Campaign supports our field programmes by pushing for improved access to existing medicines, diagnostics and vaccines, and "
+        },
+        {
+          "section_type": "financial",
+          "text": "Conflict was a major driver of human suffering and vulnerability in 2023, causing many thousands of deaths worldwide and displacing record numbers of people. i As in previous years, assisting communities affected by violence was a significant component of Médecins Sans Frontières (MSF) programmes. We also responded to disasters and disease outbreaks, and worked to improve healthcare for refugees, migrants and other marginalised people."
+        },
+        {
+          "section_type": "impact",
+          "text": "In mid-April, when war suddenly broke out in Sudan between the Sudanese army and paramilitary group the Rapid Support Forces (RSF), our teams quickly adapted their activities to respond. Fighting was intense in the capital, Khartoum, and across large swathes of the country. As a result, 8.5 million people have been displaced, most of them within Sudan.ii But over 1.8 million have also fled into neighbouring countries, including Chad, South Sudan and Ethiopia. The war in Sudan has garnered very little of the world’s attention and support from other organisations is sometimes non-existent; in some areas, MSF is the only international humanitarian organisation present. Assisting people injured and displaced by the war proved extremely challenging. Local authorities blocked the delivery of critical medical supplies to areas under RSF control, forcing us to temporarily suspend activities in some facilities, including surgery at Khartoum’s Bashair hospital. Visas for international teams to enter and support exhausted Sudanese staff became hard to obtain. At the end of the year, many people who remained in Sudan were struggling to obtain medical care, food and water, while those who had c"
+        },
+        {
+          "section_type": "impact",
+          "text": "Authorities in Afghanistan and Yemen have increasingly marginalised women and girls from society and severely reduced their access to education and healthcare. We already face a shortage of qualified female healthcare staff in Afghanistan – needed to provide healthcare to female patients – and is something that we can only expect to worsen with the ban on female secondary and higher education. Both countries require women to travel with a (usually male) relative when they leave the home. In Yemen, paying transport costs for two people to visit a hospital, rather than one, is unaffordable for many families, while in Afghanistan, women often have to wait for someone to be available to accompany them or their child to a health facility. In 2023, we continued to assist people who had made the dangerous journey through the Darién Gap, the heavily forested region between Colombia and Panama, on their way north to Mexico and the United States. Over half a million people – including many families and children – made the crossing, twice the number in 2022. Our teams treated patients for conditions and injuries caused by their arduous journeys, as well as many victims of violence and sexual "
+        },
+        {
+          "section_type": "programs",
+          "text": "MSF PROGRAMMES AROUND THE WORLD RUSSIA BANGLADESH MYANMAR THAILAND MALAYSIA INDONESIA PHILIPPINES TAIWAN PAPUA NEW GUINEA INDIA SRI LANKA PAKISTAN KYRGYZSTAN KAZAKHSTAN TAJIKISTAN AFGHANISTAN DPR KOREA JAPAN"
+        },
+        {
+          "section_type": "programs",
+          "text": "40 AFGHANISTAN 40 ANGOLA 41 ARMENIA 41 BALKANS 42 BANGLADESH 42 BELARUS 43 BELGIUM 43 BENIN 44 BRAZIL 44 BULGARIA 45 BURKINA FASO 45 BURUNDI 46 CAMEROON 46 CENTRAL AFRICAN REPUBLIC 47 CHAD 47 COLOMBIA 48 CÔTE D’IVOIRE 48 DEMOCRATIC REPUBLIC OF CONGO 49 EGYPT 49 ESWATINI 50 ETHIOPIA 50 FRANCE 51 GREECE 51 GUATEMALA 52 GUINEA 52 HAITI 53 HONDURAS 53 INDIA 54 INDONESIA 54 IRAN 55 IRAQ 55 ITALY 56 JORDAN 56 KENYA 57 KIRIBATI 57 KYRGYZSTAN 58 LEBANON 58 LIBERIA 59 LIBYA 59 MADAGASCAR 60 MALAWI 60 MALAYSIA 61 MALI 61 MEXICO 62 MOZAMBIQUE 62 MYANMAR 63 NIGER 63 NIGERIA 64 PAKISTAN 64 PALESTINE 65 PANAMA 65 PAPUA NEW GUINEA 66 PERU 66 PHILIPPINES 67 POLAND 67 RUSSIA 68 SEARCH AND RESCUE OPERATIONS 68 SENEGAL 69 SIERRA LEONE 69 SOMALIA AND SOMALILAND 70 SOUTH AFRICA 70 SOUTH SUDAN 71 SUDAN 71 SYRIA 72 TAJIKISTAN 72 TANZANIA 73 THAILAND 73 TURKEY 74 UGANDA 74 UKRAINE 75 UZBEKISTAN 75 VENEZUELA 76 YEMEN 76 ZIMBABWE 77 OTHER COUNTRIES/ REGIONS AND TRANSVERSAL ACTIVITIES"
+        },
+        {
+          "section_type": "governance",
+          "text": "This report is presented along with the financial statements of the organisation for the year ended 31 December 2023. These financial statements are a means of transparency and accountability, illustrating the financial situation of the movement as a whole. They have been prepared in accordance with the accounting policies of Swiss GAAP FER/RPC, which are set out in Note 1.1. to the Financial Statements."
+        },
+        {
+          "section_type": "governance",
+          "text": "MSF is a non-profit, self-governed organisation. Founded in Paris, France in 1971, MSF today is a worldwide movement of associations, with offices all over the world. Specialised organisations – called satellites – are in charge of specific activities such as humanitarian relief supplies, epidemiological and medical research studies, and research on humanitarian and social action. In 2011, MSF’s international governance structure was reformed. MSF International was registered in Switzerland and in December 2011 the first annual MSF International General Assembly (IGA) was held. In subsequent years, the IGA would be held in June. The IGA comprises two representatives of each MSF association, two representatives elected by the individual members of MSF International, and the International President. The IGA is the highest authority of MSF International and is responsible for safeguarding MSF’s medical humanitarian mission, and providing strategic orientation to all MSF entities. The International Board acts on behalf of, and is accountable to, the IGA. It is made up of representatives of MSF’s operational directorates as well as a group elected by the IGA, and is chaired by the Inter"
+        }
+      ],
+      "content_excerpt": "Number of Pages: 82\n\n# INTERNATIONAL FINANCIAL REPORT 2023 CONTENTS \n\n2 MSF PROGRAMMES AROUND THE WORLD \n\n4 ACTIVITIES AND ORGANISATION \n\n5 FOREWORD \n\n6 YEAR IN REVIEW \n\n8 TREASURER’S REPORT \n\n9 AUDITORS’ REPORT \n\nCOMBINED FINANCIAL STATEMENTS \n\n12  Combined Statement of Financial Activities \n\n13  Combined Statement of Financial Position \n\n14  Combined Statement of Changes in Funds \n\n16  Combined Statement of Cash Flows \n\nNOTES TO THE COMBINED FINANCIAL STATEMENTS \n\n18  Basis of Reporting \n\n21  Notes to the Combined Statement of Financial Activities \n\n27  Notes to the Combined Statement of Financial Position \n\n33  Ratios and Sectorial Information \n\n36  Other Information \n\n39  FINANCES BY COUNTRY \n\nInternational Financial Report 2023 1\n\nCONTENTS IRAN TÜRKIYE UZBEKISTAN IRAQ GEORGIA UKRAINE BELARUS LITHUANIA SERBIA BULGARIA POLAND ARMENIA LEBANON SYRIA JORDAN GREECE ITALY FRANCE SWITZERLAND UNITED KINGDOM SPAIN MOROCCO BELGIUM SUDAN SOUTH SUDAN CENTRAL AFRICAN REPUBLIC DEMOCRATIC REPUBLIC OF CONGO ETHIOPIA SOMALIA AND SOMALILAND UNITED ARAB EMIRATES KENYA UGANDA BURUNDI MALAWI TANZANIA ZIMBABWE ZAMBIA MOZAMBIQUE ESWATINI SOUTH AFRICA COLOMBIA HAITI MEXICO USA HONDURAS PANAMA EL SALVADOR CHAD NIGERIA GHANA NIGER CAMEROON EQUATORIAL GUINEA MALI GUINEA SIERRA LEONE LIBERIA CÔTE D’IVOIRE EGYPT LIBYA PALESTINE YEMEN VENEZUELA BURKINA FASO \n\nBRAZIL BOLIVIA PARAGUAY PERU ECUADOR \n\n# MSF PROGRAMMES AROUND THE WORLD \n\nGUATEMALA TUNISIA SENEGAL BENIN ANGOLA ERITREA MADAGASCAR \n\n2 Médecins Sans Frontières \n\nMSF PROGRAMMES AROUND THE WORLD RUSSIA BANGLADESH MYANMAR THAILAND MALAYSIA INDONESIA PHILIPPINES TAIWAN PAPUA NEW GUINEA INDIA SRI LANKA PAKISTAN KYRGYZSTAN KAZAKHSTAN TAJIKISTAN AFGHANISTAN DPR KOREA JAPAN \n\nCountries/regions in blue have a total expenditure of less than \n\n€500,000 and are included in ‘other countries/regions’. \n\n40  AFGHANISTAN 40  ANGOLA 41  ARMENIA 41  BALKANS 42  BANGLADESH 42  BELARUS 43  BELGIUM 43  BENIN 44  BRAZIL 44  BULGARIA 45  BURKINA FASO 45  BURUNDI 46  CAMEROON 46  CENTRAL AFRICAN REPUBLIC 47  CHAD 47  COLOMBIA 48  CÔTE D’IVOIRE 48  DEMOCRATIC REPUBLIC OF CONGO 49  EGYPT 49  ESWATINI 50  ETHIOPIA 50  FRANCE 51  GREECE 51  GUATEMALA 52  GUINEA 52  HAITI 53  HONDURAS 53  INDIA 54  INDONESIA 54  IRAN 55  IRAQ 55  ITALY 56  JORDAN 56  KENYA 57  KIRIBATI 57  KYRGYZSTAN 58  LEBANON 58  LIBERIA 59  LIBYA 59  MADAGASCAR 60  MALAWI 60  MALAYSIA 61  MALI 61  MEXICO 62  MOZAMBIQUE 62  MYANMAR 63  NIGER 63  NIGERIA 64  PAKISTAN 64  PALESTINE 65  PANAMA 65  PAPUA NEW GUINEA 66  PERU 66  PHILIPPINES 67  POLAND 67  RUSSIA 68  SEARCH AND RESCUE OPERATIONS 68  SENEGAL 69  SIERRA LEONE 69  SOMALIA AND SOMALILAND 70  SOUTH AFRICA 70  SOUTH SUDAN 71  SUDAN 71  SYRIA 72  TAJIKISTAN 72  TANZANIA 73  THAILAND 73  TURKEY 74  UGANDA 74  UKRAINE 75  UZBEKISTAN 75  VENEZUELA 76  YEMEN 76  ZIMBABWE 77  OTHER COUNTRIES/ REGIONS AND TRANSVERSAL ACTIVITIES  \n\n> VIETNAM HONG KONG SAR\n> KIRIBATI\n\nInternational Financial Report 2023 3ACTIVITIES AND ORGANIS",
+      "extracted_character_count": 80000
+    }
+  ],
+  "sources": [
+    {
+      "source_id": "SRC-DOC-001",
+      "title": "MSF_Financial_Report_2023_FINAL_APPROVED_030724.pdf",
+      "url": "https://www.msf.org/sites/default/files/2024-07/MSF_Financial_Report_2023_FINAL_APPROVED_030724.pdf",
+      "source_type": "public_document_audited_financial_statement",
+      "publisher": "Médecins Sans Frontières",
+      "publication_date": null,
+      "retrieved_at": "2026-08-10T15:39:19.007Z",
+      "authority_level": "official",
+      "freshness": "unknown",
+      "is_official": true,
+      "document_id": "DOC-001",
+      "document_type": "audited_financial_statement",
+      "file_type": "pdf",
+      "discovered_by": "web_search",
+      "extraction_provider": "jina_reader",
+      "useful_sections": [
+        {
+          "section_type": "financial",
+          "text": "MSF offers humanitarian assistance to people based on need and irrespective of race, religion, gender or political affiliation. We work to save lives, alleviate suffering and restore dignity. Our actions are guided by medical ethics and the principles of neutrality and impartiality. In order to be able to access and assist people in need, our operational policies must be scrupulously independent of governments, as well as religious and economic powers. We conduct our own assessments, manage our projects directly and monitor the impact of our assistance. We do not accept funds from governments or other parties who are directly involved in the conflicts to which MSF is responding. We rely on the generosity of private individuals for the majority of our funding. In 2023, 4,116* health professionals, logistics specialists and administrative staff of all nationalities were assigned in medical programmes, to work with 42,149 locally hired staff* in over 74 countries. MSF is constantly seeking to improve the quality, relevance and extent of its assistance. The Access Campaign supports our field programmes by pushing for improved access to existing medicines, diagnostics and vaccines, and "
+        },
+        {
+          "section_type": "financial",
+          "text": "Conflict was a major driver of human suffering and vulnerability in 2023, causing many thousands of deaths worldwide and displacing record numbers of people. i As in previous years, assisting communities affected by violence was a significant component of Médecins Sans Frontières (MSF) programmes. We also responded to disasters and disease outbreaks, and worked to improve healthcare for refugees, migrants and other marginalised people."
+        },
+        {
+          "section_type": "impact",
+          "text": "In mid-April, when war suddenly broke out in Sudan between the Sudanese army and paramilitary group the Rapid Support Forces (RSF), our teams quickly adapted their activities to respond. Fighting was intense in the capital, Khartoum, and across large swathes of the country. As a result, 8.5 million people have been displaced, most of them within Sudan.ii But over 1.8 million have also fled into neighbouring countries, including Chad, South Sudan and Ethiopia. The war in Sudan has garnered very little of the world’s attention and support from other organisations is sometimes non-existent; in some areas, MSF is the only international humanitarian organisation present. Assisting people injured and displaced by the war proved extremely challenging. Local authorities blocked the delivery of critical medical supplies to areas under RSF control, forcing us to temporarily suspend activities in some facilities, including surgery at Khartoum’s Bashair hospital. Visas for international teams to enter and support exhausted Sudanese staff became hard to obtain. At the end of the year, many people who remained in Sudan were struggling to obtain medical care, food and water, while those who had c"
+        },
+        {
+          "section_type": "impact",
+          "text": "Authorities in Afghanistan and Yemen have increasingly marginalised women and girls from society and severely reduced their access to education and healthcare. We already face a shortage of qualified female healthcare staff in Afghanistan – needed to provide healthcare to female patients – and is something that we can only expect to worsen with the ban on female secondary and higher education. Both countries require women to travel with a (usually male) relative when they leave the home. In Yemen, paying transport costs for two people to visit a hospital, rather than one, is unaffordable for many families, while in Afghanistan, women often have to wait for someone to be available to accompany them or their child to a health facility. In 2023, we continued to assist people who had made the dangerous journey through the Darién Gap, the heavily forested region between Colombia and Panama, on their way north to Mexico and the United States. Over half a million people – including many families and children – made the crossing, twice the number in 2022. Our teams treated patients for conditions and injuries caused by their arduous journeys, as well as many victims of violence and sexual "
+        },
+        {
+          "section_type": "programs",
+          "text": "MSF PROGRAMMES AROUND THE WORLD RUSSIA BANGLADESH MYANMAR THAILAND MALAYSIA INDONESIA PHILIPPINES TAIWAN PAPUA NEW GUINEA INDIA SRI LANKA PAKISTAN KYRGYZSTAN KAZAKHSTAN TAJIKISTAN AFGHANISTAN DPR KOREA JAPAN"
+        },
+        {
+          "section_type": "programs",
+          "text": "40 AFGHANISTAN 40 ANGOLA 41 ARMENIA 41 BALKANS 42 BANGLADESH 42 BELARUS 43 BELGIUM 43 BENIN 44 BRAZIL 44 BULGARIA 45 BURKINA FASO 45 BURUNDI 46 CAMEROON 46 CENTRAL AFRICAN REPUBLIC 47 CHAD 47 COLOMBIA 48 CÔTE D’IVOIRE 48 DEMOCRATIC REPUBLIC OF CONGO 49 EGYPT 49 ESWATINI 50 ETHIOPIA 50 FRANCE 51 GREECE 51 GUATEMALA 52 GUINEA 52 HAITI 53 HONDURAS 53 INDIA 54 INDONESIA 54 IRAN 55 IRAQ 55 ITALY 56 JORDAN 56 KENYA 57 KIRIBATI 57 KYRGYZSTAN 58 LEBANON 58 LIBERIA 59 LIBYA 59 MADAGASCAR 60 MALAWI 60 MALAYSIA 61 MALI 61 MEXICO 62 MOZAMBIQUE 62 MYANMAR 63 NIGER 63 NIGERIA 64 PAKISTAN 64 PALESTINE 65 PANAMA 65 PAPUA NEW GUINEA 66 PERU 66 PHILIPPINES 67 POLAND 67 RUSSIA 68 SEARCH AND RESCUE OPERATIONS 68 SENEGAL 69 SIERRA LEONE 69 SOMALIA AND SOMALILAND 70 SOUTH AFRICA 70 SOUTH SUDAN 71 SUDAN 71 SYRIA 72 TAJIKISTAN 72 TANZANIA 73 THAILAND 73 TURKEY 74 UGANDA 74 UKRAINE 75 UZBEKISTAN 75 VENEZUELA 76 YEMEN 76 ZIMBABWE 77 OTHER COUNTRIES/ REGIONS AND TRANSVERSAL ACTIVITIES"
+        },
+        {
+          "section_type": "governance",
+          "text": "This report is presented along with the financial statements of the organisation for the year ended 31 December 2023. These financial statements are a means of transparency and accountability, illustrating the financial situation of the movement as a whole. They have been prepared in accordance with the accounting policies of Swiss GAAP FER/RPC, which are set out in Note 1.1. to the Financial Statements."
+        },
+        {
+          "section_type": "governance",
+          "text": "MSF is a non-profit, self-governed organisation. Founded in Paris, France in 1971, MSF today is a worldwide movement of associations, with offices all over the world. Specialised organisations – called satellites – are in charge of specific activities such as humanitarian relief supplies, epidemiological and medical research studies, and research on humanitarian and social action. In 2011, MSF’s international governance structure was reformed. MSF International was registered in Switzerland and in December 2011 the first annual MSF International General Assembly (IGA) was held. In subsequent years, the IGA would be held in June. The IGA comprises two representatives of each MSF association, two representatives elected by the individual members of MSF International, and the International President. The IGA is the highest authority of MSF International and is responsible for safeguarding MSF’s medical humanitarian mission, and providing strategic orientation to all MSF entities. The International Board acts on behalf of, and is accountable to, the IGA. It is made up of representatives of MSF’s operational directorates as well as a group elected by the IGA, and is chaired by the Inter"
+        }
+      ]
+    }
+  ],
+  "useful_sections_count": 8,
+  "errors": []
+}
