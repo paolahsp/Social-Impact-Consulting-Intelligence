@@ -1,0 +1,222 @@
+{
+  "run_context": {
+    "run_id": "RUN-FICTIONAL-001",
+    "organization": {
+      "name": "Fictional River Learning Collective",
+      "website": "https://fictional-river-learning.example.org",
+      "country": "Germany",
+      "mission_area": "youth education"
+    },
+    "current_challenge": "Preparing for a pre-engagement diagnostic workshop",
+    "uploaded_document_refs": [],
+    "status": "analyzing",
+    "started_at": "2026-08-09T09:00:00Z",
+    "errors": []
+  },
+  "hypotheses": [
+    {
+      "hypothesis_id": "HYP-001",
+      "run_id": "RUN-FICTIONAL-001",
+      "domain": "operations_cx",
+      "evidence_ids": [
+        "EV-001"
+      ],
+      "finding_ids": [
+        "F-001"
+      ],
+      "hypothesis": "The operations_cx process may involve steps that are not publicly visible. This internal workflow should be validated during the client conversation.",
+      "confidence": 0.49199999999999994,
+      "requires_validation": true,
+      "validation_gap": "The internal follow-up process after volunteer form submission is not publicly visible."
+    },
+    {
+      "hypothesis_id": "HYP-002",
+      "run_id": "RUN-FICTIONAL-001",
+      "domain": "revenue_resilience",
+      "evidence_ids": [
+        "EV-002"
+      ],
+      "finding_ids": [
+        "F-002"
+      ],
+      "hypothesis": "Based on the evidence, it appears that public reporting indicates more than one revenue signal, but the concentration of funding is not publicly visible. This should be validated with the client.",
+      "confidence": 0.40599999999999997,
+      "requires_validation": true,
+      "validation_gap": "Additional evidence needed to validate: Public reporting indicates more than one revenue signal, but the concentration of funding is not publicly visible."
+    }
+  ],
+  "diagnoses": [
+    {
+      "diagnosis_id": "DX-001",
+      "domain": "operations_cx",
+      "diagnosis_type": "unknown",
+      "statement": "The actual cause cannot be determined from public evidence. The operations_cx process may involve steps that are not publicly visible. This internal workflow should be validated during the client conversation.",
+      "finding_ids": [
+        "F-001"
+      ],
+      "hypothesis_ids": [
+        "HYP-001"
+      ],
+      "evidence_ids": [
+        "EV-001"
+      ],
+      "confidence": 0.49199999999999994,
+      "requires_validation": true
+    },
+    {
+      "diagnosis_id": "DX-002",
+      "domain": "revenue_resilience",
+      "diagnosis_type": "unknown",
+      "statement": "The actual cause cannot be determined from public evidence. Based on the evidence, it appears that public reporting indicates more than one revenue signal, but the concentration of funding is not publicly visible. This should be validated with the client.",
+      "finding_ids": [
+        "F-002"
+      ],
+      "hypothesis_ids": [
+        "HYP-002"
+      ],
+      "evidence_ids": [
+        "EV-002"
+      ],
+      "confidence": 0.40599999999999997,
+      "requires_validation": true
+    }
+  ],
+  "recommendations": [
+    {
+      "recommendation_id": "REC-001",
+      "finding_ids": [
+        "F-001"
+      ],
+      "diagnosis_ids": [
+        "DX-001"
+      ],
+      "diagnosis": "The actual cause cannot be determined from public evidence. The operations_cx process may involve steps that are not publicly visible. This internal workflow should be validated during the client conversation.",
+      "action": "Validate the current operations and customer experience process during the client workshop. Understand the actual workflow before recommending changes.",
+      "priority": "high",
+      "kpi": {
+        "name": "Operations efficiency / Customer experience quality",
+        "baseline": null,
+        "baseline_status": "unknown",
+        "target": null,
+        "timeframe": "After validation",
+        "measurement_method": "Review process documentation, staff interviews, and workflow metrics."
+      },
+      "confidence": 0.49199999999999994,
+      "requires_human_review": true
+    },
+    {
+      "recommendation_id": "REC-002",
+      "finding_ids": [
+        "F-002"
+      ],
+      "diagnosis_ids": [
+        "DX-002"
+      ],
+      "diagnosis": "The actual cause cannot be determined from public evidence. Based on the evidence, it appears that public reporting indicates more than one revenue signal, but the concentration of funding is not publicly visible. This should be validated with the client.",
+      "action": "Discuss funding sources and concentration during the client workshop. Confirm the organization's actual revenue dependencies.",
+      "priority": "high",
+      "kpi": {
+        "name": "Funding source diversity / Revenue stability",
+        "baseline": null,
+        "baseline_status": "unknown",
+        "target": null,
+        "timeframe": "After validation",
+        "measurement_method": "Analyze financial statements and funding reports."
+      },
+      "confidence": 0.40599999999999997,
+      "requires_human_review": true
+    }
+  ],
+  "kpis": [
+    {
+      "name": "Operations efficiency / Customer experience quality",
+      "baseline": null,
+      "baseline_status": "unknown",
+      "target": null,
+      "timeframe": "After validation",
+      "measurement_method": "Review process documentation, staff interviews, and workflow metrics."
+    },
+    {
+      "name": "Funding source diversity / Revenue stability",
+      "baseline": null,
+      "baseline_status": "unknown",
+      "target": null,
+      "timeframe": "After validation",
+      "measurement_method": "Analyze financial statements and funding reports."
+    }
+  ],
+  "validation_questions": [
+    {
+      "question_id": "Q-001",
+      "finding_ids": [
+        "F-001"
+      ],
+      "hypothesis_ids": [
+        "HYP-001"
+      ],
+      "question": "Can you describe the actual workflow after a application is submitted happens? What specific steps are involved?",
+      "purpose": "Validate: The internal follow-up process after volunteer form submission is not publicly visible.",
+      "domain": "operations_cx",
+      "priority": "high"
+    },
+    {
+      "question_id": "Q-002",
+      "finding_ids": [
+        "F-002"
+      ],
+      "hypothesis_ids": [
+        "HYP-002"
+      ],
+      "question": "What are your actual revenue sources, and approximately what percentage comes from each?",
+      "purpose": "Validate: Additional evidence needed to validate: Public reporting indicates more than one revenue signal, but the concentration of funding is not publicly visible.",
+      "domain": "revenue_resilience",
+      "priority": "high"
+    },
+    {
+      "question_id": "Q-003",
+      "finding_ids": [],
+      "hypothesis_ids": [],
+      "question": "Regarding 'The internal follow-up process after volunteer form submission is not publicly visible.' \u2014 can you walk us through how this actually works?",
+      "purpose": "Discover: The internal follow-up process after volunteer form submission is not publicly visible.",
+      "domain": "operations_cx",
+      "priority": "medium"
+    },
+    {
+      "question_id": "Q-004",
+      "finding_ids": [],
+      "hypothesis_ids": [],
+      "question": "Regarding 'Funding concentration cannot be determined from the public annual snapshot.' \u2014 can you walk us through how this actually works?",
+      "purpose": "Discover: Funding concentration cannot be determined from the public annual snapshot.",
+      "domain": "revenue_resilience",
+      "priority": "medium"
+    }
+  ],
+  "roadmap_actions": [
+    {
+      "roadmap_action_id": "RA-001",
+      "time_bucket": "30_days",
+      "action": "Validate during client workshop: Validate the current operations and customer experience process during the client workshop. Understand the actual workflow before recommending changes.",
+      "action_type": "validation",
+      "recommendation_ids": [
+        "REC-001"
+      ],
+      "hypothesis_ids": [],
+      "validation_question_ids": [
+        "Q-001"
+      ]
+    },
+    {
+      "roadmap_action_id": "RA-002",
+      "time_bucket": "30_days",
+      "action": "Validate during client workshop: Discuss funding sources and concentration during the client workshop. Confirm the organization's actual revenue dependencies.",
+      "action_type": "validation",
+      "recommendation_ids": [
+        "REC-002"
+      ],
+      "hypothesis_ids": [],
+      "validation_question_ids": [
+        "Q-002"
+      ]
+    }
+  ]
+}

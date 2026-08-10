@@ -30,7 +30,7 @@
     },
     {
       "parameters": {
-        "jsCode": "// SKELETON_PLACEHOLDER: INPUT_CONTRACT__PUBLIC_OPERATIONS_EVIDENCE\n// Accept public evidence and operations/CX RAG.\n// TODO: Replace this placeholder with configured production logic.\n// Contract discipline: preserve FACT / INFERENCE / HYPOTHESIS / UNKNOWN boundaries.\nreturn items;\n"
+        "jsCode": "// INPUT_CONTRACT__PUBLIC_OPERATIONS_EVIDENCE\n// Accept evidence array and sources from Paola track output.\n// Input structure: { evidence: [], sources: [], run_context: {} }\n// Pass through with validation.\nif (!Array.isArray($input.all()[0].evidence)) {\n  throw new Error('Input must contain evidence array');\n}\nreturn $input.all();\n"
       },
       "id": "input_contract__public_operations_evidence",
       "name": "INPUT_CONTRACT__PUBLIC_OPERATIONS_EVIDENCE",
@@ -43,10 +43,10 @@
     },
     {
       "parameters": {
-        "jsCode": "// SKELETON_PLACEHOLDER: TODO_AGENT__OPERATIONS_CX\n// AGENT_INTERFACE__OPERATIONS_CX_ANALYSIS.\n// TODO: Replace this placeholder with configured production logic.\n// Contract discipline: preserve FACT / INFERENCE / HYPOTHESIS / UNKNOWN boundaries.\nreturn items;\n"
+        "jsCode": "// FILTER_OPERATIONS_DOMAIN\n// Extract evidence relevant to operations_cx domain.\nconst input = $input.all()[0];\nconst evidence = input.evidence || [];\nconst sources = input.sources || [];\n\n// Keywords indicating operations/CX relevance\nconst opsKeywords = [\n  'volunteer', 'donor', 'application', 'form', 'process', 'workflow',\n  'journey', 'follow-up', 'followup', 'contact', 'email', 'phone',\n  'communication', 'automation', 'crm', 'database', 'tracking',\n  'onboarding', 'stakeholder', 'experience', 'customer'\n];\n\nconst opsEvidence = evidence.filter(ev => {\n  const claim = (ev.claim || '').toLowerCase();\n  const domain = ev.domain || '';\n  return domain === 'operations_cx' || \n         opsKeywords.some(kw => claim.includes(kw));\n});\n\nreturn [{ evidence: opsEvidence, sources: sources, run_context: input.run_context, all_evidence: evidence }];\n"
       },
       "id": "todo_agent__operations_cx",
-      "name": "TODO_AGENT__OPERATIONS_CX",
+      "name": "FILTER_OPERATIONS_DOMAIN",
       "type": "n8n-nodes-base.code",
       "typeVersion": 2,
       "position": [
@@ -56,10 +56,10 @@
     },
     {
       "parameters": {
-        "jsCode": "// SKELETON_PLACEHOLDER: OBSERVABLE_FINDING\n// Record only publicly observable signals as facts.\n// TODO: Replace this placeholder with configured production logic.\n// Contract discipline: preserve FACT / INFERENCE / HYPOTHESIS / UNKNOWN boundaries.\nreturn items;\n"
+        "jsCode": "// CLASSIFY_EVIDENCE\n// Classify evidence as observable (fact), inferred, unknown, or hypothesis.\nconst input = $input.all()[0];\nconst evidence = input.evidence || [];\nconst classified = {};\n\nevidence.forEach(ev => {\n  const type = ev.evidence_type || 'unknown';\n  if (!classified[type]) classified[type] = [];\n  classified[type].push(ev);\n});\n\nreturn [{ \n  observable: classified.fact || [],\n  inferred_signals: classified.inferred || [],\n  unknowns: classified.unknown || [],\n  sources: input.sources,\n  run_context: input.run_context,\n  all_evidence: input.all_evidence\n}];\n"
       },
       "id": "observable_finding",
-      "name": "OBSERVABLE_FINDING",
+      "name": "CLASSIFY_EVIDENCE",
       "type": "n8n-nodes-base.code",
       "typeVersion": 2,
       "position": [
@@ -69,10 +69,10 @@
     },
     {
       "parameters": {
-        "jsCode": "// SKELETON_PLACEHOLDER: HYPOTHESIS_BUILDER\n// Create hypotheses where internal process is not publicly evidenced.\n// TODO: Replace this placeholder with configured production logic.\n// Contract discipline: preserve FACT / INFERENCE / HYPOTHESIS / UNKNOWN boundaries.\nreturn items;\n"
+        "jsCode": "// BUILD_FINDINGS\n// Construct findings from classified evidence.\nconst input = $input.all()[0];\nconst findings = [];\nlet findingCounter = 0;\n\nconst makeId = () => `F-${String(++findingCounter).padStart(3, '0')}`;\n\n// Observable findings (type: fact → finding_type: observed)\ninput.observable.forEach(ev => {\n  const claim = ev.claim || '';\n  const confidence = ev.confidence || 0.7;\n  \n  // Pattern: digital entry points\n  if (claim.toLowerCase().includes('application') || claim.toLowerCase().includes('form')) {\n    if (claim.toLowerCase().includes('volunteer')) {\n      findings.push({\n        finding_id: makeId(),\n        domain: 'operations_cx',\n        finding: 'The organization provides a digital entry point for prospective volunteers through its website.',\n        evidence_ids: [ev.evidence_id],\n        finding_type: 'observed',\n        confidence: Math.min(confidence, 0.9),\n        requires_validation: false,\n        validation_question: null\n      });\n    }\n  }\n  \n  // Pattern: communication mechanisms\n  if (claim.toLowerCase().match(/(email|phone|contact|communication|website)/)) {\n    findings.push({\n      finding_id: makeId(),\n      domain: 'operations_cx',\n      finding: `Observable communication mechanism: ${claim}`,\n      evidence_ids: [ev.evidence_id],\n      finding_type: 'observed',\n      confidence: Math.min(confidence, 0.85),\n      requires_validation: false,\n      validation_question: null\n    });\n  }\n});\n\n// Inferred findings (multiple signals suggest pattern)\nif (input.observable.length >= 2) {\n  const volunteerEvidence = input.observable.filter(e => e.claim.toLowerCase().includes('volunteer'));\n  if (volunteerEvidence.length >= 2) {\n    findings.push({\n      finding_id: makeId(),\n      domain: 'operations_cx',\n      finding: 'The organization has established processes for volunteer recruitment and engagement, evidenced by public volunteer channels.',\n      evidence_ids: volunteerEvidence.slice(0, 2).map(e => e.evidence_id),\n      finding_type: 'inferred',\n      confidence: 0.65,\n      requires_validation: true,\n      validation_question: 'Can you describe the complete volunteer journey from initial interest to active participation?'\n    });\n  }\n}\n\n// Unknown findings (public signals imply hidden internal processes)\ninput.observable.forEach(ev => {\n  const claim = ev.claim.toLowerCase();\n  \n  // Application exists → internal process is unknown\n  if (claim.includes('application') || claim.includes('form')) {\n    if (claim.includes('volunteer')) {\n      findings.push({\n        finding_id: makeId(),\n        domain: 'operations_cx',\n        finding: 'The internal volunteer intake and qualification process after application submission is not publicly described.',\n        evidence_ids: [ev.evidence_id],\n        finding_type: 'unknown',\n        confidence: 0.7,\n        requires_validation: true,\n        validation_question: 'After a volunteer submits an application, what is the internal process for review, qualification, and onboarding?'\n      });\n    }\n  }\n});\n\n// Generic unknowns for processes always hidden\nif (input.observable.length >= 2) {\n  const genericUnknowns = [\n    {\n      finding: 'The organization\\'s internal approach to workflow automation cannot be determined from public information.',\n      question: 'Are volunteer and donor workflows currently automated or managed manually?'\n    },\n    {\n      finding: 'The organization\\'s internal approach to data integration cannot be determined from public information.',\n      question: 'How is stakeholder data integrated across different systems?'\n    },\n    {\n      finding: 'The organization\\'s internal approach to follow-up tracking cannot be determined from public information.',\n      question: 'How does the organization track follow-up communications with stakeholders?'\n    }\n  ];\n  \n  genericUnknowns.forEach(u => {\n    findings.push({\n      finding_id: makeId(),\n      domain: 'operations_cx',\n      finding: u.finding,\n      evidence_ids: [input.observable[0].evidence_id],\n      finding_type: 'unknown',\n      confidence: 0.5,\n      requires_validation: true,\n      validation_question: u.question\n    });\n  });\n}\n\nreturn [{ findings: findings, finding_count: findings.length }];\n"
       },
       "id": "hypothesis_builder",
-      "name": "HYPOTHESIS_BUILDER",
+      "name": "BUILD_FINDINGS",
       "type": "n8n-nodes-base.code",
       "typeVersion": 2,
       "position": [
@@ -82,10 +82,10 @@
     },
     {
       "parameters": {
-        "jsCode": "// SKELETON_PLACEHOLDER: VALIDATION_QUESTION\n// Generate client validation questions for operational unknowns.\n// TODO: Replace this placeholder with configured production logic.\n// Contract discipline: preserve FACT / INFERENCE / HYPOTHESIS / UNKNOWN boundaries.\nreturn items;\n"
+        "jsCode": "// VALIDATE_FINDINGS\n// Verify findings comply with contract.\nconst input = $input.all()[0];\nconst findings = input.findings || [];\nconst errors = [];\n\nfindings.forEach((f, i) => {\n  if (!f.finding_id || !f.finding_id.startsWith('F-')) {\n    errors.push(`Finding[${i}]: invalid ID`);\n  }\n  if (f.domain !== 'operations_cx') {\n    errors.push(`Finding[${i}]: domain must be operations_cx`);\n  }\n  if (!['observed', 'inferred', 'unknown', 'hypothesis'].includes(f.finding_type)) {\n    errors.push(`Finding[${i}]: invalid finding_type`);\n  }\n  if (!(f.confidence >= 0 && f.confidence <= 1)) {\n    errors.push(`Finding[${i}]: confidence must be 0-1`);\n  }\n  if (typeof f.requires_validation !== 'boolean') {\n    errors.push(`Finding[${i}]: requires_validation must be boolean`);\n  }\n  if (f.requires_validation && !f.validation_question) {\n    errors.push(`Finding[${i}]: requires_validation=true but no validation_question`);\n  }\n});\n\nif (errors.length > 0) {\n  throw new Error(`Validation failed: ${errors.join('; ')}`);\n}\n\nreturn input;\n"
       },
       "id": "validation_question",
-      "name": "VALIDATION_QUESTION",
+      "name": "VALIDATE_FINDINGS",
       "type": "n8n-nodes-base.code",
       "typeVersion": 2,
       "position": [
@@ -95,7 +95,7 @@
     },
     {
       "parameters": {
-        "jsCode": "// TERMINAL_OUTPUT_NODE: OUTPUT_CONTRACT__OPERATIONS_CX_FINDINGS\n// Return operations/CX findings.\n// TODO: Replace this placeholder with configured production logic.\n// Contract discipline: preserve FACT / INFERENCE / HYPOTHESIS / UNKNOWN boundaries.\nreturn items;\n"
+        "jsCode": "// OUTPUT_CONTRACT__OPERATIONS_CX_FINDINGS\n// Return structured findings array.\nconst input = $input.all()[0];\nreturn [{ findings: input.findings }];\n"
       },
       "id": "output_contract__operations_cx_findings",
       "name": "OUTPUT_CONTRACT__OPERATIONS_CX_FINDINGS",
@@ -123,47 +123,47 @@
       "main": [
         [
           {
-            "node": "TODO_AGENT__OPERATIONS_CX",
+            "node": "FILTER_OPERATIONS_DOMAIN",
             "type": "main",
             "index": 0
           }
         ]
       ]
     },
-    "TODO_AGENT__OPERATIONS_CX": {
+    "FILTER_OPERATIONS_DOMAIN": {
       "main": [
         [
           {
-            "node": "OBSERVABLE_FINDING",
+            "node": "CLASSIFY_EVIDENCE",
             "type": "main",
             "index": 0
           }
         ]
       ]
     },
-    "OBSERVABLE_FINDING": {
+    "CLASSIFY_EVIDENCE": {
       "main": [
         [
           {
-            "node": "HYPOTHESIS_BUILDER",
+            "node": "BUILD_FINDINGS",
             "type": "main",
             "index": 0
           }
         ]
       ]
     },
-    "HYPOTHESIS_BUILDER": {
+    "BUILD_FINDINGS": {
       "main": [
         [
           {
-            "node": "VALIDATION_QUESTION",
+            "node": "VALIDATE_FINDINGS",
             "type": "main",
             "index": 0
           }
         ]
       ]
     },
-    "VALIDATION_QUESTION": {
+    "VALIDATE_FINDINGS": {
       "main": [
         [
           {

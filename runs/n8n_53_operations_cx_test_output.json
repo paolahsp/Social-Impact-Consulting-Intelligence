@@ -1,0 +1,76 @@
+{
+  "findings": [
+    {
+      "finding_id": "F-001",
+      "domain": "operations_cx",
+      "finding": "The organization provides a digital entry point for prospective volunteers through its website.",
+      "evidence_ids": [
+        "EV-001"
+      ],
+      "finding_type": "observed",
+      "confidence": 0.86,
+      "requires_validation": false,
+      "validation_question": null
+    },
+    {
+      "finding_id": "F-002",
+      "domain": "operations_cx",
+      "finding": "Observable communication mechanism: Volunteer applications are collected through a public website form.",
+      "evidence_ids": [
+        "EV-001"
+      ],
+      "finding_type": "observed",
+      "confidence": 0.85,
+      "requires_validation": false,
+      "validation_question": null
+    },
+    {
+      "finding_id": "F-003",
+      "domain": "operations_cx",
+      "finding": "The internal volunteer intake and qualification process after application submission is not publicly described.",
+      "evidence_ids": [
+        "EV-001"
+      ],
+      "finding_type": "unknown",
+      "confidence": 0.7,
+      "requires_validation": true,
+      "validation_question": "After a volunteer submits an application, what is the internal process for review, qualification, and onboarding?"
+    },
+    {
+      "finding_id": "F-004",
+      "domain": "operations_cx",
+      "finding": "The organization's internal approach to workflow automation cannot be determined from public information.",
+      "evidence_ids": [
+        "EV-001"
+      ],
+      "finding_type": "unknown",
+      "confidence": 0.5,
+      "requires_validation": true,
+      "validation_question": "Are volunteer and donor workflows currently automated or managed manually?"
+    },
+    {
+      "finding_id": "F-005",
+      "domain": "operations_cx",
+      "finding": "The organization's internal approach to data integration cannot be determined from public information.",
+      "evidence_ids": [
+        "EV-001"
+      ],
+      "finding_type": "unknown",
+      "confidence": 0.5,
+      "requires_validation": true,
+      "validation_question": "How is stakeholder data integrated across different systems?"
+    },
+    {
+      "finding_id": "F-006",
+      "domain": "operations_cx",
+      "finding": "The organization's internal approach to follow-up tracking cannot be determined from public information.",
+      "evidence_ids": [
+        "EV-001"
+      ],
+      "finding_type": "unknown",
+      "confidence": 0.5,
+      "requires_validation": true,
+      "validation_question": "How does the organization track follow-up communications with stakeholders?"
+    }
+  ]
+}

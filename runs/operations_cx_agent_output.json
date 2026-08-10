@@ -1,0 +1,103 @@
+{
+  "domain": "operations_cx",
+  "findings": [
+    {
+      "finding_id": "F-001",
+      "domain": "operations_cx",
+      "finding": "The organization provides a digital entry point for prospective volunteers through its website.",
+      "evidence_ids": [
+        "EV-001"
+      ],
+      "finding_type": "observed",
+      "confidence": 0.86,
+      "requires_validation": false,
+      "validation_question": null
+    },
+    {
+      "finding_id": "F-002",
+      "domain": "operations_cx",
+      "finding": "Observable communication mechanism: Volunteer applications are collected through a public website form.",
+      "evidence_ids": [
+        "EV-001"
+      ],
+      "finding_type": "observed",
+      "confidence": 0.85,
+      "requires_validation": false,
+      "validation_question": null
+    },
+    {
+      "finding_id": "F-003",
+      "domain": "operations_cx",
+      "finding": "The organization has established processes for volunteer recruitment and engagement, evidenced by public volunteer channels.",
+      "evidence_ids": [
+        "EV-001",
+        "EV-003"
+      ],
+      "finding_type": "inferred",
+      "confidence": 0.65,
+      "requires_validation": true,
+      "validation_question": "Can you describe the complete volunteer journey from initial interest to active participation?"
+    },
+    {
+      "finding_id": "F-004",
+      "domain": "operations_cx",
+      "finding": "The internal volunteer intake and qualification process after application submission is not publicly described.",
+      "evidence_ids": [
+        "EV-001"
+      ],
+      "finding_type": "unknown",
+      "confidence": 0.7,
+      "requires_validation": true,
+      "validation_question": "After a volunteer submits an application, what is the internal process for review, qualification, and onboarding?"
+    },
+    {
+      "finding_id": "F-005",
+      "domain": "operations_cx",
+      "finding": "The internal process for acknowledging donations and maintaining donor engagement is not publicly visible.",
+      "evidence_ids": [
+        "EV-002"
+      ],
+      "finding_type": "unknown",
+      "confidence": 0.65,
+      "requires_validation": true,
+      "validation_question": "How does the organization acknowledge and engage with donors after they make a contribution?"
+    },
+    {
+      "finding_id": "F-006",
+      "domain": "operations_cx",
+      "finding": "The organization's internal approach to workflow automation cannot be determined from public information.",
+      "evidence_ids": [
+        "EV-001"
+      ],
+      "finding_type": "unknown",
+      "confidence": 0.5,
+      "requires_validation": true,
+      "validation_question": "Are volunteer and donor workflows currently automated or managed manually?"
+    },
+    {
+      "finding_id": "F-007",
+      "domain": "operations_cx",
+      "finding": "The organization's internal approach to data integration cannot be determined from public information.",
+      "evidence_ids": [
+        "EV-001"
+      ],
+      "finding_type": "unknown",
+      "confidence": 0.5,
+      "requires_validation": true,
+      "validation_question": "How is stakeholder data integrated across different systems?"
+    },
+    {
+      "finding_id": "F-008",
+      "domain": "operations_cx",
+      "finding": "The organization's internal approach to follow-up tracking cannot be determined from public information.",
+      "evidence_ids": [
+        "EV-001"
+      ],
+      "finding_type": "unknown",
+      "confidence": 0.5,
+      "requires_validation": true,
+      "validation_question": "How does the organization track follow-up communications with stakeholders?"
+    }
+  ],
+  "total": 8
+}
