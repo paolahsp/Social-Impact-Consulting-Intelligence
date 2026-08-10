@@ -1,0 +1,46 @@
+{
+  "live_n8n_evidence": {
+    "verified_at": "2026-08-10T10:06:44Z",
+    "dev_execution_id": "1277",
+    "subworkflow_execution_id": "1279",
+    "workflow_id": "azDD2e5wihHdfZYr",
+    "dev_workflow_id": "RIdoB60VUKg7H5de",
+    "snapshot_note": "Compact evidence snapshot of the controlled live failure."
+  },
+  "run_context": {
+    "run_id": "RUN-N8N-22-INVALID",
+    "organization": {
+      "name": "Invalid Website Test",
+      "website": "https://this-domain-must-not-exist.invalid",
+      "country": "Test",
+      "mission_area": null
+    },
+    "current_challenge": null,
+    "uploaded_document_refs": [],
+    "status": "created",
+    "started_at": "2026-08-10T10:06:44Z",
+    "errors": []
+  },
+  "controlled_state": "request_failure",
+  "extraction_provider": "jina_reader",
+  "pages_attempted": 8,
+  "sources": [],
+  "website_context": {
+    "mission_signals": [],
+    "program_signals": [],
+    "impact_signals": [],
+    "fundraising_signals": [],
+    "stakeholder_entry_points": [],
+    "report_links": []
+  },
+  "errors": [
+    {"stage": "EXTRACTION_REQUEST__JINA_READER", "error_type": "request_failure", "page_url": "https://this-domain-must-not-exist.invalid/", "message": "422 - SubmittedDataMalformedError: Domain 'this-domain-must-not-exist.invalid' could not be resolved"},
+    {"stage": "EXTRACTION_REQUEST__JINA_READER", "error_type": "request_failure", "page_url": "https://this-domain-must-not-exist.invalid/about", "message": "422 - SubmittedDataMalformedError: Domain 'this-domain-must-not-exist.invalid' could not be resolved"},
+    {"stage": "EXTRACTION_REQUEST__JINA_READER", "error_type": "request_failure", "page_url": "https://this-domain-must-not-exist.invalid/our-work", "message": "422 - SubmittedDataMalformedError: Domain 'this-domain-must-not-exist.invalid' could not be resolved"},
+    {"stage": "EXTRACTION_REQUEST__JINA_READER", "error_type": "request_failure", "page_url": "https://this-domain-must-not-exist.invalid/impact", "message": "422 - SubmittedDataMalformedError: Domain 'this-domain-must-not-exist.invalid' could not be resolved"},
+    {"stage": "EXTRACTION_REQUEST__JINA_READER", "error_type": "request_failure", "page_url": "https://this-domain-must-not-exist.invalid/financials", "message": "422 - SubmittedDataMalformedError: Domain 'this-domain-must-not-exist.invalid' could not be resolved"},
+    {"stage": "EXTRACTION_REQUEST__JINA_READER", "error_type": "request_failure", "page_url": "https://this-domain-must-not-exist.invalid/annual-reports", "message": "422 - SubmittedDataMalformedError: Domain 'this-domain-must-not-exist.invalid' could not be resolved"},
+    {"stage": "EXTRACTION_REQUEST__JINA_READER", "error_type": "request_failure", "page_url": "https://this-domain-must-not-exist.invalid/donate", "message": "422 - SubmittedDataMalformedError: Domain 'this-domain-must-not-exist.invalid' could not be resolved"},
+    {"stage": "EXTRACTION_REQUEST__JINA_READER", "error_type": "request_failure", "page_url": "https://this-domain-must-not-exist.invalid/contact", "message": "422 - SubmittedDataMalformedError: Domain 'this-domain-must-not-exist.invalid' could not be resolved"}
+  ]
+}
