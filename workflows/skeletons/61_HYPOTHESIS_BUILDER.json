@@ -3,9 +3,9 @@
   "nodes": [
     {
       "parameters": {
-        "content": "PURPOSE\nBuild explicit hypotheses from public evidence while preserving fact/inference/hypothesis/unknown boundaries.\n\nOWNER\nGRETEL TRACK B\n\nINPUT CONTRACT\nfinding.schema.json[] plus evidence.schema.json[]\n\nOUTPUT CONTRACT\nhypothesis.schema.json[] plus updated finding references\n\nSTATUS\nSkeleton only. Inactive by default. No credentials. Configure TODO nodes after import.",
-        "height": 340,
-        "width": 520,
+        "content": "PURPOSE\nBuild explicit hypotheses from public findings without turning internal unknowns into facts.\n\nOWNER\nGRETEL TRACK B\n\nINPUT CONTRACT\nPaola track output: run_context, findings[], evidence[], unknowns[]\n\nOUTPUT CONTRACT\nAccumulated payload plus hypotheses[] conforming to hypothesis.schema.json\n\nSTATUS\nPhase 2B repository-ready. Inactive by default. No credentials. Deterministic fixture path; no Python execution.",
+        "height": 390,
+        "width": 560,
         "color": 4
       },
       "id": "00_readme__purpose_owner_contracts_status",
@@ -13,24 +13,24 @@
       "type": "n8n-nodes-base.stickyNote",
       "typeVersion": 1,
       "position": [
-        -420,
-        -320
+        -520,
+        -380
       ]
     },
     {
       "parameters": {
-        "content": "PRODUCT LOGIC\nObserved fact: volunteer applications are collected through a website form.\nHypothesis: volunteer follow-up may rely on manual handoffs.\nThis must not become a confirmed diagnosis without validation.",
-        "height": 200,
-        "width": 520,
-        "color": 4
+        "content": "VISIBLE PATH\nInput findings + evidence + unknowns -> Can internal reality be observed?\nYES -> preserve observed interpretation\nNO -> build hypothesis -> confidence + validation gap -> structured hypotheses\nEvery hypothesis requires validation and carries finding/evidence IDs.",
+        "height": 320,
+        "width": 560,
+        "color": 5
       },
-      "id": "note__1",
-      "name": "NOTE__1",
+      "id": "note__visible_transformation_path",
+      "name": "NOTE__VISIBLE_TRANSFORMATION_PATH",
       "type": "n8n-nodes-base.stickyNote",
       "typeVersion": 1,
       "position": [
-        -420,
-        60
+        -520,
+        40
       ]
     },
     {
@@ -46,10 +46,10 @@
     },
     {
       "parameters": {
-        "jsCode": "// SKELETON_PLACEHOLDER: INPUT_CONTRACT__FINDINGS_AND_EVIDENCE\n// Accept merged findings and traceable evidence ledger.\n// TODO: Replace this placeholder with configured production logic.\n// Contract discipline: preserve FACT / INFERENCE / HYPOTHESIS / UNKNOWN boundaries.\nreturn items;\n"
+        "jsCode": "const payload = items[0]?.json ?? {};\nfor (const key of ['evidence', 'findings', 'unknowns']) {\n  if (!Array.isArray(payload[key])) throw new Error(`61 input requires ${key}[]`);\n}\nconst runId = payload.run_context?.run_id;\nif (!runId) throw new Error('61 input requires run_context.run_id');\nif (payload.findings.length === 0) {\n  return [{ json: { context: payload, skip: true, can_observe_internal_reality: true } }];\n}\nreturn payload.findings.map((finding, index) => {\n  const findingEvidence = payload.evidence.filter(ev => (finding.evidence_ids || []).includes(ev.evidence_id));\n  const relatedUnknowns = payload.unknowns.filter(unknown =>\n    unknown.domain === finding.domain ||\n    (unknown.evidence_ids || []).some(id => (finding.evidence_ids || []).includes(id))\n  );\n  const allDirectFacts = findingEvidence.length > 0 && findingEvidence.every(ev =>\n    ev.evidence_type === 'fact' && ev.status === 'supported' && ev.requires_validation === false\n  );\n  const canObserve = finding.finding_type === 'observed' && finding.requires_validation === false &&\n    relatedUnknowns.length === 0 && allDirectFacts;\n  return { json: {\n    context: payload,\n    index,\n    finding,\n    finding_evidence: findingEvidence,\n    related_unknowns: relatedUnknowns,\n    can_observe_internal_reality: canObserve\n  } };\n});\n"
       },
-      "id": "input_contract__findings_and_evidence",
-      "name": "INPUT_CONTRACT__FINDINGS_AND_EVIDENCE",
+      "id": "input_contract__findings_evidence_unknowns",
+      "name": "INPUT_CONTRACT__FINDINGS_EVIDENCE_UNKNOWNS",
       "type": "n8n-nodes-base.code",
       "typeVersion": 2,
       "position": [
@@ -59,12 +59,32 @@
     },
     {
       "parameters": {
-        "jsCode": "// SKELETON_PLACEHOLDER: CLASSIFY_FACT_INFERENCE_HYPOTHESIS_UNKNOWN\n// Preserve public-data-first distinction for every claim.\n// TODO: Replace this placeholder with configured production logic.\n// Contract discipline: preserve FACT / INFERENCE / HYPOTHESIS / UNKNOWN boundaries.\nreturn items;\n"
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 2
+          },
+          "conditions": [
+            {
+              "id": "decision__can_internal_reality_be_observed_condition",
+              "leftValue": "={{ $json.can_observe_internal_reality }}",
+              "operator": {
+                "type": "boolean",
+                "operation": "true",
+                "singleValue": true
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
       },
-      "id": "classify_fact_inference_hypothesis_unknown",
-      "name": "CLASSIFY_FACT_INFERENCE_HYPOTHESIS_UNKNOWN",
-      "type": "n8n-nodes-base.code",
-      "typeVersion": 2,
+      "id": "decision__can_internal_reality_be_observed",
+      "name": "DECISION__CAN_INTERNAL_REALITY_BE_OBSERVED",
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.2,
       "position": [
         560,
         0
@@ -72,25 +92,39 @@
     },
     {
       "parameters": {
-        "jsCode": "// SKELETON_PLACEHOLDER: TODO_AGENT__HYPOTHESIS_BUILDER\n// AGENT_INTERFACE__HYPOTHESIS_BUILDER.\n// TODO: Replace this placeholder with configured production logic.\n// Contract discipline: preserve FACT / INFERENCE / HYPOTHESIS / UNKNOWN boundaries.\nreturn items;\n"
+        "jsCode": "return items.map(item => ({ json: { ...item.json, interpretation: 'observed', hypothesis_record: null } }));\n"
       },
-      "id": "todo_agent__hypothesis_builder",
-      "name": "TODO_AGENT__HYPOTHESIS_BUILDER",
+      "id": "preserve_observed_interpretation",
+      "name": "PRESERVE_OBSERVED_INTERPRETATION",
       "type": "n8n-nodes-base.code",
       "typeVersion": 2,
       "position": [
         860,
-        0
+        -140
       ]
     },
     {
       "parameters": {
-        "jsCode": "// SKELETON_PLACEHOLDER: STRUCTURE_HYPOTHESIS_RECORD\n// Require evidence_ids, hypothesis, confidence, requires_validation=true, and validation_gap.\n// TODO: Replace this placeholder with configured production logic.\n// Contract discipline: preserve FACT / INFERENCE / HYPOTHESIS / UNKNOWN boundaries.\nreturn items;\n"
+        "jsCode": "const templates = {\n  operations_cx: 'The internal stakeholder journey may include handoffs or coordination steps that are not visible in public information.',\n  revenue_resilience: 'Revenue resilience may depend on funding concentration or dependencies that are not visible in public information.',\n  impact_evidence: 'Impact measurement may rely on internal methods or reporting steps that are not visible in public information.'\n};\nreturn items.map(item => {\n  if (item.json.skip) return { json: { ...item.json, hypothesis_record: null } };\n  const { context, finding, related_unknowns: unknowns, index } = item.json;\n  const unknownEvidenceIds = unknowns.flatMap(unknown => unknown.evidence_ids || []);\n  const evidenceIds = [...new Set([...(finding.evidence_ids || []), ...unknownEvidenceIds])];\n  const gap = unknowns[0]?.description || finding.validation_question ||\n    `Public information does not validate the internal reality behind finding ${finding.finding_id}.`;\n  const confidence = Math.max(0.2, Math.min(0.65, Number((Number(finding.confidence || 0) * 0.6).toFixed(2))));\n  return { json: { ...item.json, interpretation: 'hypothesis', hypothesis_record: {\n    hypothesis_id: `HYP-${String(index + 1).padStart(3, '0')}`,\n    run_id: context.run_context.run_id,\n    domain: finding.domain,\n    evidence_ids: evidenceIds,\n    finding_ids: [finding.finding_id],\n    hypothesis: templates[finding.domain] || 'Internal organizational reality may differ from what is visible in public information.',\n    confidence,\n    requires_validation: true,\n    validation_gap: gap\n  } } };\n});\n"
       },
-      "id": "structure_hypothesis_record",
-      "name": "STRUCTURE_HYPOTHESIS_RECORD",
+      "id": "build_hypothesis_from_gap",
+      "name": "BUILD_HYPOTHESIS_FROM_GAP",
       "type": "n8n-nodes-base.code",
       "typeVersion": 2,
+      "position": [
+        860,
+        140
+      ]
+    },
+    {
+      "parameters": {
+        "mode": "append",
+        "options": {}
+      },
+      "id": "merge__observed_and_hypothesis",
+      "name": "MERGE__OBSERVED_AND_HYPOTHESIS",
+      "type": "n8n-nodes-base.merge",
+      "typeVersion": 3,
       "position": [
         1160,
         0
@@ -98,10 +132,10 @@
     },
     {
       "parameters": {
-        "jsCode": "// SKELETON_PLACEHOLDER: VALIDATE_NO_HYPOTHESIS_AS_FACT\n// Prevent a public-evidence hypothesis from becoming a confirmed diagnosis.\n// TODO: Replace this placeholder with configured production logic.\n// Contract discipline: preserve FACT / INFERENCE / HYPOTHESIS / UNKNOWN boundaries.\nreturn items;\n"
+        "jsCode": "return items.map(item => {\n  const hypothesis = item.json.hypothesis_record;\n  if (!hypothesis) return item;\n  if (hypothesis.requires_validation !== true) throw new Error('Hypothesis must require validation');\n  if (!hypothesis.validation_gap) throw new Error('Hypothesis requires a validation_gap');\n  if (!hypothesis.evidence_ids.length || !hypothesis.finding_ids.length) throw new Error('Hypothesis traceability is required');\n  return item;\n});\n"
       },
-      "id": "validate_no_hypothesis_as_fact",
-      "name": "VALIDATE_NO_HYPOTHESIS_AS_FACT",
+      "id": "confidence_and_validation_gap",
+      "name": "CONFIDENCE_AND_VALIDATION_GAP",
       "type": "n8n-nodes-base.code",
       "typeVersion": 2,
       "position": [
@@ -111,14 +145,27 @@
     },
     {
       "parameters": {
-        "jsCode": "// TERMINAL_OUTPUT_NODE: OUTPUT_CONTRACT__HYPOTHESES\n// Return structured hypotheses.\n// TODO: Replace this placeholder with configured production logic.\n// Contract discipline: preserve FACT / INFERENCE / HYPOTHESIS / UNKNOWN boundaries.\nreturn items;\n"
+        "jsCode": "const context = items[0]?.json?.context ?? {};\nconst hypotheses = items.map(item => item.json.hypothesis_record).filter(Boolean)\n  .sort((a, b) => a.hypothesis_id.localeCompare(b.hypothesis_id));\nreturn [{ json: { ...context, hypotheses } }];\n"
+      },
+      "id": "structure_hypothesis_records",
+      "name": "STRUCTURE_HYPOTHESIS_RECORDS",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        1760,
+        0
+      ]
+    },
+    {
+      "parameters": {
+        "jsCode": "const payload = items[0].json;\nfor (const hypothesis of payload.hypotheses || []) {\n  if (!/^HYP-/.test(hypothesis.hypothesis_id) || hypothesis.requires_validation !== true) {\n    throw new Error('61 output violates hypothesis contract');\n  }\n}\nreturn [{ json: payload }];\n"
       },
       "id": "output_contract__hypotheses",
       "name": "OUTPUT_CONTRACT__HYPOTHESES",
       "type": "n8n-nodes-base.code",
       "typeVersion": 2,
       "position": [
-        1760,
+        2060,
         0
       ]
     }
@@ -128,58 +175,87 @@
       "main": [
         [
           {
-            "node": "INPUT_CONTRACT__FINDINGS_AND_EVIDENCE",
+            "node": "INPUT_CONTRACT__FINDINGS_EVIDENCE_UNKNOWNS",
             "type": "main",
             "index": 0
           }
         ]
       ]
     },
-    "INPUT_CONTRACT__FINDINGS_AND_EVIDENCE": {
+    "INPUT_CONTRACT__FINDINGS_EVIDENCE_UNKNOWNS": {
       "main": [
         [
           {
-            "node": "CLASSIFY_FACT_INFERENCE_HYPOTHESIS_UNKNOWN",
+            "node": "DECISION__CAN_INTERNAL_REALITY_BE_OBSERVED",
             "type": "main",
             "index": 0
           }
         ]
       ]
     },
-    "CLASSIFY_FACT_INFERENCE_HYPOTHESIS_UNKNOWN": {
+    "DECISION__CAN_INTERNAL_REALITY_BE_OBSERVED": {
       "main": [
         [
           {
-            "node": "TODO_AGENT__HYPOTHESIS_BUILDER",
+            "node": "PRESERVE_OBSERVED_INTERPRETATION",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "BUILD_HYPOTHESIS_FROM_GAP",
             "type": "main",
             "index": 0
           }
         ]
       ]
     },
-    "TODO_AGENT__HYPOTHESIS_BUILDER": {
+    "PRESERVE_OBSERVED_INTERPRETATION": {
       "main": [
         [
           {
-            "node": "STRUCTURE_HYPOTHESIS_RECORD",
+            "node": "MERGE__OBSERVED_AND_HYPOTHESIS",
             "type": "main",
             "index": 0
           }
         ]
       ]
     },
-    "STRUCTURE_HYPOTHESIS_RECORD": {
+    "BUILD_HYPOTHESIS_FROM_GAP": {
       "main": [
         [
           {
-            "node": "VALIDATE_NO_HYPOTHESIS_AS_FACT",
+            "node": "MERGE__OBSERVED_AND_HYPOTHESIS",
+            "type": "main",
+            "index": 1
+          }
+        ]
+      ]
+    },
+    "MERGE__OBSERVED_AND_HYPOTHESIS": {
+      "main": [
+        [
+          {
+            "node": "CONFIDENCE_AND_VALIDATION_GAP",
             "type": "main",
             "index": 0
           }
         ]
       ]
     },
-    "VALIDATE_NO_HYPOTHESIS_AS_FACT": {
+    "CONFIDENCE_AND_VALIDATION_GAP": {
+      "main": [
+        [
+          {
+            "node": "STRUCTURE_HYPOTHESIS_RECORDS",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "STRUCTURE_HYPOTHESIS_RECORDS": {
       "main": [
         [
           {

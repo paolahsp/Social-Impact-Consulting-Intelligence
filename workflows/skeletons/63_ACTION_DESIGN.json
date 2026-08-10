@@ -3,9 +3,9 @@
   "nodes": [
     {
       "parameters": {
-        "content": "PURPOSE\nGenerate concrete actions only where evidence and diagnosis justify action.\n\nOWNER\nGRETEL TRACK B\n\nINPUT CONTRACT\ndiagnosis records plus prioritized findings/hypotheses\n\nOUTPUT CONTRACT\naction recommendations suitable for recommendation.schema.json\n\nSTATUS\nSkeleton only. Inactive by default. No credentials. Configure TODO nodes after import.",
-        "height": 340,
-        "width": 520,
+        "content": "PURPOSE\nCreate proportionate recommendations that validate uncertain diagnoses before intervention.\n\nOWNER\nGRETEL TRACK B\n\nINPUT CONTRACT\nAccumulated payload with diagnoses[] and findings[]\n\nOUTPUT CONTRACT\nAccumulated payload plus recommendations[] conforming to recommendation.schema.json\n\nSTATUS\nPhase 2B repository-ready. Inactive by default. No credentials. Deterministic fixture path; no Python execution.",
+        "height": 390,
+        "width": 560,
         "color": 4
       },
       "id": "00_readme__purpose_owner_contracts_status",
@@ -13,8 +13,24 @@
       "type": "n8n-nodes-base.stickyNote",
       "typeVersion": 1,
       "position": [
-        -420,
-        -320
+        -520,
+        -380
+      ]
+    },
+    {
+      "parameters": {
+        "content": "VISIBLE PATH\nDiagnosis -> validation required?\nYES -> discovery/validation action\nNO -> improvement action\nMission + proportionality gate -> structured recommendation\nJourney before technology is enforced.",
+        "height": 320,
+        "width": 560,
+        "color": 5
+      },
+      "id": "note__visible_transformation_path",
+      "name": "NOTE__VISIBLE_TRANSFORMATION_PATH",
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [
+        -520,
+        40
       ]
     },
     {
@@ -30,10 +46,10 @@
     },
     {
       "parameters": {
-        "jsCode": "// SKELETON_PLACEHOLDER: INPUT_CONTRACT__DIAGNOSIS_PRIORITY\n// Accept diagnosis and prioritization context.\n// TODO: Replace this placeholder with configured production logic.\n// Contract discipline: preserve FACT / INFERENCE / HYPOTHESIS / UNKNOWN boundaries.\nreturn items;\n"
+        "jsCode": "const payload = items[0]?.json ?? {};\nif (!Array.isArray(payload.diagnoses) || !Array.isArray(payload.findings)) throw new Error('63 input requires diagnoses[] and findings[]');\nif (payload.diagnoses.length === 0) return [{ json: { context: payload, skip: true, validation_required: true } }];\nreturn payload.diagnoses.map((diagnosis, index) => ({ json: {\n  context: payload,\n  index,\n  diagnosis,\n  validation_required: diagnosis.requires_validation === true || diagnosis.diagnosis_type === 'unknown' || Number(diagnosis.confidence || 0) < 0.7\n} }));\n"
       },
-      "id": "input_contract__diagnosis_priority",
-      "name": "INPUT_CONTRACT__DIAGNOSIS_PRIORITY",
+      "id": "input_contract__diagnoses_findings",
+      "name": "INPUT_CONTRACT__DIAGNOSES_FINDINGS",
       "type": "n8n-nodes-base.code",
       "typeVersion": 2,
       "position": [
@@ -43,12 +59,32 @@
     },
     {
       "parameters": {
-        "jsCode": "// SKELETON_PLACEHOLDER: ACTION_JUSTIFICATION_GATE\n// Block implementation actions for weak or unvalidated hypotheses.\n// TODO: Replace this placeholder with configured production logic.\n// Contract discipline: preserve FACT / INFERENCE / HYPOTHESIS / UNKNOWN boundaries.\nreturn items;\n"
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 2
+          },
+          "conditions": [
+            {
+              "id": "decision__validation_required_condition",
+              "leftValue": "={{ $json.validation_required }}",
+              "operator": {
+                "type": "boolean",
+                "operation": "true",
+                "singleValue": true
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
       },
-      "id": "action_justification_gate",
-      "name": "ACTION_JUSTIFICATION_GATE",
-      "type": "n8n-nodes-base.code",
-      "typeVersion": 2,
+      "id": "decision__validation_required",
+      "name": "DECISION__VALIDATION_REQUIRED",
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.2,
       "position": [
         560,
         0
@@ -56,25 +92,39 @@
     },
     {
       "parameters": {
-        "jsCode": "// SKELETON_PLACEHOLDER: TODO_AGENT__ACTION_DESIGN\n// AGENT_INTERFACE__ACTION_DESIGN.\n// TODO: Replace this placeholder with configured production logic.\n// Contract discipline: preserve FACT / INFERENCE / HYPOTHESIS / UNKNOWN boundaries.\nreturn items;\n"
+        "jsCode": "const templates = {\n  operations_cx: 'Map the current stakeholder journey and validate each handoff with staff before considering technology changes.',\n  revenue_resilience: 'Validate funding sources, concentration, and dependencies with the client before designing a resilience intervention.',\n  impact_evidence: 'Review the current impact measurement journey with staff before proposing changes to tools or reporting.'\n};\nreturn items.map(item => {\n  if (item.json.skip) return { json: { ...item.json, recommendation_record: null } };\n  const diagnosis = item.json.diagnosis;\n  return { json: { ...item.json, recommendation_record: {\n    recommendation_id: `REC-${String(item.json.index + 1).padStart(3, '0')}`,\n    finding_ids: diagnosis.finding_ids,\n    diagnosis_ids: [diagnosis.diagnosis_id],\n    diagnosis: diagnosis.statement,\n    action: templates[diagnosis.domain] || 'Validate the current journey with the client before selecting an intervention.',\n    priority: diagnosis.diagnosis_type === 'unknown' ? 'high' : 'medium',\n    kpi: { name: 'Validation outcome', baseline: null, baseline_status: 'unknown', target: null, timeframe: 'After baseline is confirmed', measurement_method: 'Confirm the measurement method with the client' },\n    confidence: diagnosis.confidence,\n    requires_human_review: true\n  } } };\n});\n"
       },
-      "id": "todo_agent__action_design",
-      "name": "TODO_AGENT__ACTION_DESIGN",
+      "id": "build__validation_or_discovery_action",
+      "name": "BUILD__VALIDATION_OR_DISCOVERY_ACTION",
       "type": "n8n-nodes-base.code",
       "typeVersion": 2,
       "position": [
         860,
-        0
+        -140
       ]
     },
     {
       "parameters": {
-        "jsCode": "// SKELETON_PLACEHOLDER: STRUCTURE_ACTIONS\n// Tie each action to diagnosis, finding_ids, and evidence/hypothesis support.\n// TODO: Replace this placeholder with configured production logic.\n// Contract discipline: preserve FACT / INFERENCE / HYPOTHESIS / UNKNOWN boundaries.\nreturn items;\n"
+        "jsCode": "const templates = {\n  operations_cx: 'Improve the validated stakeholder journey, beginning with the highest-friction handoff and only then assessing enabling technology.',\n  revenue_resilience: 'Implement the agreed revenue resilience improvement based on validated funding dependencies.',\n  impact_evidence: 'Implement the agreed impact measurement improvement using the validated reporting journey.'\n};\nreturn items.map(item => {\n  const diagnosis = item.json.diagnosis;\n  return { json: { ...item.json, recommendation_record: {\n    recommendation_id: `REC-${String(item.json.index + 1).padStart(3, '0')}`,\n    finding_ids: diagnosis.finding_ids,\n    diagnosis_ids: [diagnosis.diagnosis_id],\n    diagnosis: diagnosis.statement,\n    action: templates[diagnosis.domain] || 'Implement a proportionate improvement based on the validated diagnosis.',\n    priority: 'medium',\n    kpi: { name: 'Improvement outcome', baseline: null, baseline_status: 'unknown', target: null, timeframe: '30-90 days', measurement_method: 'Agree a measurement method with the client' },\n    confidence: diagnosis.confidence,\n    requires_human_review: false\n  } } };\n});\n"
       },
-      "id": "structure_actions",
-      "name": "STRUCTURE_ACTIONS",
+      "id": "build__improvement_action",
+      "name": "BUILD__IMPROVEMENT_ACTION",
       "type": "n8n-nodes-base.code",
       "typeVersion": 2,
+      "position": [
+        860,
+        140
+      ]
+    },
+    {
+      "parameters": {
+        "mode": "append",
+        "options": {}
+      },
+      "id": "merge__action_paths",
+      "name": "MERGE__ACTION_PATHS",
+      "type": "n8n-nodes-base.merge",
+      "typeVersion": 3,
       "position": [
         1160,
         0
@@ -82,10 +132,10 @@
     },
     {
       "parameters": {
-        "jsCode": "// SKELETON_PLACEHOLDER: HUMAN_REVIEW_FLAG\n// Mark sensitive or low-confidence actions for human review.\n// TODO: Replace this placeholder with configured production logic.\n// Contract discipline: preserve FACT / INFERENCE / HYPOTHESIS / UNKNOWN boundaries.\nreturn items;\n"
+        "jsCode": "return items.map(item => {\n  const recommendation = item.json.recommendation_record;\n  if (!recommendation) return item;\n  const technologyFirst = /automate|new platform|replace system/i.test(recommendation.action) && !/journey|handoff|validated/i.test(recommendation.action);\n  if (technologyFirst) throw new Error('Journey-before-technology proportionality check failed');\n  if (!recommendation.finding_ids.length || !recommendation.diagnosis_ids.length) throw new Error('Recommendation traceability check failed');\n  return item;\n});\n"
       },
-      "id": "human_review_flag",
-      "name": "HUMAN_REVIEW_FLAG",
+      "id": "mission_and_proportionality_check",
+      "name": "MISSION_AND_PROPORTIONALITY_CHECK",
       "type": "n8n-nodes-base.code",
       "typeVersion": 2,
       "position": [
@@ -95,14 +145,27 @@
     },
     {
       "parameters": {
-        "jsCode": "// TERMINAL_OUTPUT_NODE: OUTPUT_CONTRACT__ACTIONS\n// Return justified action records.\n// TODO: Replace this placeholder with configured production logic.\n// Contract discipline: preserve FACT / INFERENCE / HYPOTHESIS / UNKNOWN boundaries.\nreturn items;\n"
+        "jsCode": "const context = items[0]?.json?.context ?? {};\nconst recommendations = items.map(item => item.json.recommendation_record).filter(Boolean)\n  .sort((a, b) => a.recommendation_id.localeCompare(b.recommendation_id));\nreturn [{ json: { ...context, recommendations } }];\n"
       },
-      "id": "output_contract__actions",
-      "name": "OUTPUT_CONTRACT__ACTIONS",
+      "id": "structure_recommendations",
+      "name": "STRUCTURE_RECOMMENDATIONS",
       "type": "n8n-nodes-base.code",
       "typeVersion": 2,
       "position": [
         1760,
+        0
+      ]
+    },
+    {
+      "parameters": {
+        "jsCode": "for (const recommendation of items[0].json.recommendations || []) {\n  if (!recommendation.action || !recommendation.kpi || typeof recommendation.requires_human_review !== 'boolean') {\n    throw new Error('63 output violates recommendation contract');\n  }\n}\nreturn items;\n"
+      },
+      "id": "output_contract__recommendations",
+      "name": "OUTPUT_CONTRACT__RECOMMENDATIONS",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        2060,
         0
       ]
     }
@@ -112,62 +175,91 @@
       "main": [
         [
           {
-            "node": "INPUT_CONTRACT__DIAGNOSIS_PRIORITY",
+            "node": "INPUT_CONTRACT__DIAGNOSES_FINDINGS",
             "type": "main",
             "index": 0
           }
         ]
       ]
     },
-    "INPUT_CONTRACT__DIAGNOSIS_PRIORITY": {
+    "INPUT_CONTRACT__DIAGNOSES_FINDINGS": {
       "main": [
         [
           {
-            "node": "ACTION_JUSTIFICATION_GATE",
+            "node": "DECISION__VALIDATION_REQUIRED",
             "type": "main",
             "index": 0
           }
         ]
       ]
     },
-    "ACTION_JUSTIFICATION_GATE": {
+    "DECISION__VALIDATION_REQUIRED": {
       "main": [
         [
           {
-            "node": "TODO_AGENT__ACTION_DESIGN",
+            "node": "BUILD__VALIDATION_OR_DISCOVERY_ACTION",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "BUILD__IMPROVEMENT_ACTION",
             "type": "main",
             "index": 0
           }
         ]
       ]
     },
-    "TODO_AGENT__ACTION_DESIGN": {
+    "BUILD__VALIDATION_OR_DISCOVERY_ACTION": {
       "main": [
         [
           {
-            "node": "STRUCTURE_ACTIONS",
+            "node": "MERGE__ACTION_PATHS",
             "type": "main",
             "index": 0
           }
         ]
       ]
     },
-    "STRUCTURE_ACTIONS": {
+    "BUILD__IMPROVEMENT_ACTION": {
       "main": [
         [
           {
-            "node": "HUMAN_REVIEW_FLAG",
+            "node": "MERGE__ACTION_PATHS",
+            "type": "main",
+            "index": 1
+          }
+        ]
+      ]
+    },
+    "MERGE__ACTION_PATHS": {
+      "main": [
+        [
+          {
+            "node": "MISSION_AND_PROPORTIONALITY_CHECK",
             "type": "main",
             "index": 0
           }
         ]
       ]
     },
-    "HUMAN_REVIEW_FLAG": {
+    "MISSION_AND_PROPORTIONALITY_CHECK": {
       "main": [
         [
           {
-            "node": "OUTPUT_CONTRACT__ACTIONS",
+            "node": "STRUCTURE_RECOMMENDATIONS",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "STRUCTURE_RECOMMENDATIONS": {
+      "main": [
+        [
+          {
+            "node": "OUTPUT_CONTRACT__RECOMMENDATIONS",
             "type": "main",
             "index": 0
           }

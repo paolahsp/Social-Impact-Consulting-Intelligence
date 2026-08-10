@@ -37,6 +37,7 @@ REQUIRED_FIXTURES = sorted(
     set(FIXTURE_SCHEMA_MAP)
     | {
         "paola_track_output.json",
+        "paola_track_insufficient_evidence.json",
         "gretel_track_output.json",
     }
 )
@@ -131,19 +132,19 @@ def validate_fixture_against_schema(fixture_name, schema_name, schemas):
     validate_value(fixture, schemas[schema_name], schemas, fixture_name)
 
 
-def validate_paola_output(schemas):
-    data = load_json(FIXTURE_DIR / "paola_track_output.json")
+def validate_paola_output(schemas, fixture_name="paola_track_output.json"):
+    data = load_json(FIXTURE_DIR / fixture_name)
     for key, schema_name in PAOLA_COLLECTIONS.items():
         if key not in data:
-            raise ValidationError(f"paola_track_output.json: missing {key}")
+            raise ValidationError(f"{fixture_name}: missing {key}")
         if isinstance(data[key], list):
             for index, item in enumerate(data[key]):
-                validate_value(item, schemas[schema_name], schemas, f"paola_track_output.json.{key}[{index}]")
+                validate_value(item, schemas[schema_name], schemas, f"{fixture_name}.{key}[{index}]")
         else:
-            validate_value(data[key], schemas[schema_name], schemas, f"paola_track_output.json.{key}")
+            validate_value(data[key], schemas[schema_name], schemas, f"{fixture_name}.{key}")
     for key in ["unknowns", "contradictions", "rag_metadata"]:
         if key not in data:
-            raise ValidationError(f"paola_track_output.json: missing {key}")
+            raise ValidationError(f"{fixture_name}: missing {key}")
 
 
 def validate_gretel_output(schemas):
@@ -177,10 +178,11 @@ def main():
                 except ValidationError as exc:
                     errors.append(str(exc))
 
-        try:
-            validate_paola_output(schemas)
-        except ValidationError as exc:
-            errors.append(str(exc))
+        for fixture_name in ["paola_track_output.json", "paola_track_insufficient_evidence.json"]:
+            try:
+                validate_paola_output(schemas, fixture_name)
+            except ValidationError as exc:
+                errors.append(str(exc))
 
         try:
             validate_gretel_output(schemas)
@@ -201,4 +203,3 @@ def main():
 
 if __name__ == "__main__":
     sys.exit(main())
-

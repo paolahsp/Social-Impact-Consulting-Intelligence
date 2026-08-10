@@ -3,9 +3,9 @@
   "nodes": [
     {
       "parameters": {
-        "content": "PURPOSE\nDistinguish observed problems, likely causes, validated causes, and unknowns.\n\nOWNER\nGRETEL TRACK B\n\nINPUT CONTRACT\nfinding.schema.json[] plus hypothesis.schema.json[]\n\nOUTPUT CONTRACT\ndiagnosis records with diagnosis_type\n\nSTATUS\nSkeleton only. Inactive by default. No credentials. Configure TODO nodes after import.",
-        "height": 340,
-        "width": 520,
+        "content": "PURPOSE\nClassify diagnoses while maintaining the boundary between public evidence and client-validated causes.\n\nOWNER\nGRETEL TRACK B\n\nINPUT CONTRACT\nAccumulated payload with findings[], evidence[], hypotheses[]\n\nOUTPUT CONTRACT\nAccumulated payload plus diagnoses[] conforming to diagnosis.schema.json\n\nSTATUS\nPhase 2B repository-ready. Inactive by default. No credentials. Deterministic fixture path; no Python execution.",
+        "height": 390,
+        "width": 560,
         "color": 4
       },
       "id": "00_readme__purpose_owner_contracts_status",
@@ -13,8 +13,24 @@
       "type": "n8n-nodes-base.stickyNote",
       "typeVersion": 1,
       "position": [
-        -420,
-        -320
+        -520,
+        -380
+      ]
+    },
+    {
+      "parameters": {
+        "content": "VISIBLE PATH\nFinding + hypothesis -> evidence strength -> direct client validation?\nYES -> validated_cause\nNO -> observed_problem / likely_cause / unknown\nTraceability and boundary check prevents public evidence from silently becoming validated cause.",
+        "height": 320,
+        "width": 560,
+        "color": 5
+      },
+      "id": "note__visible_transformation_path",
+      "name": "NOTE__VISIBLE_TRANSFORMATION_PATH",
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [
+        -520,
+        40
       ]
     },
     {
@@ -30,7 +46,7 @@
     },
     {
       "parameters": {
-        "jsCode": "// SKELETON_PLACEHOLDER: INPUT_CONTRACT__FINDINGS_HYPOTHESES\n// Accept findings and hypotheses.\n// TODO: Replace this placeholder with configured production logic.\n// Contract discipline: preserve FACT / INFERENCE / HYPOTHESIS / UNKNOWN boundaries.\nreturn items;\n"
+        "jsCode": "const payload = items[0]?.json ?? {};\nif (!Array.isArray(payload.findings) || !Array.isArray(payload.evidence) || !Array.isArray(payload.hypotheses)) {\n  throw new Error('62 input requires findings[], evidence[], and hypotheses[]');\n}\nif (payload.hypotheses.length === 0) return [{ json: { context: payload, skip: true, direct_validation_present: false } }];\nreturn payload.hypotheses.map((hypothesis, index) => ({ json: {\n  context: payload,\n  index,\n  hypothesis,\n  findings: payload.findings.filter(finding => (hypothesis.finding_ids || []).includes(finding.finding_id)),\n  evidence: payload.evidence.filter(ev => (hypothesis.evidence_ids || []).includes(ev.evidence_id)),\n  direct_validation_present: Boolean(payload.client_validation?.validated_hypothesis_ids?.includes(hypothesis.hypothesis_id))\n} }));\n"
       },
       "id": "input_contract__findings_hypotheses",
       "name": "INPUT_CONTRACT__FINDINGS_HYPOTHESES",
@@ -43,10 +59,10 @@
     },
     {
       "parameters": {
-        "jsCode": "// SKELETON_PLACEHOLDER: CLASSIFY_DIAGNOSIS_TYPE\n// Use observed_problem, likely_cause, validated_cause, or unknown.\n// TODO: Replace this placeholder with configured production logic.\n// Contract discipline: preserve FACT / INFERENCE / HYPOTHESIS / UNKNOWN boundaries.\nreturn items;\n"
+        "jsCode": "return items.map(item => {\n  if (item.json.skip) return { json: { ...item.json, evidence_strength: 'none' } };\n  const scores = item.json.evidence.map(ev => Number(ev.confidence || 0));\n  const average = scores.length ? scores.reduce((a, b) => a + b, 0) / scores.length : 0;\n  const supportedFacts = item.json.evidence.filter(ev => ev.evidence_type === 'fact' && ev.status === 'supported').length;\n  const strength = supportedFacts > 0 && average >= 0.75 ? 'strong' : average >= 0.5 ? 'moderate' : 'weak';\n  return { json: { ...item.json, evidence_strength: strength } };\n});\n"
       },
-      "id": "classify_diagnosis_type",
-      "name": "CLASSIFY_DIAGNOSIS_TYPE",
+      "id": "evaluate_evidence_strength",
+      "name": "EVALUATE_EVIDENCE_STRENGTH",
       "type": "n8n-nodes-base.code",
       "typeVersion": 2,
       "position": [
@@ -56,12 +72,32 @@
     },
     {
       "parameters": {
-        "jsCode": "// SKELETON_PLACEHOLDER: TODO_AGENT__ROOT_CAUSE\n// AGENT_INTERFACE__ROOT_CAUSE_DIAGNOSIS.\n// TODO: Replace this placeholder with configured production logic.\n// Contract discipline: preserve FACT / INFERENCE / HYPOTHESIS / UNKNOWN boundaries.\nreturn items;\n"
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 2
+          },
+          "conditions": [
+            {
+              "id": "decision__direct_client_validation_present_condition",
+              "leftValue": "={{ $json.direct_validation_present }}",
+              "operator": {
+                "type": "boolean",
+                "operation": "true",
+                "singleValue": true
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
       },
-      "id": "todo_agent__root_cause",
-      "name": "TODO_AGENT__ROOT_CAUSE",
-      "type": "n8n-nodes-base.code",
-      "typeVersion": 2,
+      "id": "decision__direct_client_validation_present",
+      "name": "DECISION__DIRECT_CLIENT_VALIDATION_PRESENT",
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.2,
       "position": [
         860,
         0
@@ -69,25 +105,39 @@
     },
     {
       "parameters": {
-        "jsCode": "// SKELETON_PLACEHOLDER: EVIDENCE_SUPPORT_CHECK\n// Public evidence normally produces likely_cause, not validated_cause.\n// TODO: Replace this placeholder with configured production logic.\n// Contract discipline: preserve FACT / INFERENCE / HYPOTHESIS / UNKNOWN boundaries.\nreturn items;\n"
+        "jsCode": "return items.map(item => {\n  const hypothesis = item.json.hypothesis;\n  return { json: { ...item.json, diagnosis_record: {\n    diagnosis_id: `DX-${String(item.json.index + 1).padStart(3, '0')}`,\n    domain: hypothesis.domain,\n    diagnosis_type: 'validated_cause',\n    statement: `Client validation confirms: ${hypothesis.hypothesis}`,\n    finding_ids: hypothesis.finding_ids,\n    hypothesis_ids: [hypothesis.hypothesis_id],\n    evidence_ids: hypothesis.evidence_ids,\n    confidence: Math.max(0.8, hypothesis.confidence),\n    requires_validation: false\n  } } };\n});\n"
       },
-      "id": "evidence_support_check",
-      "name": "EVIDENCE_SUPPORT_CHECK",
+      "id": "classify__validated_cause",
+      "name": "CLASSIFY__VALIDATED_CAUSE",
       "type": "n8n-nodes-base.code",
       "typeVersion": 2,
       "position": [
         1160,
-        0
+        -140
       ]
     },
     {
       "parameters": {
-        "jsCode": "// SKELETON_PLACEHOLDER: VALIDATION_BOUNDARY_CHECK\n// Require clear evidence before validated_cause.\n// TODO: Replace this placeholder with configured production logic.\n// Contract discipline: preserve FACT / INFERENCE / HYPOTHESIS / UNKNOWN boundaries.\nreturn items;\n"
+        "jsCode": "return items.map(item => {\n  if (item.json.skip) return { json: { ...item.json, diagnosis_record: null } };\n  const hypothesis = item.json.hypothesis;\n  const confidence = Number(hypothesis.confidence || 0);\n  const findingObserved = item.json.findings.some(f => f.finding_type === 'observed' && f.requires_validation === false);\n  let type = confidence >= 0.4 ? 'likely_cause' : 'unknown';\n  if (findingObserved && item.json.evidence_strength === 'strong' && hypothesis.requires_validation === false) type = 'observed_problem';\n  const statement = type === 'unknown'\n    ? `The cause cannot be determined from public evidence. ${hypothesis.hypothesis}`\n    : `A likely contributing factor is: ${hypothesis.hypothesis}`;\n  return { json: { ...item.json, diagnosis_record: {\n    diagnosis_id: `DX-${String(item.json.index + 1).padStart(3, '0')}`,\n    domain: hypothesis.domain,\n    diagnosis_type: type,\n    statement,\n    finding_ids: hypothesis.finding_ids,\n    hypothesis_ids: [hypothesis.hypothesis_id],\n    evidence_ids: hypothesis.evidence_ids,\n    confidence,\n    requires_validation: true\n  } } };\n});\n"
       },
-      "id": "validation_boundary_check",
-      "name": "VALIDATION_BOUNDARY_CHECK",
+      "id": "classify__public_evidence",
+      "name": "CLASSIFY__PUBLIC_EVIDENCE",
       "type": "n8n-nodes-base.code",
       "typeVersion": 2,
+      "position": [
+        1160,
+        140
+      ]
+    },
+    {
+      "parameters": {
+        "mode": "append",
+        "options": {}
+      },
+      "id": "merge__diagnosis_classifications",
+      "name": "MERGE__DIAGNOSIS_CLASSIFICATIONS",
+      "type": "n8n-nodes-base.merge",
+      "typeVersion": 3,
       "position": [
         1460,
         0
@@ -95,14 +145,27 @@
     },
     {
       "parameters": {
-        "jsCode": "// TERMINAL_OUTPUT_NODE: OUTPUT_CONTRACT__DIAGNOSIS\n// Return structured diagnosis records.\n// TODO: Replace this placeholder with configured production logic.\n// Contract discipline: preserve FACT / INFERENCE / HYPOTHESIS / UNKNOWN boundaries.\nreturn items;\n"
+        "jsCode": "const context = items[0]?.json?.context ?? {};\nconst diagnoses = items.map(item => item.json.diagnosis_record).filter(Boolean)\n  .sort((a, b) => a.diagnosis_id.localeCompare(b.diagnosis_id));\nfor (const diagnosis of diagnoses) {\n  if (!diagnosis.finding_ids.length || !diagnosis.hypothesis_ids.length || !diagnosis.evidence_ids.length) {\n    throw new Error('Diagnosis traceability check failed');\n  }\n  if (diagnosis.diagnosis_type === 'validated_cause' && diagnosis.requires_validation) {\n    throw new Error('Public evidence cannot silently become validated cause');\n  }\n}\nreturn [{ json: { ...context, diagnoses } }];\n"
       },
-      "id": "output_contract__diagnosis",
-      "name": "OUTPUT_CONTRACT__DIAGNOSIS",
+      "id": "traceability_and_validation_boundary_check",
+      "name": "TRACEABILITY_AND_VALIDATION_BOUNDARY_CHECK",
       "type": "n8n-nodes-base.code",
       "typeVersion": 2,
       "position": [
         1760,
+        0
+      ]
+    },
+    {
+      "parameters": {
+        "jsCode": "const allowed = new Set(['observed_problem', 'likely_cause', 'validated_cause', 'unknown']);\nif (!(items[0].json.diagnoses || []).every(diagnosis => allowed.has(diagnosis.diagnosis_type))) {\n  throw new Error('62 output violates diagnosis contract');\n}\nreturn items;\n"
+      },
+      "id": "output_contract__diagnoses",
+      "name": "OUTPUT_CONTRACT__DIAGNOSES",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        2060,
         0
       ]
     }
@@ -123,51 +186,80 @@
       "main": [
         [
           {
-            "node": "CLASSIFY_DIAGNOSIS_TYPE",
+            "node": "EVALUATE_EVIDENCE_STRENGTH",
             "type": "main",
             "index": 0
           }
         ]
       ]
     },
-    "CLASSIFY_DIAGNOSIS_TYPE": {
+    "EVALUATE_EVIDENCE_STRENGTH": {
       "main": [
         [
           {
-            "node": "TODO_AGENT__ROOT_CAUSE",
+            "node": "DECISION__DIRECT_CLIENT_VALIDATION_PRESENT",
             "type": "main",
             "index": 0
           }
         ]
       ]
     },
-    "TODO_AGENT__ROOT_CAUSE": {
+    "DECISION__DIRECT_CLIENT_VALIDATION_PRESENT": {
       "main": [
         [
           {
-            "node": "EVIDENCE_SUPPORT_CHECK",
+            "node": "CLASSIFY__VALIDATED_CAUSE",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "CLASSIFY__PUBLIC_EVIDENCE",
             "type": "main",
             "index": 0
           }
         ]
       ]
     },
-    "EVIDENCE_SUPPORT_CHECK": {
+    "CLASSIFY__VALIDATED_CAUSE": {
       "main": [
         [
           {
-            "node": "VALIDATION_BOUNDARY_CHECK",
+            "node": "MERGE__DIAGNOSIS_CLASSIFICATIONS",
             "type": "main",
             "index": 0
           }
         ]
       ]
     },
-    "VALIDATION_BOUNDARY_CHECK": {
+    "CLASSIFY__PUBLIC_EVIDENCE": {
       "main": [
         [
           {
-            "node": "OUTPUT_CONTRACT__DIAGNOSIS",
+            "node": "MERGE__DIAGNOSIS_CLASSIFICATIONS",
+            "type": "main",
+            "index": 1
+          }
+        ]
+      ]
+    },
+    "MERGE__DIAGNOSIS_CLASSIFICATIONS": {
+      "main": [
+        [
+          {
+            "node": "TRACEABILITY_AND_VALIDATION_BOUNDARY_CHECK",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "TRACEABILITY_AND_VALIDATION_BOUNDARY_CHECK": {
+      "main": [
+        [
+          {
+            "node": "OUTPUT_CONTRACT__DIAGNOSES",
             "type": "main",
             "index": 0
           }

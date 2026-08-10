@@ -1,0 +1,359 @@
+{
+  "name": "DEV_GRETEL_P0_LIVE_TEST",
+  "nodes": [
+    {
+      "parameters": {
+        "content": "DEV_GRETEL_P0_LIVE_TEST\nDevelopment-only runner for repository fixtures.\nImport after workflows 61-66, then manually select each imported workflow in its Execute Sub-workflow node.\nNo workflow IDs or production data are embedded.\nChange selected_case in DEV_SELECT_TEST_CASE to normal or insufficient_evidence.",
+        "height": 360,
+        "width": 580,
+        "color": 4
+      },
+      "id": "00_readme__dev_workflow",
+      "name": "00_README__DEV_WORKFLOW",
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [
+        -520,
+        -360
+      ]
+    },
+    {
+      "parameters": {
+        "content": "NORMAL\nTwo evidence-backed hypotheses proceed through diagnosis, validation-first recommendations, unknown-baseline KPIs, neutral questions, and 30-day validation tasks.\n\nINSUFFICIENT EVIDENCE\nLow-confidence unknown -> validation-first recommendation -> null/unknown KPI -> neutral question -> 30-day discovery task.",
+        "height": 340,
+        "width": 580,
+        "color": 5
+      },
+      "id": "note__expected_tests",
+      "name": "NOTE__EXPECTED_TESTS",
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [
+        -520,
+        40
+      ]
+    },
+    {
+      "parameters": {},
+      "id": "start__manual_test_trigger",
+      "name": "START__MANUAL_TEST_TRIGGER",
+      "type": "n8n-nodes-base.manualTrigger",
+      "typeVersion": 1,
+      "position": [
+        0,
+        0
+      ]
+    },
+    {
+      "parameters": {
+        "jsCode": "return [{ json: { selected_case: 'normal' } }];\n"
+      },
+      "id": "dev_select_test_case",
+      "name": "DEV_SELECT_TEST_CASE",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        260,
+        0
+      ]
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 2
+          },
+          "conditions": [
+            {
+              "id": "decision__normal_fixture_condition",
+              "leftValue": "={{ $json.selected_case }}",
+              "rightValue": "normal",
+              "operator": {
+                "type": "string",
+                "operation": "equals",
+                "singleValue": false
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "id": "decision__normal_fixture",
+      "name": "DECISION__NORMAL_FIXTURE",
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.2,
+      "position": [
+        560,
+        0
+      ]
+    },
+    {
+      "parameters": {
+        "jsCode": "// DEV NORMAL FIXTURE: development data embedded from repository fixture.\nconst fixture = {\"run_context\":{\"run_id\":\"RUN-FICTIONAL-001\",\"organization\":{\"name\":\"Fictional River Learning Collective\",\"website\":\"https://fictional-river-learning.example.org\",\"country\":\"Germany\",\"mission_area\":\"youth education\"},\"current_challenge\":\"Preparing for a pre-engagement diagnostic workshop\",\"uploaded_document_refs\":[],\"status\":\"analyzing\",\"started_at\":\"2026-08-09T09:00:00Z\",\"errors\":[]},\"sources\":[{\"source_id\":\"SRC-001\",\"title\":\"Fictional River Learning Collective Volunteer Page\",\"url\":\"https://fictional-river-learning.example.org/volunteer\",\"source_type\":\"official_website\",\"publisher\":\"Fictional River Learning Collective\",\"publication_date\":null,\"retrieved_at\":\"2026-08-09T09:10:00Z\",\"authority_level\":\"official\",\"freshness\":\"current\",\"is_official\":true},{\"source_id\":\"SRC-002\",\"title\":\"Fictional River Learning Collective Annual Snapshot\",\"url\":\"https://fictional-river-learning.example.org/annual-snapshot\",\"source_type\":\"public_report\",\"publisher\":\"Fictional River Learning Collective\",\"publication_date\":\"2026-03-01\",\"retrieved_at\":\"2026-08-09T09:14:00Z\",\"authority_level\":\"official\",\"freshness\":\"recent\",\"is_official\":true}],\"evidence\":[{\"evidence_id\":\"EV-001\",\"run_id\":\"RUN-FICTIONAL-001\",\"claim\":\"Volunteer applications are collected through a public website form.\",\"source_ids\":[\"SRC-001\"],\"domain\":\"operations_cx\",\"evidence_type\":\"fact\",\"confidence\":0.86,\"status\":\"supported\",\"contradiction_ids\":[],\"requires_validation\":false},{\"evidence_id\":\"EV-002\",\"run_id\":\"RUN-FICTIONAL-001\",\"claim\":\"The organization describes grant funding and small donor support in its annual snapshot.\",\"source_ids\":[\"SRC-002\"],\"domain\":\"revenue_resilience\",\"evidence_type\":\"fact\",\"confidence\":0.78,\"status\":\"supported\",\"contradiction_ids\":[],\"requires_validation\":false},{\"evidence_id\":\"EV-003\",\"run_id\":\"RUN-FICTIONAL-001\",\"claim\":\"The internal volunteer follow-up process is not described in public sources.\",\"source_ids\":[\"SRC-001\"],\"domain\":\"operations_cx\",\"evidence_type\":\"unknown\",\"confidence\":0.7,\"status\":\"unknown\",\"contradiction_ids\":[],\"requires_validation\":true}],\"findings\":[{\"finding_id\":\"F-001\",\"domain\":\"operations_cx\",\"finding\":\"The public volunteer journey includes an online application form.\",\"evidence_ids\":[\"EV-001\"],\"finding_type\":\"observed\",\"confidence\":0.82,\"requires_validation\":false,\"validation_question\":null},{\"finding_id\":\"F-002\",\"domain\":\"revenue_resilience\",\"finding\":\"Public reporting indicates more than one revenue signal, but the concentration of funding is not publicly visible.\",\"evidence_ids\":[\"EV-002\"],\"finding_type\":\"inferred\",\"confidence\":0.58,\"requires_validation\":true,\"validation_question\":\"What share of annual income comes from the largest funding source?\"}],\"unknowns\":[{\"unknown_id\":\"UNK-001\",\"domain\":\"operations_cx\",\"description\":\"The internal follow-up process after volunteer form submission is not publicly visible.\",\"evidence_ids\":[\"EV-003\"]},{\"unknown_id\":\"UNK-002\",\"domain\":\"revenue_resilience\",\"description\":\"Funding concentration cannot be determined from the public annual snapshot.\",\"evidence_ids\":[\"EV-002\"]}],\"contradictions\":[],\"rag_metadata\":{\"retrieval_run_id\":\"RAG-FICTIONAL-001\",\"domains\":[\"revenue_resilience\",\"operations_cx\"],\"retrieved_context_ids\":[\"FRAMEWORK-REV-001\",\"FRAMEWORK-OPS-001\"]}};\nreturn [{ json: fixture }];\n"
+      },
+      "id": "dev_input__paola_track_fixture",
+      "name": "DEV_INPUT__PAOLA_TRACK_FIXTURE",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        860,
+        -140
+      ]
+    },
+    {
+      "parameters": {
+        "jsCode": "// DEV INSUFFICIENT-EVIDENCE FIXTURE: development data embedded from repository fixture.\nconst fixture = {\"run_context\":{\"run_id\":\"RUN-INSUFFICIENT-EVIDENCE-TEST\",\"organization\":{\"name\":\"Test Organization with Gaps\",\"website\":\"https://test-org.example.org\",\"country\":\"Kenya\",\"mission_area\":\"health\"},\"current_challenge\":\"Testing insufficient evidence handling\",\"status\":\"analyzing\",\"started_at\":\"2026-08-10T09:00:00Z\",\"errors\":[]},\"sources\":[{\"source_id\":\"SRC-INSUF-001\",\"title\":\"Organization homepage\",\"url\":\"https://test-org.example.org\",\"source_type\":\"official_website\",\"publisher\":\"Test Organization\",\"publication_date\":null,\"retrieved_at\":\"2026-08-10T09:10:00Z\",\"authority_level\":\"official\",\"freshness\":\"current\",\"is_official\":true}],\"evidence\":[{\"evidence_id\":\"EV-INSUF-001\",\"run_id\":\"RUN-INSUFFICIENT-EVIDENCE-TEST\",\"claim\":\"The organization website mentions community health programs.\",\"source_ids\":[\"SRC-INSUF-001\"],\"domain\":\"impact_evidence\",\"evidence_type\":\"fact\",\"confidence\":0.45,\"status\":\"supported\",\"contradiction_ids\":[],\"requires_validation\":true},{\"evidence_id\":\"EV-INSUF-002\",\"run_id\":\"RUN-INSUFFICIENT-EVIDENCE-TEST\",\"claim\":\"Internal impact measurement methodology is not described in public sources.\",\"source_ids\":[\"SRC-INSUF-001\"],\"domain\":\"impact_evidence\",\"evidence_type\":\"unknown\",\"confidence\":0.3,\"status\":\"unknown\",\"contradiction_ids\":[],\"requires_validation\":true}],\"findings\":[{\"finding_id\":\"F-INSUF-001\",\"domain\":\"impact_evidence\",\"finding\":\"Public sources do not provide clear information about how the organization measures or reports impact.\",\"evidence_ids\":[\"EV-INSUF-001\",\"EV-INSUF-002\"],\"finding_type\":\"inferred\",\"confidence\":0.35,\"requires_validation\":true,\"validation_question\":\"What is your actual impact measurement approach?\"}],\"unknowns\":[{\"unknown_id\":\"UNK-INSUF-001\",\"domain\":\"impact_evidence\",\"description\":\"Impact measurement framework and methodology are not described in public sources.\",\"evidence_ids\":[\"EV-INSUF-002\"]}],\"contradictions\":[],\"rag_metadata\":{\"retrieval_run_id\":\"RAG-INSUF-001\",\"domains\":[\"impact_evidence\"],\"retrieved_context_ids\":[]}};\nreturn [{ json: fixture }];\n"
+      },
+      "id": "dev_input__insufficient_evidence_fixture",
+      "name": "DEV_INPUT__INSUFFICIENT_EVIDENCE_FIXTURE",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        860,
+        140
+      ]
+    },
+    {
+      "parameters": {
+        "workflowId": "",
+        "options": {}
+      },
+      "id": "todo_link_subworkflow__61_hypothesis_builder",
+      "name": "TODO_LINK_SUBWORKFLOW__61_HYPOTHESIS_BUILDER",
+      "type": "n8n-nodes-base.executeWorkflow",
+      "typeVersion": 1,
+      "position": [
+        1160,
+        0
+      ],
+      "notes": "AFTER IMPORT: select 61_HYPOTHESIS_BUILDER. Repository JSON intentionally contains no fabricated workflow ID."
+    },
+    {
+      "parameters": {
+        "workflowId": "",
+        "options": {}
+      },
+      "id": "todo_link_subworkflow__62_root_cause_diagnosis",
+      "name": "TODO_LINK_SUBWORKFLOW__62_ROOT_CAUSE_DIAGNOSIS",
+      "type": "n8n-nodes-base.executeWorkflow",
+      "typeVersion": 1,
+      "position": [
+        1460,
+        0
+      ],
+      "notes": "AFTER IMPORT: select 62_ROOT_CAUSE_DIAGNOSIS. Repository JSON intentionally contains no fabricated workflow ID."
+    },
+    {
+      "parameters": {
+        "workflowId": "",
+        "options": {}
+      },
+      "id": "todo_link_subworkflow__63_action_design",
+      "name": "TODO_LINK_SUBWORKFLOW__63_ACTION_DESIGN",
+      "type": "n8n-nodes-base.executeWorkflow",
+      "typeVersion": 1,
+      "position": [
+        1760,
+        0
+      ],
+      "notes": "AFTER IMPORT: select 63_ACTION_DESIGN. Repository JSON intentionally contains no fabricated workflow ID."
+    },
+    {
+      "parameters": {
+        "workflowId": "",
+        "options": {}
+      },
+      "id": "todo_link_subworkflow__64_kpi_design",
+      "name": "TODO_LINK_SUBWORKFLOW__64_KPI_DESIGN",
+      "type": "n8n-nodes-base.executeWorkflow",
+      "typeVersion": 1,
+      "position": [
+        2060,
+        0
+      ],
+      "notes": "AFTER IMPORT: select 64_KPI_DESIGN. Repository JSON intentionally contains no fabricated workflow ID."
+    },
+    {
+      "parameters": {
+        "workflowId": "",
+        "options": {}
+      },
+      "id": "todo_link_subworkflow__65_client_validation_questions",
+      "name": "TODO_LINK_SUBWORKFLOW__65_CLIENT_VALIDATION_QUESTIONS",
+      "type": "n8n-nodes-base.executeWorkflow",
+      "typeVersion": 1,
+      "position": [
+        2360,
+        0
+      ],
+      "notes": "AFTER IMPORT: select 65_CLIENT_VALIDATION_QUESTIONS. Repository JSON intentionally contains no fabricated workflow ID."
+    },
+    {
+      "parameters": {
+        "workflowId": "",
+        "options": {}
+      },
+      "id": "todo_link_subworkflow__66_90_day_roadmap",
+      "name": "TODO_LINK_SUBWORKFLOW__66_90_DAY_ROADMAP",
+      "type": "n8n-nodes-base.executeWorkflow",
+      "typeVersion": 1,
+      "position": [
+        2660,
+        0
+      ],
+      "notes": "AFTER IMPORT: select 66_90_DAY_ROADMAP. Repository JSON intentionally contains no fabricated workflow ID."
+    },
+    {
+      "parameters": {
+        "jsCode": "return items;\n"
+      },
+      "id": "final_gretel_track_output",
+      "name": "FINAL_GRETEL_TRACK_OUTPUT",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        2960,
+        0
+      ]
+    }
+  ],
+  "connections": {
+    "START__MANUAL_TEST_TRIGGER": {
+      "main": [
+        [
+          {
+            "node": "DEV_SELECT_TEST_CASE",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "DEV_SELECT_TEST_CASE": {
+      "main": [
+        [
+          {
+            "node": "DECISION__NORMAL_FIXTURE",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "DECISION__NORMAL_FIXTURE": {
+      "main": [
+        [
+          {
+            "node": "DEV_INPUT__PAOLA_TRACK_FIXTURE",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "DEV_INPUT__INSUFFICIENT_EVIDENCE_FIXTURE",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "DEV_INPUT__PAOLA_TRACK_FIXTURE": {
+      "main": [
+        [
+          {
+            "node": "TODO_LINK_SUBWORKFLOW__61_HYPOTHESIS_BUILDER",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "DEV_INPUT__INSUFFICIENT_EVIDENCE_FIXTURE": {
+      "main": [
+        [
+          {
+            "node": "TODO_LINK_SUBWORKFLOW__61_HYPOTHESIS_BUILDER",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "TODO_LINK_SUBWORKFLOW__61_HYPOTHESIS_BUILDER": {
+      "main": [
+        [
+          {
+            "node": "TODO_LINK_SUBWORKFLOW__62_ROOT_CAUSE_DIAGNOSIS",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "TODO_LINK_SUBWORKFLOW__62_ROOT_CAUSE_DIAGNOSIS": {
+      "main": [
+        [
+          {
+            "node": "TODO_LINK_SUBWORKFLOW__63_ACTION_DESIGN",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "TODO_LINK_SUBWORKFLOW__63_ACTION_DESIGN": {
+      "main": [
+        [
+          {
+            "node": "TODO_LINK_SUBWORKFLOW__64_KPI_DESIGN",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "TODO_LINK_SUBWORKFLOW__64_KPI_DESIGN": {
+      "main": [
+        [
+          {
+            "node": "TODO_LINK_SUBWORKFLOW__65_CLIENT_VALIDATION_QUESTIONS",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "TODO_LINK_SUBWORKFLOW__65_CLIENT_VALIDATION_QUESTIONS": {
+      "main": [
+        [
+          {
+            "node": "TODO_LINK_SUBWORKFLOW__66_90_DAY_ROADMAP",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "TODO_LINK_SUBWORKFLOW__66_90_DAY_ROADMAP": {
+      "main": [
+        [
+          {
+            "node": "FINAL_GRETEL_TRACK_OUTPUT",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": false,
+  "settings": {
+    "executionOrder": "v1"
+  },
+  "pinData": {}
+}

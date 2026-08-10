@@ -3,9 +3,9 @@
   "nodes": [
     {
       "parameters": {
-        "content": "PURPOSE\nOrganize supported actions into 30, 60, and 90 day roadmap steps.\n\nOWNER\nGRETEL TRACK B\n\nINPUT CONTRACT\nactions, KPIs, validation questions, hypotheses, and diagnosis records\n\nOUTPUT CONTRACT\nroadmap_action.schema.json[]\n\nSTATUS\nSkeleton only. Inactive by default. No credentials. Configure TODO nodes after import.",
-        "height": 340,
-        "width": 520,
+        "content": "PURPOSE\nSequence recommendations into validation-first or implementation roadmap actions.\n\nOWNER\nGRETEL TRACK B\n\nINPUT CONTRACT\nAccumulated payload with recommendations[], kpis[], validation_questions[], hypotheses[], diagnoses[]\n\nOUTPUT CONTRACT\nExact Gretel track object with hypotheses, diagnoses, recommendations, kpis, validation_questions, roadmap_actions\n\nSTATUS\nPhase 2B repository-ready. Inactive by default. No credentials. Deterministic fixture path; no Python execution.",
+        "height": 390,
+        "width": 560,
         "color": 4
       },
       "id": "00_readme__purpose_owner_contracts_status",
@@ -13,24 +13,24 @@
       "type": "n8n-nodes-base.stickyNote",
       "typeVersion": 1,
       "position": [
-        -420,
-        -320
+        -520,
+        -380
       ]
     },
     {
       "parameters": {
-        "content": "ROADMAP RULE\nValidated or sufficiently supported actions may become implementation steps. Unvalidated hypotheses should become validation/discovery actions instead.",
-        "height": 200,
-        "width": 520,
-        "color": 4
+        "content": "VISIBLE PATH\nActions -> validation status -> validation first?\nYES -> 30-day validation/discovery task\nNO -> 60/90-day implementation task\nSequence -> roadmap contract check.\nUnvalidated hypotheses cannot become implementation actions.",
+        "height": 320,
+        "width": 560,
+        "color": 5
       },
-      "id": "note__1",
-      "name": "NOTE__1",
+      "id": "note__visible_transformation_path",
+      "name": "NOTE__VISIBLE_TRANSFORMATION_PATH",
       "type": "n8n-nodes-base.stickyNote",
       "typeVersion": 1,
       "position": [
-        -420,
-        60
+        -520,
+        40
       ]
     },
     {
@@ -46,7 +46,7 @@
     },
     {
       "parameters": {
-        "jsCode": "// SKELETON_PLACEHOLDER: INPUT_CONTRACT__TRANSFORMATION_COMPONENTS\n// Accept actions, KPIs, questions, hypotheses, and diagnoses.\n// TODO: Replace this placeholder with configured production logic.\n// Contract discipline: preserve FACT / INFERENCE / HYPOTHESIS / UNKNOWN boundaries.\nreturn items;\n"
+        "jsCode": "const payload = items[0]?.json ?? {};\nfor (const key of ['recommendations', 'diagnoses', 'hypotheses', 'validation_questions', 'kpis']) {\n  if (!Array.isArray(payload[key])) throw new Error(`66 input requires ${key}[]`);\n}\nif (payload.recommendations.length === 0) return [{ json: { context: payload, skip: true, validation_first: true } }];\nreturn payload.recommendations.map((recommendation, index) => {\n  const diagnoses = payload.diagnoses.filter(d => (recommendation.diagnosis_ids || []).includes(d.diagnosis_id));\n  const hypothesisIds = [...new Set(diagnoses.flatMap(d => d.hypothesis_ids || []))];\n  const questions = payload.validation_questions.filter(question =>\n    (question.finding_ids || []).some(id => (recommendation.finding_ids || []).includes(id)) ||\n    (question.hypothesis_ids || []).some(id => hypothesisIds.includes(id))\n  );\n  const validationFirst = recommendation.requires_human_review === true || diagnoses.some(d => d.requires_validation === true);\n  return { json: { context: payload, index, recommendation, diagnoses, hypothesis_ids: hypothesisIds, questions, validation_first: validationFirst } };\n});\n"
       },
       "id": "input_contract__transformation_components",
       "name": "INPUT_CONTRACT__TRANSFORMATION_COMPONENTS",
@@ -59,12 +59,32 @@
     },
     {
       "parameters": {
-        "jsCode": "// SKELETON_PLACEHOLDER: UNVALIDATED_HYPOTHESIS_GATE\n// Do not treat unvalidated hypotheses as confirmed implementation tasks.\n// TODO: Replace this placeholder with configured production logic.\n// Contract discipline: preserve FACT / INFERENCE / HYPOTHESIS / UNKNOWN boundaries.\nreturn items;\n"
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 2
+          },
+          "conditions": [
+            {
+              "id": "decision__validation_first_condition",
+              "leftValue": "={{ $json.validation_first }}",
+              "operator": {
+                "type": "boolean",
+                "operation": "true",
+                "singleValue": true
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
       },
-      "id": "unvalidated_hypothesis_gate",
-      "name": "UNVALIDATED_HYPOTHESIS_GATE",
-      "type": "n8n-nodes-base.code",
-      "typeVersion": 2,
+      "id": "decision__validation_first",
+      "name": "DECISION__VALIDATION_FIRST",
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.2,
       "position": [
         560,
         0
@@ -72,25 +92,39 @@
     },
     {
       "parameters": {
-        "jsCode": "// SKELETON_PLACEHOLDER: DISCOVERY_ACTION_BUILDER\n// Create discovery tasks such as Validate X during client workshop when appropriate.\n// TODO: Replace this placeholder with configured production logic.\n// Contract discipline: preserve FACT / INFERENCE / HYPOTHESIS / UNKNOWN boundaries.\nreturn items;\n"
+        "jsCode": "return items.map(item => {\n  if (item.json.skip) return { json: { ...item.json, roadmap_record: null } };\n  const unknown = item.json.diagnoses.some(d => d.diagnosis_type === 'unknown');\n  return { json: { ...item.json, roadmap_record: {\n    roadmap_action_id: `RA-${String(item.json.index + 1).padStart(3, '0')}`,\n    time_bucket: '30_days',\n    action: unknown\n      ? `Discover the missing internal context before intervention: ${item.json.recommendation.action}`\n      : `Validate the diagnosis with the client before intervention: ${item.json.recommendation.action}`,\n    action_type: unknown ? 'discovery' : 'validation',\n    recommendation_ids: [item.json.recommendation.recommendation_id],\n    hypothesis_ids: item.json.hypothesis_ids,\n    validation_question_ids: item.json.questions.map(question => question.question_id)\n  } } };\n});\n"
       },
-      "id": "discovery_action_builder",
-      "name": "DISCOVERY_ACTION_BUILDER",
+      "id": "build__validation_or_discovery_task",
+      "name": "BUILD__VALIDATION_OR_DISCOVERY_TASK",
       "type": "n8n-nodes-base.code",
       "typeVersion": 2,
       "position": [
         860,
-        0
+        -140
       ]
     },
     {
       "parameters": {
-        "jsCode": "// SKELETON_PLACEHOLDER: TODO_AGENT__90_DAY_ROADMAP\n// AGENT_INTERFACE__90_DAY_ROADMAP.\n// TODO: Replace this placeholder with configured production logic.\n// Contract discipline: preserve FACT / INFERENCE / HYPOTHESIS / UNKNOWN boundaries.\nreturn items;\n"
+        "jsCode": "return items.map(item => ({ json: { ...item.json, roadmap_record: {\n  roadmap_action_id: `RA-${String(item.json.index + 1).padStart(3, '0')}`,\n  time_bucket: item.json.recommendation.priority === 'high' ? '60_days' : '90_days',\n  action: item.json.recommendation.action,\n  action_type: 'implementation',\n  recommendation_ids: [item.json.recommendation.recommendation_id],\n  hypothesis_ids: item.json.hypothesis_ids,\n  validation_question_ids: item.json.questions.map(question => question.question_id)\n} } }));\n"
       },
-      "id": "todo_agent__90_day_roadmap",
-      "name": "TODO_AGENT__90_DAY_ROADMAP",
+      "id": "build__improvement_task",
+      "name": "BUILD__IMPROVEMENT_TASK",
       "type": "n8n-nodes-base.code",
       "typeVersion": 2,
+      "position": [
+        860,
+        140
+      ]
+    },
+    {
+      "parameters": {
+        "mode": "append",
+        "options": {}
+      },
+      "id": "merge__roadmap_paths",
+      "name": "MERGE__ROADMAP_PATHS",
+      "type": "n8n-nodes-base.merge",
+      "typeVersion": 3,
       "position": [
         1160,
         0
@@ -98,10 +132,10 @@
     },
     {
       "parameters": {
-        "jsCode": "// SKELETON_PLACEHOLDER: ORGANIZE_30_60_90_DAYS\n// Group roadmap actions into 30 days, 60 days, and 90 days.\n// TODO: Replace this placeholder with configured production logic.\n// Contract discipline: preserve FACT / INFERENCE / HYPOTHESIS / UNKNOWN boundaries.\nreturn items;\n"
+        "jsCode": "const order = { '30_days': 1, '60_days': 2, '90_days': 3 };\nreturn items.sort((a, b) => (order[a.json.roadmap_record?.time_bucket] || 99) - (order[b.json.roadmap_record?.time_bucket] || 99) || a.json.index - b.json.index);\n"
       },
-      "id": "organize_30_60_90_days",
-      "name": "ORGANIZE_30_60_90_DAYS",
+      "id": "sequence__30_60_90_days",
+      "name": "SEQUENCE__30_60_90_DAYS",
       "type": "n8n-nodes-base.code",
       "typeVersion": 2,
       "position": [
@@ -111,14 +145,27 @@
     },
     {
       "parameters": {
-        "jsCode": "// TERMINAL_OUTPUT_NODE: OUTPUT_CONTRACT__ROADMAP\n// Return roadmap action records.\n// TODO: Replace this placeholder with configured production logic.\n// Contract discipline: preserve FACT / INFERENCE / HYPOTHESIS / UNKNOWN boundaries.\nreturn items;\n"
+        "jsCode": "const context = items[0]?.json?.context ?? {};\nconst roadmap_actions = items.map(item => item.json.roadmap_record).filter(Boolean);\nconst allowed = new Set(['implementation', 'validation', 'discovery']);\nfor (const action of roadmap_actions) {\n  if (!allowed.has(action.action_type)) throw new Error('Roadmap action_type violates contract');\n  const relatedHypotheses = (context.hypotheses || []).filter(h => action.hypothesis_ids.includes(h.hypothesis_id));\n  if (relatedHypotheses.some(h => h.requires_validation) && action.action_type === 'implementation') {\n    throw new Error('Unvalidated hypothesis cannot become an implementation task');\n  }\n}\nreturn [{ json: { ...context, roadmap_actions } }];\n"
       },
-      "id": "output_contract__roadmap",
-      "name": "OUTPUT_CONTRACT__ROADMAP",
+      "id": "structure_and_validate_roadmap",
+      "name": "STRUCTURE_AND_VALIDATE_ROADMAP",
       "type": "n8n-nodes-base.code",
       "typeVersion": 2,
       "position": [
         1760,
+        0
+      ]
+    },
+    {
+      "parameters": {
+        "jsCode": "const payload = items[0].json;\nreturn [{ json: {\n  hypotheses: payload.hypotheses || [],\n  diagnoses: payload.diagnoses || [],\n  recommendations: payload.recommendations || [],\n  kpis: payload.kpis || [],\n  validation_questions: payload.validation_questions || [],\n  roadmap_actions: payload.roadmap_actions || []\n} }];\n"
+      },
+      "id": "output_contract__gretel_track",
+      "name": "OUTPUT_CONTRACT__GRETEL_TRACK",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        2060,
         0
       ]
     }
@@ -139,51 +186,80 @@
       "main": [
         [
           {
-            "node": "UNVALIDATED_HYPOTHESIS_GATE",
+            "node": "DECISION__VALIDATION_FIRST",
             "type": "main",
             "index": 0
           }
         ]
       ]
     },
-    "UNVALIDATED_HYPOTHESIS_GATE": {
+    "DECISION__VALIDATION_FIRST": {
       "main": [
         [
           {
-            "node": "DISCOVERY_ACTION_BUILDER",
+            "node": "BUILD__VALIDATION_OR_DISCOVERY_TASK",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "BUILD__IMPROVEMENT_TASK",
             "type": "main",
             "index": 0
           }
         ]
       ]
     },
-    "DISCOVERY_ACTION_BUILDER": {
+    "BUILD__VALIDATION_OR_DISCOVERY_TASK": {
       "main": [
         [
           {
-            "node": "TODO_AGENT__90_DAY_ROADMAP",
+            "node": "MERGE__ROADMAP_PATHS",
             "type": "main",
             "index": 0
           }
         ]
       ]
     },
-    "TODO_AGENT__90_DAY_ROADMAP": {
+    "BUILD__IMPROVEMENT_TASK": {
       "main": [
         [
           {
-            "node": "ORGANIZE_30_60_90_DAYS",
+            "node": "MERGE__ROADMAP_PATHS",
+            "type": "main",
+            "index": 1
+          }
+        ]
+      ]
+    },
+    "MERGE__ROADMAP_PATHS": {
+      "main": [
+        [
+          {
+            "node": "SEQUENCE__30_60_90_DAYS",
             "type": "main",
             "index": 0
           }
         ]
       ]
     },
-    "ORGANIZE_30_60_90_DAYS": {
+    "SEQUENCE__30_60_90_DAYS": {
       "main": [
         [
           {
-            "node": "OUTPUT_CONTRACT__ROADMAP",
+            "node": "STRUCTURE_AND_VALIDATE_ROADMAP",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "STRUCTURE_AND_VALIDATE_ROADMAP": {
+      "main": [
+        [
+          {
+            "node": "OUTPUT_CONTRACT__GRETEL_TRACK",
             "type": "main",
             "index": 0
           }

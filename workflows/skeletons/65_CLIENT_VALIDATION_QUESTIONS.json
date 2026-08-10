@@ -3,9 +3,9 @@
   "nodes": [
     {
       "parameters": {
-        "content": "PURPOSE\nTurn evidence gaps and hypotheses into useful first-conversation consultant questions.\n\nOWNER\nGRETEL TRACK B\n\nINPUT CONTRACT\nfinding.schema.json[] plus hypothesis.schema.json[] plus diagnosis records\n\nOUTPUT CONTRACT\nvalidation_question.schema.json[]\n\nSTATUS\nSkeleton only. Inactive by default. No credentials. Configure TODO nodes after import.",
-        "height": 340,
-        "width": 520,
+        "content": "PURPOSE\nTurn hypotheses, unknowns, and likely causes into neutral, traceable client questions.\n\nOWNER\nGRETEL TRACK B\n\nINPUT CONTRACT\nAccumulated payload with hypotheses[], unknowns[], diagnoses[]\n\nOUTPUT CONTRACT\nAccumulated payload plus validation_questions[] conforming to validation_question.schema.json\n\nSTATUS\nPhase 2B repository-ready. Inactive by default. No credentials. Deterministic fixture path; no Python execution.",
+        "height": 390,
+        "width": 560,
         "color": 4
       },
       "id": "00_readme__purpose_owner_contracts_status",
@@ -13,24 +13,24 @@
       "type": "n8n-nodes-base.stickyNote",
       "typeVersion": 1,
       "position": [
-        -420,
-        -320
+        -520,
+        -380
       ]
     },
     {
       "parameters": {
-        "content": "CORE MVP WORKFLOW\nExample validation question: What happens internally after someone submits the volunteer form?",
-        "height": 200,
-        "width": 520,
-        "color": 4
+        "content": "VISIBLE PATH\nHypothesis / unknown / likely cause -> validation gap -> neutral question -> leading-language check -> traceability check -> question output.\nEvery emitted question links to a finding and hypothesis.",
+        "height": 320,
+        "width": 560,
+        "color": 5
       },
-      "id": "note__1",
-      "name": "NOTE__1",
+      "id": "note__visible_transformation_path",
+      "name": "NOTE__VISIBLE_TRANSFORMATION_PATH",
       "type": "n8n-nodes-base.stickyNote",
       "typeVersion": 1,
       "position": [
-        -420,
-        60
+        -520,
+        40
       ]
     },
     {
@@ -46,10 +46,10 @@
     },
     {
       "parameters": {
-        "jsCode": "// SKELETON_PLACEHOLDER: INPUT_CONTRACT__GAPS_HYPOTHESES\n// Accept evidence gaps, findings, hypotheses, and diagnosis records.\n// TODO: Replace this placeholder with configured production logic.\n// Contract discipline: preserve FACT / INFERENCE / HYPOTHESIS / UNKNOWN boundaries.\nreturn items;\n"
+        "jsCode": "const payload = items[0]?.json ?? {};\nif (!Array.isArray(payload.hypotheses) || !Array.isArray(payload.unknowns) || !Array.isArray(payload.diagnoses)) {\n  throw new Error('65 input requires hypotheses[], unknowns[], and diagnoses[]');\n}\nif (payload.hypotheses.length === 0) return [{ json: { context: payload, skip: true } }];\nreturn payload.hypotheses.map((hypothesis, index) => {\n  const diagnosis = payload.diagnoses.find(d => (d.hypothesis_ids || []).includes(hypothesis.hypothesis_id)) || {};\n  const relatedUnknown = payload.unknowns.find(unknown =>\n    unknown.domain === hypothesis.domain ||\n    (unknown.evidence_ids || []).some(id => (hypothesis.evidence_ids || []).includes(id))\n  );\n  return { json: { context: payload, index, hypothesis, diagnosis, related_unknown: relatedUnknown || null } };\n});\n"
       },
-      "id": "input_contract__gaps_hypotheses",
-      "name": "INPUT_CONTRACT__GAPS_HYPOTHESES",
+      "id": "input_contract__hypotheses_unknowns_diagnoses",
+      "name": "INPUT_CONTRACT__HYPOTHESES_UNKNOWNS_DIAGNOSES",
       "type": "n8n-nodes-base.code",
       "typeVersion": 2,
       "position": [
@@ -59,10 +59,10 @@
     },
     {
       "parameters": {
-        "jsCode": "// SKELETON_PLACEHOLDER: QUESTION_SCOPE_SELECTION\n// Select questions tied to a finding or hypothesis.\n// TODO: Replace this placeholder with configured production logic.\n// Contract discipline: preserve FACT / INFERENCE / HYPOTHESIS / UNKNOWN boundaries.\nreturn items;\n"
+        "jsCode": "return items.map(item => {\n  if (item.json.skip) return item;\n  const gap = item.json.related_unknown?.description || item.json.hypothesis.validation_gap ||\n    `Validate hypothesis ${item.json.hypothesis.hypothesis_id}.`;\n  return { json: { ...item.json, validation_gap: gap } };\n});\n"
       },
-      "id": "question_scope_selection",
-      "name": "QUESTION_SCOPE_SELECTION",
+      "id": "determine_validation_gap",
+      "name": "DETERMINE_VALIDATION_GAP",
       "type": "n8n-nodes-base.code",
       "typeVersion": 2,
       "position": [
@@ -72,10 +72,10 @@
     },
     {
       "parameters": {
-        "jsCode": "// SKELETON_PLACEHOLDER: TODO_AGENT__CLIENT_QUESTIONS\n// AGENT_INTERFACE__CLIENT_VALIDATION_QUESTIONS.\n// TODO: Replace this placeholder with configured production logic.\n// Contract discipline: preserve FACT / INFERENCE / HYPOTHESIS / UNKNOWN boundaries.\nreturn items;\n"
+        "jsCode": "const templates = {\n  operations_cx: 'What happens internally after someone enters this stakeholder journey, and which handoffs occur before the next response?',\n  revenue_resilience: 'How is annual income distributed across funding sources, and how has that mix changed over the most recent reporting period?',\n  impact_evidence: 'How do you currently measure and report impact, and which steps or methods are used across active programs?'\n};\nreturn items.map(item => {\n  if (item.json.skip) return { json: { ...item.json, question_record: null } };\n  const hypothesis = item.json.hypothesis;\n  return { json: { ...item.json, question_record: {\n    question_id: `Q-${String(item.json.index + 1).padStart(3, '0')}`,\n    finding_ids: hypothesis.finding_ids,\n    hypothesis_ids: [hypothesis.hypothesis_id],\n    question: templates[hypothesis.domain] || 'Can you describe how this process currently works in practice?',\n    purpose: `Validate: ${item.json.validation_gap}`,\n    domain: hypothesis.domain,\n    priority: item.json.diagnosis.diagnosis_type === 'unknown' ? 'high' : 'medium'\n  } } };\n});\n"
       },
-      "id": "todo_agent__client_questions",
-      "name": "TODO_AGENT__CLIENT_QUESTIONS",
+      "id": "generate_neutral_question",
+      "name": "GENERATE_NEUTRAL_QUESTION",
       "type": "n8n-nodes-base.code",
       "typeVersion": 2,
       "position": [
@@ -85,10 +85,10 @@
     },
     {
       "parameters": {
-        "jsCode": "// SKELETON_PLACEHOLDER: NEUTRALITY_AND_SPECIFICITY_CHECK\n// Ensure questions are specific, neutral, non-leading, and consultant-useful.\n// TODO: Replace this placeholder with configured production logic.\n// Contract discipline: preserve FACT / INFERENCE / HYPOTHESIS / UNKNOWN boundaries.\nreturn items;\n"
+        "jsCode": "const leadingPatterns = [/\\bdon't you\\b/i, /\\bisn't it true\\b/i, /\\bwouldn't you agree\\b/i, /\\bobviously\\b/i];\nreturn items.map(item => {\n  const question = item.json.question_record;\n  if (!question) return item;\n  if (leadingPatterns.some(pattern => pattern.test(question.question))) throw new Error('Leading-language check failed');\n  if (!question.question.trim().endsWith('?')) throw new Error('Validation question must be explicit and end with a question mark');\n  return item;\n});\n"
       },
-      "id": "neutrality_and_specificity_check",
-      "name": "NEUTRALITY_AND_SPECIFICITY_CHECK",
+      "id": "leading_language_check",
+      "name": "LEADING_LANGUAGE_CHECK",
       "type": "n8n-nodes-base.code",
       "typeVersion": 2,
       "position": [
@@ -98,7 +98,7 @@
     },
     {
       "parameters": {
-        "jsCode": "// SKELETON_PLACEHOLDER: TRACEABILITY_CHECK\n// Require finding_ids or hypothesis_ids on every question.\n// TODO: Replace this placeholder with configured production logic.\n// Contract discipline: preserve FACT / INFERENCE / HYPOTHESIS / UNKNOWN boundaries.\nreturn items;\n"
+        "jsCode": "const context = items[0]?.json?.context ?? {};\nconst validation_questions = items.map(item => item.json.question_record).filter(Boolean)\n  .sort((a, b) => a.question_id.localeCompare(b.question_id));\nfor (const question of validation_questions) {\n  if (!question.finding_ids.length && !question.hypothesis_ids.length) throw new Error('Validation question traceability check failed');\n}\nreturn [{ json: { ...context, validation_questions } }];\n"
       },
       "id": "traceability_check",
       "name": "TRACEABILITY_CHECK",
@@ -111,7 +111,7 @@
     },
     {
       "parameters": {
-        "jsCode": "// TERMINAL_OUTPUT_NODE: OUTPUT_CONTRACT__VALIDATION_QUESTIONS\n// Return validation question records.\n// TODO: Replace this placeholder with configured production logic.\n// Contract discipline: preserve FACT / INFERENCE / HYPOTHESIS / UNKNOWN boundaries.\nreturn items;\n"
+        "jsCode": "if (!(items[0].json.validation_questions || []).every(question => /^Q-/.test(question.question_id))) {\n  throw new Error('65 output violates validation question contract');\n}\nreturn items;\n"
       },
       "id": "output_contract__validation_questions",
       "name": "OUTPUT_CONTRACT__VALIDATION_QUESTIONS",
@@ -128,47 +128,47 @@
       "main": [
         [
           {
-            "node": "INPUT_CONTRACT__GAPS_HYPOTHESES",
+            "node": "INPUT_CONTRACT__HYPOTHESES_UNKNOWNS_DIAGNOSES",
             "type": "main",
             "index": 0
           }
         ]
       ]
     },
-    "INPUT_CONTRACT__GAPS_HYPOTHESES": {
+    "INPUT_CONTRACT__HYPOTHESES_UNKNOWNS_DIAGNOSES": {
       "main": [
         [
           {
-            "node": "QUESTION_SCOPE_SELECTION",
+            "node": "DETERMINE_VALIDATION_GAP",
             "type": "main",
             "index": 0
           }
         ]
       ]
     },
-    "QUESTION_SCOPE_SELECTION": {
+    "DETERMINE_VALIDATION_GAP": {
       "main": [
         [
           {
-            "node": "TODO_AGENT__CLIENT_QUESTIONS",
+            "node": "GENERATE_NEUTRAL_QUESTION",
             "type": "main",
             "index": 0
           }
         ]
       ]
     },
-    "TODO_AGENT__CLIENT_QUESTIONS": {
+    "GENERATE_NEUTRAL_QUESTION": {
       "main": [
         [
           {
-            "node": "NEUTRALITY_AND_SPECIFICITY_CHECK",
+            "node": "LEADING_LANGUAGE_CHECK",
             "type": "main",
             "index": 0
           }
         ]
       ]
     },
-    "NEUTRALITY_AND_SPECIFICITY_CHECK": {
+    "LEADING_LANGUAGE_CHECK": {
       "main": [
         [
           {
