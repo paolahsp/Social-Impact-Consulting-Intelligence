@@ -9,7 +9,7 @@ P0 = vertical slice. P1 = required expansion. P2 = hardening.
 | 20_CONTEXT_RESEARCH_ORCHESTRATOR | Paola | P1 | No | Optional | No | No | 21,22,23,24 | Ready for channel linking |
 | 21_WEB_SEARCH | Paola | P0 | Yes | No | No | Optional | 10 | n8n-native repo-ready with HTTP Request and branch paths |
 | 22_WEBSITE_EXTRACTION | Paola | P1 | Yes | Optional | No | Optional | 10 | LIVE n8n VERIFIED with GiveDirectly success and controlled invalid-domain failure |
-| 23_DOCUMENT_PUBLIC_DATA_RESEARCH | Paola | P1 | Yes | Optional | No | Optional | 10 | Placeholder only |
+| 23_DOCUMENT_PUBLIC_DATA_RESEARCH | Paola | P1 | Yes | No | No | No | 10,21,22 | Repository-ready Jina Reader document extraction with controlled partial success; live verification pending |
 | 24_NEWS_EXTERNAL_CONTEXT | Paola | P2 | Yes | No | No | Optional | 10 | Placeholder only |
 | 30_EVIDENCE_PIPELINE | Paola | P0 | No | Future optional | No | Optional | 20 or fixtures | n8n-native repo-ready deterministic P0 evidence extraction |
 | 40_RAG_RETRIEVAL_PIPELINE | Paola | P0 | No | No | Local corpus | No | 30 | n8n-native repo-ready transparent Revenue Resilience retrieval |

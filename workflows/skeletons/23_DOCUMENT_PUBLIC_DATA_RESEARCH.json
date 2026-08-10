@@ -3,9 +3,9 @@
   "nodes": [
     {
       "parameters": {
-        "content": "PURPOSE\nHandle public reports, PDFs, registries, and structured public data.\n\nOWNER\nPAOLA TRACK A\n\nINPUT CONTRACT\ndocument/public_data research_task\n\nOUTPUT CONTRACT\nsource.schema.json[] plus document metadata\n\nSTATUS\nSkeleton only. Inactive by default. No credentials. Configure TODO nodes after import.",
-        "height": 340,
-        "width": 520,
+        "content": "PURPOSE\nTurn public organizational documents into traceable, bounded sources.\n\nOWNER\nPAOLA TRACK A\n\nINPUT CONTRACT\nrun_context + organization + document_candidates[]\n\nOUTPUT CONTRACT\nsource.schema.json[] + documents[] + controlled_state + errors[]\n\nSTATUS\nRepository-ready Jina Reader implementation. Inactive by default. No credentials. Public document statements only; no consulting conclusions.",
+        "height": 420,
+        "width": 680,
         "color": 4
       },
       "id": "00_readme__purpose_owner_contracts_status",
@@ -13,8 +13,24 @@
       "type": "n8n-nodes-base.stickyNote",
       "typeVersion": 1,
       "position": [
-        -420,
-        -320
+        -620,
+        -520
+      ]
+    },
+    {
+      "parameters": {
+        "content": "WHAT THE DOCUMENT STATES \u2260 WHAT THE CONSULTING SYSTEM CONCLUDES\nExtracted sections remain source text. Missing data remains unknown. This workflow never upgrades public document text into an efficiency, performance, or strategy judgment.",
+        "height": 280,
+        "width": 680,
+        "color": 6
+      },
+      "id": "note__fact_boundaries",
+      "name": "NOTE__FACT_BOUNDARIES",
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [
+        -620,
+        -40
       ]
     },
     {
@@ -30,10 +46,10 @@
     },
     {
       "parameters": {
-        "jsCode": "// SKELETON_PLACEHOLDER: INPUT_CONTRACT__DOCUMENT_PUBLIC_DATA_TASK\n// Accept report, registry, or public data task.\n// TODO: Replace this placeholder with configured production logic.\n// Contract discipline: preserve FACT / INFERENCE / HYPOTHESIS / UNKNOWN boundaries.\nreturn items;\n"
+        "jsCode": "function normalizeWebsite(value) {\n  const raw = String(value || '').trim();\n  if (!raw) return null;\n  try {\n    const parsed = new URL(/^https?:\\/\\//i.test(raw) ? raw : `https://${raw}`);\n    if (!parsed.hostname.includes('.')) return null;\n    return `${parsed.protocol}//${parsed.hostname.toLowerCase()}`;\n  } catch { return null; }\n}\n\nreturn items.map(item => {\n  const payload = item.json || {};\n  const suppliedContext = payload.run_context || {};\n  const suppliedOrganization = suppliedContext.organization || payload.organization || {};\n  const organization = {\n    ...suppliedOrganization,\n    name: payload.organization_name || suppliedOrganization.name || null,\n    website: normalizeWebsite(payload.website || suppliedOrganization.website),\n    country: payload.country || suppliedOrganization.country || null,\n    mission_area: payload.mission_area || suppliedOrganization.mission_area || null\n  };\n  const runContext = {\n    ...suppliedContext,\n    run_id: suppliedContext.run_id || payload.run_id || `RUN-23-${Date.now()}`,\n    organization,\n    current_challenge: suppliedContext.current_challenge || payload.current_challenge || null,\n    uploaded_document_refs: suppliedContext.uploaded_document_refs || payload.uploaded_document_refs || [],\n    status: suppliedContext.status || 'created',\n    started_at: suppliedContext.started_at || payload.started_at || new Date().toISOString(),\n    errors: suppliedContext.errors || []\n  };\n  const errors = [...(payload.errors || [])];\n  if (!organization.name || !organization.website || !organization.country) {\n    errors.push({\n      stage: 'INPUT_VALIDATION',\n      error_type: 'invalid_input',\n      message: 'organization name, website, and country are required'\n    });\n  }\n  const rawCandidates = Array.isArray(payload.document_candidates)\n    ? payload.document_candidates.slice(0, 8)\n    : [];\n  return {\n    json: {\n      run_context: runContext,\n      organization,\n      document_candidates: rawCandidates,\n      controlled_state: errors.length ? 'request_failure' : 'ready',\n      errors,\n      extraction_provider: 'jina_reader'\n    }\n  };\n});\n"
       },
-      "id": "input_contract__document_public_data_task",
-      "name": "INPUT_CONTRACT__DOCUMENT_PUBLIC_DATA_TASK",
+      "id": "input_validation",
+      "name": "INPUT_VALIDATION",
       "type": "n8n-nodes-base.code",
       "typeVersion": 2,
       "position": [
@@ -43,106 +59,398 @@
     },
     {
       "parameters": {
-        "jsCode": "// SKELETON_PLACEHOLDER: LOCATE_SOURCE\n// Locate likely public source without assuming access.\n// TODO: Replace this placeholder with configured production logic.\n// Contract discipline: preserve FACT / INFERENCE / HYPOTHESIS / UNKNOWN boundaries.\nreturn items;\n"
+        "jsCode": "const output = [];\nfor (const item of items) {\n  const base = item.json;\n  if (base.controlled_state === 'request_failure') {\n    output.push({ json: { ...base, candidate_index: 0, candidate: null, candidate_state: 'input_failure', fetch_state: 'rejected' } });\n    continue;\n  }\n  if (!base.document_candidates.length) {\n    output.push({ json: { ...base, candidate_index: 0, candidate: null, candidate_state: 'no_documents_found', fetch_state: 'rejected' } });\n    continue;\n  }\n  for (let index = 0; index < base.document_candidates.length; index++) {\n    const supplied = base.document_candidates[index] || {};\n    const url = String(supplied.url || '').trim();\n    let validUrl = null;\n    try {\n      const parsed = new URL(url);\n      if (['http:', 'https:'].includes(parsed.protocol)) validUrl = parsed.toString();\n    } catch {}\n    output.push({\n      json: {\n        ...base,\n        candidate_index: index,\n        candidate: {\n          url: validUrl || url || null,\n          title: supplied.title ? String(supplied.title).trim() : null,\n          discovered_by: ['web_search', 'website_extraction', 'public_data'].includes(supplied.discovered_by)\n            ? supplied.discovered_by\n            : 'public_data'\n        },\n        candidate_state: validUrl ? 'candidate' : 'invalid_url',\n        fetch_state: validUrl ? 'pending' : 'rejected'\n      }\n    });\n  }\n}\nreturn output;\n"
       },
-      "id": "locate_source",
-      "name": "LOCATE_SOURCE",
+      "id": "document_candidates",
+      "name": "DOCUMENT_CANDIDATES",
       "type": "n8n-nodes-base.code",
       "typeVersion": 2,
       "position": [
-        560,
+        540,
         0
       ]
     },
     {
       "parameters": {
-        "jsCode": "// SKELETON_PLACEHOLDER: TODO_API__FETCH_PUBLIC_DOCUMENT_OR_DATA\n// Placeholder for fetch/download provider.\n// TODO: Replace this placeholder with configured production logic.\n// Contract discipline: preserve FACT / INFERENCE / HYPOTHESIS / UNKNOWN boundaries.\nreturn items;\n"
+        "jsCode": "const documentSignals = ['annual', 'report', 'impact', 'financial', 'finance', 'audit', 'audited', 'accounts', 'transparency', 'results', 'strategy', 'publication', 'statement', 'form 990', '990'];\nconst supportedExtensions = ['pdf', 'txt', 'html', 'htm', 'csv', 'json', 'doc', 'docx'];\nconst unsupportedExtensions = ['zip', 'rar', 'exe', 'jpg', 'jpeg', 'png', 'gif', 'mp3', 'mp4'];\n\nreturn items.map(item => {\n  if (item.json.fetch_state === 'rejected') return item;\n  const candidate = item.json.candidate || {};\n  const text = `${candidate.title || ''} ${candidate.url || ''}`.toLowerCase();\n  const extensionMatch = String(candidate.url || '').match(/\\.([a-z0-9]{2,5})(?:[?#]|$)/i);\n  const extension = extensionMatch ? extensionMatch[1].toLowerCase() : null;\n  const hasSignal = documentSignals.some(signal => text.includes(signal));\n  const supportedExtension = Boolean(extension && supportedExtensions.includes(extension));\n  const unsupportedExtension = Boolean(extension && unsupportedExtensions.includes(extension));\n  const relevant = !unsupportedExtension && (supportedExtension || hasSignal);\n  return {\n    json: {\n      ...item.json,\n      candidate_state: relevant ? 'relevant_document' : 'unsupported_document',\n      fetch_state: relevant ? 'pending' : 'rejected',\n      relevance_reason: relevant\n        ? (supportedExtension ? `supported_${extension}_candidate` : 'document_title_or_url_signal')\n        : (unsupportedExtension ? `unsupported_${extension}` : 'no_document_signal'),\n      file_type_hint: extension || (hasSignal ? 'html' : null)\n    }\n  };\n});\n"
       },
-      "id": "todo_api__fetch_public_document_or_data",
-      "name": "TODO_API__FETCH_PUBLIC_DOCUMENT_OR_DATA",
+      "id": "document_relevance_filter",
+      "name": "DOCUMENT_RELEVANCE_FILTER",
       "type": "n8n-nodes-base.code",
       "typeVersion": 2,
       "position": [
-        860,
+        820,
         0
       ]
     },
     {
       "parameters": {
-        "jsCode": "// SKELETON_PLACEHOLDER: DECISION__FILE_TYPE_BRANCH\n// Branch by PDF, HTML, or structured data.\n// TODO: Replace this placeholder with configured production logic.\n// Contract discipline: preserve FACT / INFERENCE / HYPOTHESIS / UNKNOWN boundaries.\nreturn items;\n"
+        "jsCode": "function host(value) {\n  try { return new URL(value).hostname.replace(/^www\\./, '').toLowerCase(); }\n  catch { return ''; }\n}\nfunction tokens(value) {\n  return String(value || '').toLowerCase().match(/[a-z0-9]+/g) || [];\n}\n\nreturn items.map(item => {\n  if (item.json.fetch_state === 'rejected') return item;\n  const org = item.json.organization;\n  const officialDomain = host(org.website);\n  const candidateDomain = host(item.json.candidate.url);\n  const officialMatch = Boolean(officialDomain && candidateDomain && (candidateDomain === officialDomain || candidateDomain.endsWith(`.${officialDomain}`)));\n  const orgTokens = tokens(org.name).filter(token => token.length >= 3);\n  const candidateText = `${item.json.candidate.title || ''} ${item.json.candidate.url || ''}`.toLowerCase();\n  const nameMatch = orgTokens.some(token => candidateText.includes(token));\n  const plausibleMatch = officialMatch || nameMatch;\n  return {\n    json: {\n      ...item.json,\n      organization_match: {\n        matched: plausibleMatch,\n        official_domain_match: officialMatch,\n        organization_name_match: nameMatch,\n        method: officialMatch ? 'official_domain' : (nameMatch ? 'organization_name' : 'no_match')\n      },\n      is_official: officialMatch,\n      authority_level: officialMatch ? 'official' : 'unknown',\n      candidate_state: plausibleMatch ? 'organization_matched' : 'organization_mismatch',\n      fetch_state: plausibleMatch ? 'ready' : 'rejected',\n      extraction_url: plausibleMatch ? `https://r.jina.ai/${item.json.candidate.url}` : null\n    }\n  };\n});\n"
       },
-      "id": "decision__file_type_branch",
-      "name": "DECISION__FILE_TYPE_BRANCH",
+      "id": "organization_match_check",
+      "name": "ORGANIZATION_MATCH_CHECK",
       "type": "n8n-nodes-base.code",
       "typeVersion": 2,
       "position": [
-        1160,
+        1100,
         0
       ]
     },
     {
       "parameters": {
-        "jsCode": "// SKELETON_PLACEHOLDER: EXTRACT_PLACEHOLDER__PDF\n// Placeholder for PDF extraction.\n// TODO: Replace this placeholder with configured production logic.\n// Contract discipline: preserve FACT / INFERENCE / HYPOTHESIS / UNKNOWN boundaries.\nreturn items;\n"
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict"
+          },
+          "conditions": [
+            {
+              "id": "decision__fetchable_ready",
+              "leftValue": "={{ $json.fetch_state }}",
+              "rightValue": "ready",
+              "operator": {
+                "type": "string",
+                "operation": "equals"
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
       },
-      "id": "extract_placeholder__pdf",
-      "name": "EXTRACT_PLACEHOLDER__PDF",
-      "type": "n8n-nodes-base.code",
+      "id": "decision__fetchable",
+      "name": "DECISION__FETCHABLE",
+      "type": "n8n-nodes-base.if",
       "typeVersion": 2,
       "position": [
-        1460,
+        1380,
         0
       ]
     },
     {
       "parameters": {
-        "jsCode": "// SKELETON_PLACEHOLDER: EXTRACT_PLACEHOLDER__HTML\n// Placeholder for HTML extraction.\n// TODO: Replace this placeholder with configured production logic.\n// Contract discipline: preserve FACT / INFERENCE / HYPOTHESIS / UNKNOWN boundaries.\nreturn items;\n"
+        "method": "GET",
+        "url": "={{ $json.extraction_url }}",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "Accept",
+              "value": "text/plain"
+            },
+            {
+              "name": "User-Agent",
+              "value": "Mozilla/5.0 SocialImpactConsultingIntelligence/1.0"
+            }
+          ]
+        },
+        "options": {
+          "timeout": 90000,
+          "response": {
+            "response": {
+              "responseFormat": "text",
+              "outputPropertyName": "document_text"
+            }
+          }
+        }
       },
-      "id": "extract_placeholder__html",
-      "name": "EXTRACT_PLACEHOLDER__HTML",
+      "id": "document_fetch__jina_reader",
+      "name": "DOCUMENT_FETCH__JINA_READER",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        1660,
+        -160
+      ],
+      "continueOnFail": true,
+      "retryOnFail": true,
+      "maxTries": 2,
+      "waitBetweenTries": 1000
+    },
+    {
+      "parameters": {
+        "jsCode": "function responseText(value) {\n  if (typeof value === 'string') return value;\n  if (value === null || value === undefined) return '';\n  try { return JSON.stringify(value); } catch { return String(value); }\n}\n\nreturn items.map((item, index) => {\n  const bases = $items('DECISION__FETCHABLE', 0);\n  const base = bases[index]?.json || item.json;\n  const text = responseText(item.json.document_text || item.json.data || item.json.body || item.json.response || '');\n  const errorMessage = item.json.error?.message || item.json.message || '';\n  const statusCode = Number(item.json.statusCode || item.json.status || 0);\n  const titleMatch = text.match(/^Title:\\s*(.+)$/mi);\n  const sourceMatch = text.match(/^URL Source:\\s*(.+)$/mi);\n  const publishedMatch = text.match(/^Published Time:\\s*(.+)$/mi);\n  const looksLikeProviderError = /Target URL returned error|Domain .* could not be resolved|Failed to fetch|Access Denied|\\b404 Not Found\\b|\\b502 Bad Gateway\\b|cannot find the page|page not found/i.test(text);\n  const failed = Boolean(item.json.error || errorMessage || statusCode >= 400 || looksLikeProviderError || text.trim().length < 200);\n  if (failed) {\n    return {\n      json: {\n        ...base,\n        fetch_state: 'request_failure',\n        document_text: '',\n        fetch_error: errorMessage || (statusCode ? `HTTP ${statusCode}` : 'Jina Reader returned no usable document content')\n      }\n    };\n  }\n  return {\n    json: {\n      ...base,\n      fetch_state: 'success',\n      document_text: text,\n      reader_title: titleMatch ? titleMatch[1].trim() : null,\n      reader_source_url: sourceMatch ? sourceMatch[1].trim() : base.candidate.url,\n      reader_published_time: publishedMatch ? publishedMatch[1].trim() : null\n    }\n  };\n});\n"
+      },
+      "id": "file_type_and_response_check",
+      "name": "FILE_TYPE_AND_RESPONSE_CHECK",
       "type": "n8n-nodes-base.code",
       "typeVersion": 2,
       "position": [
-        1760,
-        0
+        1940,
+        -160
       ]
     },
     {
       "parameters": {
-        "jsCode": "// SKELETON_PLACEHOLDER: EXTRACT_PLACEHOLDER__STRUCTURED_DATA\n// Placeholder for CSV/JSON/registry extraction.\n// TODO: Replace this placeholder with configured production logic.\n// Contract discipline: preserve FACT / INFERENCE / HYPOTHESIS / UNKNOWN boundaries.\nreturn items;\n"
+        "jsCode": "return items.map(item => {\n  if (item.json.fetch_state !== 'success') return item;\n  const text = `${item.json.candidate.title || ''} ${item.json.candidate.url || ''} ${item.json.reader_title || ''} ${item.json.document_text.slice(0, 5000)}`.toLowerCase();\n  let documentType = 'other_public_document';\n  if (/audited|independent auditor|auditors['\u2019]? report/.test(text) && /financial|statement|accounts/.test(text)) documentType = 'audited_financial_statement';\n  else if (/impact\\s+(and\\s+progress\\s+)?report|impact report/.test(text)) documentType = 'impact_report';\n  else if (/annual\\s+(activity\\s+)?report|annual report/.test(text)) documentType = 'annual_report';\n  else if (/financial\\s+(report|statement)|statement of financial|financial statements|form 990/.test(text)) documentType = 'financial_report';\n  else if (/program(me)?\\s+report|activity report|project report/.test(text)) documentType = 'program_report';\n  else if (/strategy|strategic framework|strategic plan/.test(text)) documentType = 'strategy_document';\n  else if (/registry|charity commission|companies house|public filing/.test(text)) documentType = 'public_registry_document';\n  return { json: { ...item.json, document_type: documentType } };\n});\n"
       },
-      "id": "extract_placeholder__structured_data",
-      "name": "EXTRACT_PLACEHOLDER__STRUCTURED_DATA",
+      "id": "document_type_classification",
+      "name": "DOCUMENT_TYPE_CLASSIFICATION",
       "type": "n8n-nodes-base.code",
       "typeVersion": 2,
       "position": [
-        2060,
-        0
+        2220,
+        -160
       ]
     },
     {
       "parameters": {
-        "jsCode": "// SKELETON_PLACEHOLDER: NORMALIZE_DOCUMENT_SOURCE\n// Normalize extracted metadata and source records.\n// TODO: Replace this placeholder with configured production logic.\n// Contract discipline: preserve FACT / INFERENCE / HYPOTHESIS / UNKNOWN boundaries.\nreturn items;\n"
+        "jsCode": "function clean(value) {\n  return String(value || '')\n    .replace(/^Title:.*$/gmi, '')\n    .replace(/^URL Source:.*$/gmi, '')\n    .replace(/^Published Time:.*$/gmi, '')\n    .replace(/^Markdown Content:\\s*$/gmi, '')\n    .replace(/\\r/g, '')\n    .replace(/\\n{3,}/g, '\\n\\n')\n    .trim();\n}\nconst sectionRules = [\n  ['financial', ['revenue', 'income', 'expenditure', 'expenses', 'funding', 'grant', 'donation', 'financial position', 'cash flow', 'net assets']],\n  ['impact', ['impact', 'outcome', 'results', 'beneficiaries', 'recipients', 'people reached']],\n  ['programs', ['program', 'programme', 'activities', 'services', 'operations']],\n  ['governance', ['governance', 'board', 'trustees', 'management', 'accountability', 'audit committee']],\n  ['partners', ['partner', 'partnership', 'donor', 'funder']],\n  ['strategy', ['strategy', 'strategic', 'priorities', 'objectives', 'goals']]\n];\n\nreturn items.map(item => {\n  if (item.json.fetch_state !== 'success') return item;\n  const content = clean(item.json.document_text).slice(0, 80000);\n  const blocks = content.split(/\\n\\s*\\n|(?=^#{1,4}\\s)/m)\n    .map(block => block.replace(/\\s+/g, ' ').trim())\n    .filter(block => block.length >= 80);\n  const sections = [];\n  const seen = new Set();\n  for (const [sectionType, terms] of sectionRules) {\n    let count = 0;\n    for (const block of blocks) {\n      const lower = block.toLowerCase();\n      if (!terms.some(term => lower.includes(term))) continue;\n      const text = block.slice(0, 1200);\n      const key = text.toLowerCase().slice(0, 240);\n      if (seen.has(key)) continue;\n      seen.add(key);\n      sections.push({ section_type: sectionType, text });\n      count += 1;\n      if (count >= 2 || sections.length >= 8) break;\n    }\n    if (sections.length >= 8) break;\n  }\n  if (!sections.length) {\n    for (const block of blocks.slice(0, 2)) sections.push({ section_type: 'overview', text: block.slice(0, 1200) });\n  }\n  return {\n    json: {\n      ...item.json,\n      extracted_content: content,\n      content_length: content.length,\n      sections\n    }\n  };\n});\n"
       },
-      "id": "normalize_document_source",
-      "name": "NORMALIZE_DOCUMENT_SOURCE",
+      "id": "useful_section_extraction",
+      "name": "USEFUL_SECTION_EXTRACTION",
       "type": "n8n-nodes-base.code",
       "typeVersion": 2,
       "position": [
-        2360,
-        0
+        2500,
+        -160
       ]
     },
     {
       "parameters": {
-        "jsCode": "// TERMINAL_OUTPUT_NODE: RETURN_SOURCES_DOCUMENTS\n// Return source/document records.\n// TODO: Replace this placeholder with configured production logic.\n// Contract discipline: preserve FACT / INFERENCE / HYPOTHESIS / UNKNOWN boundaries.\nreturn items;\n"
+        "jsCode": "function publicationDate(value) {\n  if (!value) return null;\n  const match = String(value).match(/\\b(20\\d{2})-(\\d{2})-(\\d{2})\\b/);\n  return match ? match[0] : null;\n}\nfunction fileType(value, hint) {\n  const match = String(value || '').match(/\\.([a-z0-9]{2,5})(?:[?#]|$)/i);\n  return match ? match[1].toLowerCase() : (hint || 'html');\n}\nfunction fallbackTitle(url) {\n  try {\n    const last = new URL(url).pathname.split('/').filter(Boolean).pop() || 'Public document';\n    return decodeURIComponent(last).replace(/[-_]+/g, ' ').replace(/\\.[a-z0-9]{2,5}$/i, '').trim() || 'Public document';\n  } catch { return 'Public document'; }\n}\n\nreturn items.map(item => {\n  if (item.json.fetch_state !== 'success' || !item.json.sections?.length) {\n    return {\n      json: {\n        run_context: item.json.run_context,\n        result_type: 'error',\n        candidate_index: item.json.candidate_index,\n        candidate: item.json.candidate,\n        error: {\n          stage: item.json.fetch_state === 'success' ? 'CONTENT_EXTRACTION' : 'DOCUMENT_FETCH',\n          error_type: item.json.fetch_state === 'success' ? 'extraction_failure' : 'request_failure',\n          url: item.json.candidate?.url || null,\n          message: item.json.fetch_error || 'The document did not yield useful extractable content'\n        }\n      }\n    };\n  }\n  const sequence = String(item.json.candidate_index + 1).padStart(3, '0');\n  const title = item.json.reader_title || item.json.candidate.title || fallbackTitle(item.json.candidate.url);\n  const retrievedAt = new Date().toISOString();\n  const sourceId = `SRC-DOC-${sequence}`;\n  const documentId = `DOC-${sequence}`;\n  const metadata = {\n    title,\n    url: item.json.candidate.url,\n    document_type: item.json.document_type || 'other_public_document',\n    publisher: item.json.is_official ? item.json.organization.name : null,\n    publication_date: publicationDate(item.json.reader_published_time),\n    retrieved_at: retrievedAt,\n    authority_level: item.json.authority_level || 'unknown',\n    is_official: Boolean(item.json.is_official),\n    file_type: fileType(item.json.candidate.url, item.json.file_type_hint),\n    discovered_by: item.json.candidate.discovered_by,\n    organization_match: item.json.organization_match\n  };\n  return {\n    json: {\n      run_context: item.json.run_context,\n      result_type: 'document',\n      candidate_index: item.json.candidate_index,\n      source: {\n        source_id: sourceId,\n        title: metadata.title,\n        url: metadata.url,\n        source_type: `public_document_${metadata.document_type}`,\n        publisher: metadata.publisher,\n        publication_date: metadata.publication_date,\n        retrieved_at: metadata.retrieved_at,\n        authority_level: metadata.authority_level,\n        freshness: 'unknown',\n        is_official: metadata.is_official,\n        document_id: documentId,\n        document_type: metadata.document_type,\n        file_type: metadata.file_type,\n        discovered_by: metadata.discovered_by,\n        extraction_provider: 'jina_reader',\n        useful_sections: item.json.sections\n      },\n      document: {\n        document_id: documentId,\n        source_id: sourceId,\n        ...metadata,\n        sections: item.json.sections,\n        content_excerpt: item.json.extracted_content.slice(0, 3000),\n        extracted_character_count: item.json.content_length\n      }\n    }\n  };\n});\n"
       },
-      "id": "return_sources_documents",
-      "name": "RETURN_SOURCES_DOCUMENTS",
+      "id": "metadata_normalization",
+      "name": "METADATA_NORMALIZATION",
       "type": "n8n-nodes-base.code",
       "typeVersion": 2,
       "position": [
-        2660,
-        0
+        2780,
+        -160
+      ]
+    },
+    {
+      "parameters": {
+        "jsCode": "return items.map(item => {\n  if (item.json.candidate_state === 'no_documents_found') {\n    return { json: { run_context: item.json.run_context, result_type: 'control', control_state: 'no_documents_found', candidate_index: null, candidate: null } };\n  }\n  const errorType = item.json.candidate_state === 'input_failure'\n    ? 'invalid_input'\n    : item.json.candidate_state === 'organization_mismatch'\n      ? 'organization_mismatch'\n      : item.json.candidate_state === 'invalid_url'\n        ? 'invalid_url'\n        : 'unsupported_document';\n  return {\n    json: {\n      run_context: item.json.run_context,\n      result_type: 'error',\n      candidate_index: item.json.candidate_index,\n      candidate: item.json.candidate,\n      error: {\n        stage: errorType === 'invalid_input' ? 'INPUT_VALIDATION' : errorType === 'organization_mismatch' ? 'ORGANIZATION_MATCH_CHECK' : 'DOCUMENT_RELEVANCE_FILTER',\n        error_type: errorType,\n        url: item.json.candidate?.url || null,\n        message: errorType === 'organization_mismatch'\n          ? 'Document candidate could not be matched to the target organization'\n          : errorType === 'unsupported_document'\n            ? 'Candidate is not a supported or recognizable public document'\n            : errorType === 'invalid_url'\n              ? 'Document candidate URL is not a valid HTTP(S) URL'\n              : 'Organization input is incomplete'\n      }\n    }\n  };\n});\n"
+      },
+      "id": "normalize_rejected_candidate",
+      "name": "NORMALIZE_REJECTED_CANDIDATE",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        1940,
+        240
+      ]
+    },
+    {
+      "parameters": {
+        "mode": "append",
+        "numberInputs": 2
+      },
+      "id": "merge__candidate_results",
+      "name": "MERGE__CANDIDATE_RESULTS",
+      "type": "n8n-nodes-base.merge",
+      "typeVersion": 3.2,
+      "position": [
+        3080,
+        40
+      ]
+    },
+    {
+      "parameters": {
+        "jsCode": "const rows = items.map(item => item.json);\nconst runContext = rows.find(row => row.run_context)?.run_context || null;\nconst documents = rows.filter(row => row.result_type === 'document').map(row => row.document).sort((a, b) => a.document_id.localeCompare(b.document_id));\nconst sources = rows.filter(row => row.result_type === 'document').map(row => row.source).sort((a, b) => a.source_id.localeCompare(b.source_id));\nconst errors = rows.filter(row => row.result_type === 'error').map(row => row.error);\nconst candidatesAttempted = rows.filter(row => row.candidate?.url).length;\nlet controlledState = 'success';\nif (documents.length && errors.length) controlledState = 'partial_success';\nelse if (documents.length) controlledState = 'success';\nelse if (rows.some(row => row.control_state === 'no_documents_found')) controlledState = 'no_documents_found';\nelse if (errors.length && errors.every(error => error.error_type === 'unsupported_document')) controlledState = 'unsupported_document';\nelse controlledState = 'request_failure';\n\nreturn [{\n  json: {\n    run_context: runContext,\n    controlled_state: controlledState,\n    extraction_provider: 'jina_reader',\n    provider: {\n      name: 'Jina Reader',\n      credential_required: false,\n      integration: 'n8n HTTP Request',\n      endpoint_pattern: 'https://r.jina.ai/{public_document_url}'\n    },\n    candidates_attempted: candidatesAttempted,\n    documents,\n    sources,\n    useful_sections_count: documents.reduce((total, document) => total + document.sections.length, 0),\n    errors\n  }\n}];\n"
+      },
+      "id": "aggregate_document_results",
+      "name": "AGGREGATE_DOCUMENT_RESULTS",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        3360,
+        40
+      ]
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict"
+          },
+          "conditions": [
+            {
+              "id": "decision__no_documents_found_no_documents_found",
+              "leftValue": "={{ $json.controlled_state }}",
+              "rightValue": "no_documents_found",
+              "operator": {
+                "type": "string",
+                "operation": "equals"
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "id": "decision__no_documents_found",
+      "name": "DECISION__NO_DOCUMENTS_FOUND",
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2,
+      "position": [
+        3640,
+        40
+      ]
+    },
+    {
+      "parameters": {
+        "jsCode": "return items.map(item => ({ json: {\n  run_context: item.json.run_context,\n  controlled_state: item.json.controlled_state,\n  extraction_provider: item.json.extraction_provider,\n  provider: item.json.provider,\n  candidates_attempted: item.json.candidates_attempted,\n  documents: item.json.documents || [],\n  sources: item.json.sources || [],\n  useful_sections_count: item.json.useful_sections_count || 0,\n  errors: item.json.errors || []\n} }));\n"
+      },
+      "id": "output_no_documents_found",
+      "name": "OUTPUT_NO_DOCUMENTS_FOUND",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        3920,
+        -320
+      ]
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict"
+          },
+          "conditions": [
+            {
+              "id": "decision__unsupported_document_unsupported_document",
+              "leftValue": "={{ $json.controlled_state }}",
+              "rightValue": "unsupported_document",
+              "operator": {
+                "type": "string",
+                "operation": "equals"
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "id": "decision__unsupported_document",
+      "name": "DECISION__UNSUPPORTED_DOCUMENT",
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2,
+      "position": [
+        3920,
+        40
+      ]
+    },
+    {
+      "parameters": {
+        "jsCode": "return items.map(item => ({ json: {\n  run_context: item.json.run_context,\n  controlled_state: item.json.controlled_state,\n  extraction_provider: item.json.extraction_provider,\n  provider: item.json.provider,\n  candidates_attempted: item.json.candidates_attempted,\n  documents: item.json.documents || [],\n  sources: item.json.sources || [],\n  useful_sections_count: item.json.useful_sections_count || 0,\n  errors: item.json.errors || []\n} }));\n"
+      },
+      "id": "output_unsupported_document",
+      "name": "OUTPUT_UNSUPPORTED_DOCUMENT",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        4200,
+        -220
+      ]
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict"
+          },
+          "conditions": [
+            {
+              "id": "decision__request_failure_request_failure",
+              "leftValue": "={{ $json.controlled_state }}",
+              "rightValue": "request_failure",
+              "operator": {
+                "type": "string",
+                "operation": "equals"
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "id": "decision__request_failure",
+      "name": "DECISION__REQUEST_FAILURE",
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2,
+      "position": [
+        4200,
+        100
+      ]
+    },
+    {
+      "parameters": {
+        "jsCode": "return items.map(item => ({ json: {\n  run_context: item.json.run_context,\n  controlled_state: item.json.controlled_state,\n  extraction_provider: item.json.extraction_provider,\n  provider: item.json.provider,\n  candidates_attempted: item.json.candidates_attempted,\n  documents: item.json.documents || [],\n  sources: item.json.sources || [],\n  useful_sections_count: item.json.useful_sections_count || 0,\n  errors: item.json.errors || []\n} }));\n"
+      },
+      "id": "output_request_failure",
+      "name": "OUTPUT_REQUEST_FAILURE",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        4480,
+        -100
+      ]
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict"
+          },
+          "conditions": [
+            {
+              "id": "decision__partial_success_partial_success",
+              "leftValue": "={{ $json.controlled_state }}",
+              "rightValue": "partial_success",
+              "operator": {
+                "type": "string",
+                "operation": "equals"
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "id": "decision__partial_success",
+      "name": "DECISION__PARTIAL_SUCCESS",
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2,
+      "position": [
+        4480,
+        180
+      ]
+    },
+    {
+      "parameters": {
+        "jsCode": "return items.map(item => ({ json: {\n  run_context: item.json.run_context,\n  controlled_state: item.json.controlled_state,\n  extraction_provider: item.json.extraction_provider,\n  provider: item.json.provider,\n  candidates_attempted: item.json.candidates_attempted,\n  documents: item.json.documents || [],\n  sources: item.json.sources || [],\n  useful_sections_count: item.json.useful_sections_count || 0,\n  errors: item.json.errors || []\n} }));\n"
+      },
+      "id": "output_partial_success",
+      "name": "OUTPUT_PARTIAL_SUCCESS",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        4760,
+        80
+      ]
+    },
+    {
+      "parameters": {
+        "jsCode": "return items.map(item => ({ json: {\n  run_context: item.json.run_context,\n  controlled_state: item.json.controlled_state,\n  extraction_provider: item.json.extraction_provider,\n  provider: item.json.provider,\n  candidates_attempted: item.json.candidates_attempted,\n  documents: item.json.documents || [],\n  sources: item.json.sources || [],\n  useful_sections_count: item.json.useful_sections_count || 0,\n  errors: item.json.errors || []\n} }));\n"
+      },
+      "id": "output_success",
+      "name": "OUTPUT_SUCCESS",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        4760,
+        300
       ]
     }
   ],
@@ -151,105 +459,229 @@
       "main": [
         [
           {
-            "node": "INPUT_CONTRACT__DOCUMENT_PUBLIC_DATA_TASK",
+            "node": "INPUT_VALIDATION",
             "type": "main",
             "index": 0
           }
         ]
       ]
     },
-    "INPUT_CONTRACT__DOCUMENT_PUBLIC_DATA_TASK": {
+    "INPUT_VALIDATION": {
       "main": [
         [
           {
-            "node": "LOCATE_SOURCE",
+            "node": "DOCUMENT_CANDIDATES",
             "type": "main",
             "index": 0
           }
         ]
       ]
     },
-    "LOCATE_SOURCE": {
+    "DOCUMENT_CANDIDATES": {
       "main": [
         [
           {
-            "node": "TODO_API__FETCH_PUBLIC_DOCUMENT_OR_DATA",
+            "node": "DOCUMENT_RELEVANCE_FILTER",
             "type": "main",
             "index": 0
           }
         ]
       ]
     },
-    "TODO_API__FETCH_PUBLIC_DOCUMENT_OR_DATA": {
+    "DOCUMENT_RELEVANCE_FILTER": {
       "main": [
         [
           {
-            "node": "DECISION__FILE_TYPE_BRANCH",
+            "node": "ORGANIZATION_MATCH_CHECK",
             "type": "main",
             "index": 0
           }
         ]
       ]
     },
-    "DECISION__FILE_TYPE_BRANCH": {
+    "ORGANIZATION_MATCH_CHECK": {
       "main": [
         [
           {
-            "node": "EXTRACT_PLACEHOLDER__PDF",
-            "type": "main",
-            "index": 0
-          },
-          {
-            "node": "EXTRACT_PLACEHOLDER__HTML",
-            "type": "main",
-            "index": 0
-          },
-          {
-            "node": "EXTRACT_PLACEHOLDER__STRUCTURED_DATA",
+            "node": "DECISION__FETCHABLE",
             "type": "main",
             "index": 0
           }
         ]
       ]
     },
-    "EXTRACT_PLACEHOLDER__PDF": {
+    "DECISION__FETCHABLE": {
       "main": [
         [
           {
-            "node": "NORMALIZE_DOCUMENT_SOURCE",
+            "node": "DOCUMENT_FETCH__JINA_READER",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "NORMALIZE_REJECTED_CANDIDATE",
             "type": "main",
             "index": 0
           }
         ]
       ]
     },
-    "EXTRACT_PLACEHOLDER__HTML": {
+    "DOCUMENT_FETCH__JINA_READER": {
       "main": [
         [
           {
-            "node": "NORMALIZE_DOCUMENT_SOURCE",
+            "node": "FILE_TYPE_AND_RESPONSE_CHECK",
             "type": "main",
             "index": 0
           }
         ]
       ]
     },
-    "EXTRACT_PLACEHOLDER__STRUCTURED_DATA": {
+    "FILE_TYPE_AND_RESPONSE_CHECK": {
       "main": [
         [
           {
-            "node": "NORMALIZE_DOCUMENT_SOURCE",
+            "node": "DOCUMENT_TYPE_CLASSIFICATION",
             "type": "main",
             "index": 0
           }
         ]
       ]
     },
-    "NORMALIZE_DOCUMENT_SOURCE": {
+    "DOCUMENT_TYPE_CLASSIFICATION": {
       "main": [
         [
           {
-            "node": "RETURN_SOURCES_DOCUMENTS",
+            "node": "USEFUL_SECTION_EXTRACTION",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "USEFUL_SECTION_EXTRACTION": {
+      "main": [
+        [
+          {
+            "node": "METADATA_NORMALIZATION",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "METADATA_NORMALIZATION": {
+      "main": [
+        [
+          {
+            "node": "MERGE__CANDIDATE_RESULTS",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "NORMALIZE_REJECTED_CANDIDATE": {
+      "main": [
+        [
+          {
+            "node": "MERGE__CANDIDATE_RESULTS",
+            "type": "main",
+            "index": 1
+          }
+        ]
+      ]
+    },
+    "MERGE__CANDIDATE_RESULTS": {
+      "main": [
+        [
+          {
+            "node": "AGGREGATE_DOCUMENT_RESULTS",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "AGGREGATE_DOCUMENT_RESULTS": {
+      "main": [
+        [
+          {
+            "node": "DECISION__NO_DOCUMENTS_FOUND",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "DECISION__NO_DOCUMENTS_FOUND": {
+      "main": [
+        [
+          {
+            "node": "OUTPUT_NO_DOCUMENTS_FOUND",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "DECISION__UNSUPPORTED_DOCUMENT",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "DECISION__UNSUPPORTED_DOCUMENT": {
+      "main": [
+        [
+          {
+            "node": "OUTPUT_UNSUPPORTED_DOCUMENT",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "DECISION__REQUEST_FAILURE",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "DECISION__REQUEST_FAILURE": {
+      "main": [
+        [
+          {
+            "node": "OUTPUT_REQUEST_FAILURE",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "DECISION__PARTIAL_SUCCESS",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "DECISION__PARTIAL_SUCCESS": {
+      "main": [
+        [
+          {
+            "node": "OUTPUT_PARTIAL_SUCCESS",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "OUTPUT_SUCCESS",
             "type": "main",
             "index": 0
           }

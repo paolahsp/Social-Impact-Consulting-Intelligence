@@ -62,6 +62,7 @@ REQUIRED_DOCS = [
     ROOT / "docs" / "PAOLA_P0_VERTICAL_SLICE.md",
     ROOT / "docs" / "PAOLA_P0_N8N_IMPORT.md",
     ROOT / "docs" / "PAOLA_22_WEBSITE_EXTRACTION.md",
+    ROOT / "docs" / "PAOLA_23_DOCUMENT_PUBLIC_DATA_RESEARCH.md",
     ROOT / "tests" / "PHASE2_TEST_PLAN.md",
     ROOT / "stack_decision.md",
 ]
@@ -69,6 +70,7 @@ REQUIRED_DOCS = [
 REQUIRED_DEV_WORKFLOWS = [
     ROOT / "workflows" / "dev" / "DEV_PAOLA_P0_LIVE_TEST.json",
     ROOT / "workflows" / "dev" / "DEV_PAOLA_22_WEBSITE_EXTRACTION_TEST.json",
+    ROOT / "workflows" / "dev" / "DEV_PAOLA_23_DOCUMENT_RESEARCH_TEST.json",
 ]
 
 REQUIRED_FIXTURES = [
