@@ -1,0 +1,170 @@
+{
+  "live_n8n_evidence": {
+    "verified_at": "2026-08-10T10:06:44Z",
+    "dev_execution_id": "1277",
+    "subworkflow_execution_id": "1278",
+    "workflow_id": "azDD2e5wihHdfZYr",
+    "dev_workflow_id": "RIdoB60VUKg7H5de",
+    "snapshot_note": "Compact evidence snapshot; n8n retains the full extracted page text."
+  },
+  "run_context": {
+    "run_id": "RUN-N8N-22-GIVEDIRECTLY",
+    "organization": {
+      "name": "GiveDirectly",
+      "website": "https://www.givedirectly.org",
+      "country": "United States",
+      "mission_area": null
+    },
+    "current_challenge": null,
+    "uploaded_document_refs": [],
+    "status": "created",
+    "started_at": "2026-08-10T10:06:40Z",
+    "errors": []
+  },
+  "controlled_state": "success",
+  "extraction_provider": "jina_reader",
+  "pages_attempted": 8,
+  "sources": [
+    {
+      "source_id": "SRC-WEB-001",
+      "title": "GiveDirectly: Send money to people living in poverty",
+      "url": "https://www.givedirectly.org/",
+      "source_type": "official_website_home",
+      "publisher": "GiveDirectly",
+      "publication_date": null,
+      "retrieved_at": "2026-08-10T10:06:44Z",
+      "authority_level": "official",
+      "freshness": "unknown",
+      "is_official": true,
+      "extraction_provider": "jina_reader",
+      "page_type": "home",
+      "useful_content": "GiveDirectly presents direct cash as a way to help people transform their lives and choose for themselves how best to improve them."
+    },
+    {
+      "source_id": "SRC-WEB-002",
+      "title": "About GiveDirectly",
+      "url": "https://www.givedirectly.org/about",
+      "source_type": "official_website_about",
+      "publisher": "GiveDirectly",
+      "publication_date": null,
+      "retrieved_at": "2026-08-10T10:06:44Z",
+      "authority_level": "official",
+      "freshness": "unknown",
+      "is_official": true,
+      "extraction_provider": "jina_reader",
+      "page_type": "about",
+      "useful_content": "The about page states that GiveDirectly has delivered more than $1 billion in cash to more than 2 million people living in poverty since 2009."
+    },
+    {
+      "source_id": "SRC-WEB-004",
+      "title": "GiveDirectly jobs | GiveDirectly openings",
+      "url": "https://www.givedirectly.org/impact",
+      "source_type": "official_website_careers",
+      "publisher": "GiveDirectly",
+      "publication_date": null,
+      "retrieved_at": "2026-08-10T10:06:44Z",
+      "authority_level": "official",
+      "freshness": "unknown",
+      "is_official": true,
+      "extraction_provider": "jina_reader",
+      "page_type": "careers",
+      "useful_content": "The requested impact route rendered GiveDirectly's official jobs and openings content and was normalized as careers evidence."
+    },
+    {
+      "source_id": "SRC-WEB-005",
+      "title": "Financials | GiveDirectly",
+      "url": "https://www.givedirectly.org/financials",
+      "source_type": "official_website_financials",
+      "publisher": "GiveDirectly",
+      "publication_date": null,
+      "retrieved_at": "2026-08-10T10:06:44Z",
+      "authority_level": "official",
+      "freshness": "unknown",
+      "is_official": true,
+      "extraction_provider": "jina_reader",
+      "page_type": "financials",
+      "useful_content": "The financials page explains what happens to donations and states an aim to make nonprofit finances transparent and straightforward."
+    },
+    {
+      "source_id": "SRC-WEB-007",
+      "title": "Give Now | GiveDirectly",
+      "url": "https://www.givedirectly.org/donate",
+      "source_type": "official_website_fundraising",
+      "publisher": "GiveDirectly",
+      "publication_date": null,
+      "retrieved_at": "2026-08-10T10:06:44Z",
+      "authority_level": "official",
+      "freshness": "unknown",
+      "is_official": true,
+      "extraction_provider": "jina_reader",
+      "page_type": "fundraising",
+      "useful_content": "The donation page provides a direct fundraising entry point and recipient examples describing uses of cash transfers."
+    },
+    {
+      "source_id": "SRC-WEB-008",
+      "title": "Contact Us | GiveDirectly",
+      "url": "https://www.givedirectly.org/contact",
+      "source_type": "official_website_contact",
+      "publisher": "GiveDirectly",
+      "publication_date": null,
+      "retrieved_at": "2026-08-10T10:06:44Z",
+      "authority_level": "official",
+      "freshness": "unknown",
+      "is_official": true,
+      "extraction_provider": "jina_reader",
+      "page_type": "contact",
+      "useful_content": "The contact page provides an official stakeholder entry point and explains that people cannot apply directly for program funds."
+    }
+  ],
+  "website_context": {
+    "mission_signals": [
+      "People in poverty deserve the dignity to choose for themselves how best to improve their lives — cash enables that choice.",
+      "Since 2009, GiveDirectly says it has delivered cash directly to more than 2 million people living in poverty."
+    ],
+    "program_signals": [
+      "GiveDirectly describes cash transfers as a well-studied aid intervention.",
+      "Its programs are funded by individual donors, foundations, businesses, and institutions."
+    ],
+    "impact_signals": [
+      "GiveDirectly says research has shown impacts from cash transfers even five or more years after a transfer.",
+      "The site links to research on cash transfers."
+    ],
+    "fundraising_signals": [
+      "The site describes funding from individual donors, foundations, businesses, and institutions.",
+      "A Give Now page provides the primary donation entry point."
+    ],
+    "stakeholder_entry_points": [
+      {
+        "page_type": "fundraising",
+        "title": "Give Now | GiveDirectly",
+        "url": "https://www.givedirectly.org/donate"
+      },
+      {
+        "page_type": "contact",
+        "title": "Contact Us | GiveDirectly",
+        "url": "https://www.givedirectly.org/contact"
+      }
+    ],
+    "report_links": [
+      {
+        "title": "Financials | GiveDirectly",
+        "url": "https://www.givedirectly.org/financials",
+        "page_type": "financials"
+      }
+    ]
+  },
+  "errors": [
+    {
+      "stage": "EXTRACTION_REQUEST__JINA_READER",
+      "error_type": "request_failure",
+      "page_url": "https://www.givedirectly.org/our-work",
+      "message": "Jina Reader returned no usable page content"
+    },
+    {
+      "stage": "EXTRACTION_REQUEST__JINA_READER",
+      "error_type": "request_failure",
+      "page_url": "https://www.givedirectly.org/annual-reports",
+      "message": "Jina Reader returned no usable page content"
+    }
+  ]
+}
