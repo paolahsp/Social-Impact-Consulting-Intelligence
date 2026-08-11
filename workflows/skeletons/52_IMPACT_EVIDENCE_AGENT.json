@@ -3,9 +3,9 @@
   "nodes": [
     {
       "parameters": {
-        "content": "PURPOSE\nAssess mission clarity, Theory of Change, impact claims, KPIs, and evidence maturity.\n\nOWNER\nPAOLA TRACK A\n\nINPUT CONTRACT\nimpact evidence plus impact RAG context\n\nOUTPUT CONTRACT\nfinding.schema.json[] for impact and evidence\n\nSTATUS\nSkeleton only. Inactive by default. No credentials. Configure TODO nodes after import.",
-        "height": 340,
-        "width": 520,
+        "content": "PURPOSE\nAnalyze public evidence about activities, outputs, outcomes, impact claims, indicators, evidence strength, and unknowns.\n\nOWNER\nPAOLA TRACK A\n\nINPUT CONTRACT\nrun_context + sources + evidence + optional structured documents + optional RAG context\n\nOUTPUT CONTRACT\nfinding.schema.json[] plus traceable impact_evidence and unknowns\n\nSTATUS\nRepository-ready deterministic implementation. No broad web search. No credentials. Inactive by default.",
+        "height": 420,
+        "width": 700,
         "color": 4
       },
       "id": "00_readme__purpose_owner_contracts_status",
@@ -13,8 +13,24 @@
       "type": "n8n-nodes-base.stickyNote",
       "typeVersion": 1,
       "position": [
-        -420,
-        -320
+        -620,
+        -520
+      ]
+    },
+    {
+      "parameters": {
+        "content": "ACTIVITY != OUTPUT != OUTCOME != IMPACT\nA public claim is not automatically proof. Missing public evidence remains unknown, not a negative conclusion. RAG may provide conceptual framing only; it must not add organization facts.",
+        "height": 280,
+        "width": 700,
+        "color": 6
+      },
+      "id": "note__impact_boundaries",
+      "name": "NOTE__IMPACT_BOUNDARIES",
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [
+        -620,
+        -40
       ]
     },
     {
@@ -30,10 +46,10 @@
     },
     {
       "parameters": {
-        "jsCode": "// SKELETON_PLACEHOLDER: INPUT_CONTRACT__IMPACT_EVIDENCE\n// Accept relevant evidence and impact RAG.\n// TODO: Replace this placeholder with configured production logic.\n// Contract discipline: preserve FACT / INFERENCE / HYPOTHESIS / UNKNOWN boundaries.\nreturn items;\n"
+        "jsCode": "return items.map(item => {\n  const payload = item.json || {};\n  const nested = payload.paola_track_output || payload;\n  const runContext = nested.run_context || payload.run_context || {};\n  const sources = Array.isArray(nested.sources) ? nested.sources : [];\n  const evidence = Array.isArray(nested.evidence) ? nested.evidence : [];\n  const documents = Array.isArray(nested.documents) ? nested.documents : [];\n  const ragContext = nested.rag_context || payload.rag_context || { contexts: [] };\n  const errors = [];\n  if (!runContext.run_id) errors.push({ stage: 'INPUT_CONTRACT', error_type: 'invalid_input', message: 'run_context.run_id is required' });\n  if (!Array.isArray(sources)) errors.push({ stage: 'INPUT_CONTRACT', error_type: 'invalid_input', message: 'sources must be an array' });\n  if (!Array.isArray(evidence)) errors.push({ stage: 'INPUT_CONTRACT', error_type: 'invalid_input', message: 'evidence must be an array' });\n  return {\n    json: {\n      run_context: runContext,\n      sources,\n      evidence,\n      documents,\n      rag_context: ragContext,\n      controlled_state: errors.length ? 'request_failure' : 'ready',\n      errors,\n      impact_taxonomy: ['activity', 'output', 'outcome', 'impact', 'indicator', 'unknown', 'impact_claim', 'impact_evidence']\n    }\n  };\n});\n"
       },
-      "id": "input_contract__impact_evidence",
-      "name": "INPUT_CONTRACT__IMPACT_EVIDENCE",
+      "id": "input_contract",
+      "name": "INPUT_CONTRACT",
       "type": "n8n-nodes-base.code",
       "typeVersion": 2,
       "position": [
@@ -43,67 +59,267 @@
     },
     {
       "parameters": {
-        "jsCode": "// SKELETON_PLACEHOLDER: TODO_AGENT__IMPACT\n// AGENT_INTERFACE__IMPACT_ANALYSIS.\n// TODO: Replace this placeholder with configured production logic.\n// Contract discipline: preserve FACT / INFERENCE / HYPOTHESIS / UNKNOWN boundaries.\nreturn items;\n"
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict"
+          },
+          "conditions": [
+            {
+              "id": "decision__input_failure_request_failure",
+              "leftValue": "={{ $json.controlled_state }}",
+              "rightValue": "request_failure",
+              "operator": {
+                "type": "string",
+                "operation": "equals"
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
       },
-      "id": "todo_agent__impact",
-      "name": "TODO_AGENT__IMPACT",
-      "type": "n8n-nodes-base.code",
+      "id": "decision__input_failure",
+      "name": "DECISION__INPUT_FAILURE",
+      "type": "n8n-nodes-base.if",
       "typeVersion": 2,
       "position": [
-        560,
+        540,
         0
       ]
     },
     {
       "parameters": {
-        "jsCode": "// SKELETON_PLACEHOLDER: CLASSIFY_FINDINGS\n// Classify mission, activity, output, outcome, KPI, and evidence signals.\n// TODO: Replace this placeholder with configured production logic.\n// Contract discipline: preserve FACT / INFERENCE / HYPOTHESIS / UNKNOWN boundaries.\nreturn items;\n"
+        "jsCode": "return items.map(item => ({ json: {\n  run_context: item.json.run_context || null,\n  controlled_state: item.json.controlled_state,\n  impact_taxonomy: item.json.impact_taxonomy || [],\n  sources: item.json.sources || [],\n  evidence: item.json.evidence || [],\n  impact_evidence: item.json.impact_evidence || [],\n  evidence_characteristics: item.json.evidence_characteristics || [],\n  findings: item.json.findings || [],\n  unknowns: item.json.unknowns || [],\n  contradictions: item.json.contradictions || [],\n  rag_metadata: {\n    retrieval_run_id: item.json.rag_context?.retrieval_run_id || null,\n    domains: item.json.rag_context?.domain ? [item.json.rag_context.domain] : [],\n    retrieved_context_ids: (item.json.rag_context?.contexts || []).map(ctx => ctx.context_id)\n  },\n  guardrails: [\n    'Activity, output, outcome, impact, indicator, and unknown are not interchangeable.',\n    'Absence of public evidence is not treated as evidence of organizational absence.',\n    'RAG context cannot add organization-specific facts.'\n  ],\n  errors: item.json.errors || []\n} }));\n"
       },
-      "id": "classify_findings",
-      "name": "CLASSIFY_FINDINGS",
+      "id": "output_request_failure",
+      "name": "OUTPUT_REQUEST_FAILURE",
       "type": "n8n-nodes-base.code",
       "typeVersion": 2,
       "position": [
-        860,
-        0
+        820,
+        -220
       ]
     },
     {
       "parameters": {
-        "jsCode": "// SKELETON_PLACEHOLDER: EVIDENCE_CHECK\n// Trace findings to evidence IDs and confidence.\n// TODO: Replace this placeholder with configured production logic.\n// Contract discipline: preserve FACT / INFERENCE / HYPOTHESIS / UNKNOWN boundaries.\nreturn items;\n"
+        "jsCode": "const impactTerms = ['impact', 'outcome', 'beneficiar', 'recipient', 'household', 'participant', 'people reached', 'transfer', 'poverty', 'mission', 'program', 'programme', 'kpi', 'indicator', 'research', 'evaluation', 'follow-up', 'follow up'];\nfunction hasImpactSignal(value) {\n  const text = String(value || '').toLowerCase();\n  return impactTerms.some(term => text.includes(term));\n}\nfunction splitSentences(value) {\n  return String(value || '').replace(/\\s+/g, ' ').split(/(?<=[.!?])\\s+/).map(s => s.trim()).filter(Boolean);\n}\nfunction nextId(index) {\n  return `EV-IMP-${String(index + 1).padStart(3, '0')}`;\n}\nreturn items.map(item => {\n  if (item.json.controlled_state === 'request_failure') return item;\n  const sourceIds = new Set((item.json.sources || []).map(source => source.source_id));\n  const impactEvidence = [];\n  for (const ev of item.json.evidence || []) {\n    const text = `${ev.domain || ''} ${ev.claim || ''}`;\n    const refs = (ev.source_ids || []).filter(id => sourceIds.has(id));\n    if (refs.length && hasImpactSignal(text)) {\n      impactEvidence.push({ ...ev, source_ids: refs, impact_signal_source: 'evidence_ledger' });\n    }\n  }\n  for (const doc of item.json.documents || []) {\n    const sourceId = doc.source_id;\n    if (!sourceIds.has(sourceId)) continue;\n    const sections = Array.isArray(doc.sections) ? doc.sections : [];\n    for (const section of sections) {\n      const sectionType = String(section.section_type || '').toLowerCase();\n      if (sectionType !== 'impact') continue;\n      if (!hasImpactSignal(`${section.section_type || ''} ${section.text || ''}`)) continue;\n      const selected = splitSentences(section.text)\n        .filter(hasImpactSignal)\n        .filter(sentence => !/financial statements|net assets|receivable|inventory|fair value|cash flows|auditors/i.test(sentence));\n      for (const sentence of selected.slice(0, 4)) {\n        if (impactEvidence.length >= 12) break;\n        impactEvidence.push({\n          evidence_id: nextId(impactEvidence.length),\n          run_id: item.json.run_context.run_id,\n          claim: sentence.slice(0, 360),\n          source_ids: [sourceId],\n          domain: 'impact_evidence',\n          evidence_type: 'fact',\n          confidence: doc.is_official ? 0.72 : 0.58,\n          status: 'supported',\n          contradiction_ids: [],\n          requires_validation: false,\n          impact_signal_source: 'document_section',\n          document_id: doc.document_id || null,\n          document_type: doc.document_type || null,\n          section_type: section.section_type || null\n        });\n      }\n    }\n  }\n  const controlledState = impactEvidence.length ? 'impact_evidence_available' : 'insufficient_evidence';\n  return { json: { ...item.json, impact_evidence: impactEvidence, controlled_state: controlledState } };\n});\n"
       },
-      "id": "evidence_check",
-      "name": "EVIDENCE_CHECK",
+      "id": "filter_impact_evidence",
+      "name": "FILTER_IMPACT_EVIDENCE",
       "type": "n8n-nodes-base.code",
       "typeVersion": 2,
       "position": [
-        1160,
-        0
+        820,
+        120
       ]
     },
     {
       "parameters": {
-        "jsCode": "// SKELETON_PLACEHOLDER: UNKNOWNS\n// Preserve missing impact data as unknowns.\n// TODO: Replace this placeholder with configured production logic.\n// Contract discipline: preserve FACT / INFERENCE / HYPOTHESIS / UNKNOWN boundaries.\nreturn items;\n"
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict"
+          },
+          "conditions": [
+            {
+              "id": "decision__insufficient_evidence_insufficient_evidence",
+              "leftValue": "={{ $json.controlled_state }}",
+              "rightValue": "insufficient_evidence",
+              "operator": {
+                "type": "string",
+                "operation": "equals"
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
       },
-      "id": "unknowns",
-      "name": "UNKNOWNS",
-      "type": "n8n-nodes-base.code",
+      "id": "decision__insufficient_evidence",
+      "name": "DECISION__INSUFFICIENT_EVIDENCE",
+      "type": "n8n-nodes-base.if",
       "typeVersion": 2,
       "position": [
-        1460,
-        0
+        1100,
+        120
       ]
     },
     {
       "parameters": {
-        "jsCode": "// TERMINAL_OUTPUT_NODE: OUTPUT_CONTRACT__IMPACT_FINDINGS\n// Return impact findings.\n// TODO: Replace this placeholder with configured production logic.\n// Contract discipline: preserve FACT / INFERENCE / HYPOTHESIS / UNKNOWN boundaries.\nreturn items;\n"
+        "jsCode": "return items.map(item => {\n  const ids = (item.json.impact_evidence || []).map(ev => ev.evidence_id);\n  if (item.json.controlled_state !== 'impact_evidence_available') {\n    return {\n      json: {\n        ...item.json,\n        unknowns: [{\n          unknown_id: 'UNK-IMP-001',\n          domain: 'impact_evidence',\n          description: 'Impact-related public evidence was not identified in the structured inputs reviewed.',\n          evidence_ids: ids\n        }]\n      }\n    };\n  }\n  const levels = new Set((item.json.impact_evidence || []).map(ev => ev.impact_classification.level));\n  const characteristics = item.json.evidence_characteristics || [];\n  const unknowns = [];\n  if (!levels.has('outcome')) unknowns.push('Outcome evidence was not identified in the public sources reviewed.');\n  if (!levels.has('impact')) unknowns.push('Long-term impact evidence was not identified in the public sources reviewed.');\n  if (!characteristics.some(c => c.methodology_visibility)) unknowns.push('Methodology visibility could not be determined from the public evidence reviewed.');\n  if (!characteristics.some(c => c.baseline_visibility)) unknowns.push('Baseline visibility could not be determined from the public evidence reviewed.');\n  if (!characteristics.some(c => c.denominator_sample_visibility)) unknowns.push('Denominator or sample visibility could not be determined from the public evidence reviewed.');\n  if (!characteristics.some(c => c.target_visibility)) unknowns.push('Target visibility could not be determined from the public evidence reviewed.');\n  return {\n    json: {\n      ...item.json,\n      unknowns: unknowns.map((description, index) => ({\n        unknown_id: `UNK-IMP-${String(index + 1).padStart(3, '0')}`,\n        domain: 'impact_evidence',\n        description,\n        evidence_ids: ids\n      }))\n    }\n  };\n});\n"
+      },
+      "id": "detect_unknowns__insufficient",
+      "name": "DETECT_UNKNOWNS__INSUFFICIENT",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        1380,
+        -80
+      ]
+    },
+    {
+      "parameters": {
+        "jsCode": "function avg(values) {\n  if (!values.length) return 0.35;\n  return Math.round((values.reduce((sum, value) => sum + value, 0) / values.length) * 100) / 100;\n}\nfunction evidenceIdsFor(evidence, levels) {\n  return evidence.filter(ev => levels.includes(ev.impact_classification?.level)).map(ev => ev.evidence_id);\n}\nreturn items.map(item => {\n  const evidence = item.json.impact_evidence || [];\n  if (item.json.controlled_state === 'request_failure') return item;\n  if (!evidence.length) {\n    return {\n      json: {\n        ...item.json,\n        controlled_state: 'insufficient_evidence',\n        findings: [{\n          finding_id: 'F-IMP-001',\n          domain: 'impact_evidence',\n          finding: 'Structured inputs did not contain enough impact-related public evidence to support meaningful impact findings.',\n          evidence_ids: [],\n          finding_type: 'unknown',\n          confidence: 0.35,\n          requires_validation: true,\n          validation_question: 'Which public sources should be reviewed to understand activities, outputs, outcomes, and impact claims?'\n        }]\n      }\n    };\n  }\n  const findings = [];\n  const activityIds = evidenceIdsFor(evidence, ['activity']);\n  const outputIds = evidenceIdsFor(evidence, ['output', 'indicator']);\n  const claimIds = evidenceIdsFor(evidence, ['impact_claim']);\n  const outcomeIds = evidenceIdsFor(evidence, ['outcome']);\n  const impactIds = evidenceIdsFor(evidence, ['impact']);\n  if (activityIds.length) findings.push({\n    finding_id: `F-IMP-${String(findings.length + 1).padStart(3, '0')}`,\n    domain: 'impact_evidence',\n    finding: 'Program activities or service delivery steps are publicly described in the reviewed sources.',\n    evidence_ids: activityIds,\n    finding_type: 'observed',\n    confidence: avg(evidence.filter(ev => activityIds.includes(ev.evidence_id)).map(ev => ev.confidence || 0.5)),\n    requires_validation: false,\n    validation_question: null\n  });\n  if (outputIds.length) findings.push({\n    finding_id: `F-IMP-${String(findings.length + 1).padStart(3, '0')}`,\n    domain: 'impact_evidence',\n    finding: 'Public reporting reviewed contains output or reach signals.',\n    evidence_ids: outputIds,\n    finding_type: 'observed',\n    confidence: avg(evidence.filter(ev => outputIds.includes(ev.evidence_id)).map(ev => ev.confidence || 0.5)),\n    requires_validation: false,\n    validation_question: null\n  });\n  if (claimIds.length) findings.push({\n    finding_id: `F-IMP-${String(findings.length + 1).padStart(3, '0')}`,\n    domain: 'impact_evidence',\n    finding: 'An impact-oriented claim or mission statement is publicly stated, but it is not treated as proof that long-term impact occurred.',\n    evidence_ids: claimIds,\n    finding_type: 'observed',\n    confidence: avg(evidence.filter(ev => claimIds.includes(ev.evidence_id)).map(ev => ev.confidence || 0.5)),\n    requires_validation: true,\n    validation_question: 'What outcome or longitudinal evidence supports this public impact claim?'\n  });\n  if (outcomeIds.length) findings.push({\n    finding_id: `F-IMP-${String(findings.length + 1).padStart(3, '0')}`,\n    domain: 'impact_evidence',\n    finding: 'Outcome evidence is publicly reported in the reviewed sources.',\n    evidence_ids: outcomeIds,\n    finding_type: 'observed',\n    confidence: avg(evidence.filter(ev => outcomeIds.includes(ev.evidence_id)).map(ev => ev.confidence || 0.5)),\n    requires_validation: false,\n    validation_question: null\n  });\n  if (impactIds.length) findings.push({\n    finding_id: `F-IMP-${String(findings.length + 1).padStart(3, '0')}`,\n    domain: 'impact_evidence',\n    finding: 'Long-term impact evidence is publicly reported in the reviewed sources.',\n    evidence_ids: impactIds,\n    finding_type: 'observed',\n    confidence: avg(evidence.filter(ev => impactIds.includes(ev.evidence_id)).map(ev => ev.confidence || 0.5)),\n    requires_validation: true,\n    validation_question: 'How should attribution limitations be interpreted for the long-term impact evidence?'\n  });\n  const outcomeImpactCount = outcomeIds.length + impactIds.length;\n  if (activityIds.length + outputIds.length > outcomeImpactCount && outcomeImpactCount === 0) findings.push({\n    finding_id: `F-IMP-${String(findings.length + 1).padStart(3, '0')}`,\n    domain: 'impact_evidence',\n    finding: 'Public reporting reviewed emphasizes activities, outputs, or claims more clearly than measured outcomes or long-term impact evidence.',\n    evidence_ids: evidence.map(ev => ev.evidence_id),\n    finding_type: 'inferred',\n    confidence: 0.56,\n    requires_validation: true,\n    validation_question: 'Are measured outcomes or long-term follow-up results available outside the public sources reviewed?'\n  });\n  if (item.json.unknowns?.length) findings.push({\n    finding_id: `F-IMP-${String(findings.length + 1).padStart(3, '0')}`,\n    domain: 'impact_evidence',\n    finding: 'Some impact evidence characteristics remain unknown from the public sources reviewed.',\n    evidence_ids: evidence.map(ev => ev.evidence_id),\n    finding_type: 'unknown',\n    confidence: 0.5,\n    requires_validation: true,\n    validation_question: 'Which measurement details, if any, can the organization validate directly?'\n  });\n  return { json: { ...item.json, controlled_state: 'success', findings } };\n});\n"
+      },
+      "id": "build_findings__insufficient",
+      "name": "BUILD_FINDINGS__INSUFFICIENT",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        1660,
+        -80
+      ]
+    },
+    {
+      "parameters": {
+        "jsCode": "return items.map(item => {\n  if (item.json.controlled_state === 'request_failure') return item;\n  const evidenceIds = new Set((item.json.impact_evidence || []).map(ev => ev.evidence_id));\n  const sourceIds = new Set((item.json.sources || []).map(source => source.source_id));\n  const errors = [...(item.json.errors || [])];\n  for (const ev of item.json.impact_evidence || []) {\n    if (!(ev.source_ids || []).some(id => sourceIds.has(id))) {\n      errors.push({ stage: 'TRACEABILITY_CHECK', error_type: 'untraceable_evidence', message: `${ev.evidence_id} does not reference a known source` });\n    }\n  }\n  const findings = (item.json.findings || []).map(finding => ({\n    ...finding,\n    evidence_ids: (finding.evidence_ids || []).filter(id => evidenceIds.has(id))\n  }));\n  for (const finding of findings) {\n    if (finding.finding_type !== 'unknown' && !finding.evidence_ids.length) {\n      errors.push({ stage: 'TRACEABILITY_CHECK', error_type: 'untraceable_finding', message: `${finding.finding_id} has no valid evidence references` });\n    }\n  }\n  const controlledState = errors.length ? 'request_failure' : item.json.controlled_state;\n  return { json: { ...item.json, findings, errors, controlled_state: controlledState } };\n});\n"
+      },
+      "id": "traceability_check__insufficient",
+      "name": "TRACEABILITY_CHECK__INSUFFICIENT",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        1940,
+        -80
+      ]
+    },
+    {
+      "parameters": {
+        "jsCode": "return items.map(item => ({ json: {\n  run_context: item.json.run_context || null,\n  controlled_state: item.json.controlled_state,\n  impact_taxonomy: item.json.impact_taxonomy || [],\n  sources: item.json.sources || [],\n  evidence: item.json.evidence || [],\n  impact_evidence: item.json.impact_evidence || [],\n  evidence_characteristics: item.json.evidence_characteristics || [],\n  findings: item.json.findings || [],\n  unknowns: item.json.unknowns || [],\n  contradictions: item.json.contradictions || [],\n  rag_metadata: {\n    retrieval_run_id: item.json.rag_context?.retrieval_run_id || null,\n    domains: item.json.rag_context?.domain ? [item.json.rag_context.domain] : [],\n    retrieved_context_ids: (item.json.rag_context?.contexts || []).map(ctx => ctx.context_id)\n  },\n  guardrails: [\n    'Activity, output, outcome, impact, indicator, and unknown are not interchangeable.',\n    'Absence of public evidence is not treated as evidence of organizational absence.',\n    'RAG context cannot add organization-specific facts.'\n  ],\n  errors: item.json.errors || []\n} }));\n"
+      },
+      "id": "output_insufficient_evidence",
+      "name": "OUTPUT_INSUFFICIENT_EVIDENCE",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        2220,
+        -80
+      ]
+    },
+    {
+      "parameters": {
+        "jsCode": "function levelFor(claim) {\n  const text = String(claim || '').toLowerCase();\n  const hasNumber = /\\b\\d+([,.]\\d+)?%?\\b/.test(text);\n  if (/(mission|aim|goal|vision).{0,80}(reduce poverty|improve|impact|change lives|alleviate suffering)/.test(text)) return 'impact_claim';\n  if (/(long[- ]term|sustain|five years|years later|poverty reduction measured|counterfactual|attribut)/.test(text) && /(impact|outcome|effect)/.test(text)) return 'impact';\n  if (/(improved|increased|decreased|reduced|changed|outcome|test scores|health|income|wellbeing|well-being)/.test(text) && (hasNumber || /survey|study|evaluation|research/.test(text))) return 'outcome';\n  if (/(kpi|indicator|metric|measure|measurement|rate|percent|percentage|baseline|target)/.test(text)) return 'indicator';\n  if (/(recipient|household|participant|people reached|operates in|countries|transfer sizes|attended|served|reached)/.test(text)) return 'output';\n  if (/(provides|offers|identifies|informs|helps|register|sends|follows up|deliver|conducts|runs|program|programme|service)/.test(text)) return 'activity';\n  return 'unknown';\n}\nreturn items.map(item => {\n  if (item.json.controlled_state !== 'impact_evidence_available') return item;\n  const classified = (item.json.impact_evidence || []).map(ev => ({\n    ...ev,\n    impact_classification: {\n      level: levelFor(ev.claim),\n      signal_nature: levelFor(ev.claim) === 'impact_claim' ? 'claim' : 'evidence_signal',\n      taxonomy_version: 'impact-taxonomy-v1'\n    }\n  }));\n  return { json: { ...item.json, impact_evidence: classified } };\n});\n"
+      },
+      "id": "classify_impact_level",
+      "name": "CLASSIFY_IMPACT_LEVEL",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        1380,
+        260
+      ]
+    },
+    {
+      "parameters": {
+        "jsCode": "function sourceFor(ev, sources) {\n  return sources.find(source => (ev.source_ids || []).includes(source.source_id)) || {};\n}\nfunction present(pattern, text) {\n  return pattern.test(String(text || '').toLowerCase());\n}\nreturn items.map(item => {\n  if (item.json.controlled_state !== 'impact_evidence_available') return item;\n  const evidenceCharacteristics = (item.json.impact_evidence || []).map(ev => {\n    const source = sourceFor(ev, item.json.sources || []);\n    const claim = String(ev.claim || '');\n    const measurementPresence = /\\b\\d+([,.]\\d+)?%?\\b/.test(claim);\n    return {\n      evidence_id: ev.evidence_id,\n      impact_level: ev.impact_classification.level,\n      source_authority: source.authority_level || 'unknown',\n      specificity: measurementPresence || claim.length > 120 ? 'medium' : 'low',\n      measurement_presence: measurementPresence,\n      timeframe_visibility: present(/\\b(20\\d{2}|19\\d{2}|year|month|quarter|five years|long[- ]term)\\b/, claim),\n      methodology_visibility: present(/\\b(method|survey|study|evaluation|research|random|sample|baseline|follow[- ]up)\\b/, claim),\n      denominator_sample_visibility: present(/\\b(sample|n=|participants|households|recipients)\\b/, claim) && measurementPresence,\n      baseline_visibility: present(/\\bbaseline\\b/, claim),\n      target_visibility: present(/\\btarget\\b/, claim),\n      attribution_limitations: ev.impact_classification.level === 'impact' || ev.impact_classification.level === 'outcome'\n        ? 'Attribution cannot be assessed beyond what the cited public evidence states.'\n        : null\n    };\n  });\n  return { json: { ...item.json, evidence_characteristics: evidenceCharacteristics } };\n});\n"
+      },
+      "id": "assess_evidence_characteristics",
+      "name": "ASSESS_EVIDENCE_CHARACTERISTICS",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        1660,
+        260
+      ]
+    },
+    {
+      "parameters": {
+        "jsCode": "return items.map(item => {\n  const ids = (item.json.impact_evidence || []).map(ev => ev.evidence_id);\n  if (item.json.controlled_state !== 'impact_evidence_available') {\n    return {\n      json: {\n        ...item.json,\n        unknowns: [{\n          unknown_id: 'UNK-IMP-001',\n          domain: 'impact_evidence',\n          description: 'Impact-related public evidence was not identified in the structured inputs reviewed.',\n          evidence_ids: ids\n        }]\n      }\n    };\n  }\n  const levels = new Set((item.json.impact_evidence || []).map(ev => ev.impact_classification.level));\n  const characteristics = item.json.evidence_characteristics || [];\n  const unknowns = [];\n  if (!levels.has('outcome')) unknowns.push('Outcome evidence was not identified in the public sources reviewed.');\n  if (!levels.has('impact')) unknowns.push('Long-term impact evidence was not identified in the public sources reviewed.');\n  if (!characteristics.some(c => c.methodology_visibility)) unknowns.push('Methodology visibility could not be determined from the public evidence reviewed.');\n  if (!characteristics.some(c => c.baseline_visibility)) unknowns.push('Baseline visibility could not be determined from the public evidence reviewed.');\n  if (!characteristics.some(c => c.denominator_sample_visibility)) unknowns.push('Denominator or sample visibility could not be determined from the public evidence reviewed.');\n  if (!characteristics.some(c => c.target_visibility)) unknowns.push('Target visibility could not be determined from the public evidence reviewed.');\n  return {\n    json: {\n      ...item.json,\n      unknowns: unknowns.map((description, index) => ({\n        unknown_id: `UNK-IMP-${String(index + 1).padStart(3, '0')}`,\n        domain: 'impact_evidence',\n        description,\n        evidence_ids: ids\n      }))\n    }\n  };\n});\n"
+      },
+      "id": "detect_unknowns",
+      "name": "DETECT_UNKNOWNS",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        1940,
+        260
+      ]
+    },
+    {
+      "parameters": {
+        "jsCode": "function avg(values) {\n  if (!values.length) return 0.35;\n  return Math.round((values.reduce((sum, value) => sum + value, 0) / values.length) * 100) / 100;\n}\nfunction evidenceIdsFor(evidence, levels) {\n  return evidence.filter(ev => levels.includes(ev.impact_classification?.level)).map(ev => ev.evidence_id);\n}\nreturn items.map(item => {\n  const evidence = item.json.impact_evidence || [];\n  if (item.json.controlled_state === 'request_failure') return item;\n  if (!evidence.length) {\n    return {\n      json: {\n        ...item.json,\n        controlled_state: 'insufficient_evidence',\n        findings: [{\n          finding_id: 'F-IMP-001',\n          domain: 'impact_evidence',\n          finding: 'Structured inputs did not contain enough impact-related public evidence to support meaningful impact findings.',\n          evidence_ids: [],\n          finding_type: 'unknown',\n          confidence: 0.35,\n          requires_validation: true,\n          validation_question: 'Which public sources should be reviewed to understand activities, outputs, outcomes, and impact claims?'\n        }]\n      }\n    };\n  }\n  const findings = [];\n  const activityIds = evidenceIdsFor(evidence, ['activity']);\n  const outputIds = evidenceIdsFor(evidence, ['output', 'indicator']);\n  const claimIds = evidenceIdsFor(evidence, ['impact_claim']);\n  const outcomeIds = evidenceIdsFor(evidence, ['outcome']);\n  const impactIds = evidenceIdsFor(evidence, ['impact']);\n  if (activityIds.length) findings.push({\n    finding_id: `F-IMP-${String(findings.length + 1).padStart(3, '0')}`,\n    domain: 'impact_evidence',\n    finding: 'Program activities or service delivery steps are publicly described in the reviewed sources.',\n    evidence_ids: activityIds,\n    finding_type: 'observed',\n    confidence: avg(evidence.filter(ev => activityIds.includes(ev.evidence_id)).map(ev => ev.confidence || 0.5)),\n    requires_validation: false,\n    validation_question: null\n  });\n  if (outputIds.length) findings.push({\n    finding_id: `F-IMP-${String(findings.length + 1).padStart(3, '0')}`,\n    domain: 'impact_evidence',\n    finding: 'Public reporting reviewed contains output or reach signals.',\n    evidence_ids: outputIds,\n    finding_type: 'observed',\n    confidence: avg(evidence.filter(ev => outputIds.includes(ev.evidence_id)).map(ev => ev.confidence || 0.5)),\n    requires_validation: false,\n    validation_question: null\n  });\n  if (claimIds.length) findings.push({\n    finding_id: `F-IMP-${String(findings.length + 1).padStart(3, '0')}`,\n    domain: 'impact_evidence',\n    finding: 'An impact-oriented claim or mission statement is publicly stated, but it is not treated as proof that long-term impact occurred.',\n    evidence_ids: claimIds,\n    finding_type: 'observed',\n    confidence: avg(evidence.filter(ev => claimIds.includes(ev.evidence_id)).map(ev => ev.confidence || 0.5)),\n    requires_validation: true,\n    validation_question: 'What outcome or longitudinal evidence supports this public impact claim?'\n  });\n  if (outcomeIds.length) findings.push({\n    finding_id: `F-IMP-${String(findings.length + 1).padStart(3, '0')}`,\n    domain: 'impact_evidence',\n    finding: 'Outcome evidence is publicly reported in the reviewed sources.',\n    evidence_ids: outcomeIds,\n    finding_type: 'observed',\n    confidence: avg(evidence.filter(ev => outcomeIds.includes(ev.evidence_id)).map(ev => ev.confidence || 0.5)),\n    requires_validation: false,\n    validation_question: null\n  });\n  if (impactIds.length) findings.push({\n    finding_id: `F-IMP-${String(findings.length + 1).padStart(3, '0')}`,\n    domain: 'impact_evidence',\n    finding: 'Long-term impact evidence is publicly reported in the reviewed sources.',\n    evidence_ids: impactIds,\n    finding_type: 'observed',\n    confidence: avg(evidence.filter(ev => impactIds.includes(ev.evidence_id)).map(ev => ev.confidence || 0.5)),\n    requires_validation: true,\n    validation_question: 'How should attribution limitations be interpreted for the long-term impact evidence?'\n  });\n  const outcomeImpactCount = outcomeIds.length + impactIds.length;\n  if (activityIds.length + outputIds.length > outcomeImpactCount && outcomeImpactCount === 0) findings.push({\n    finding_id: `F-IMP-${String(findings.length + 1).padStart(3, '0')}`,\n    domain: 'impact_evidence',\n    finding: 'Public reporting reviewed emphasizes activities, outputs, or claims more clearly than measured outcomes or long-term impact evidence.',\n    evidence_ids: evidence.map(ev => ev.evidence_id),\n    finding_type: 'inferred',\n    confidence: 0.56,\n    requires_validation: true,\n    validation_question: 'Are measured outcomes or long-term follow-up results available outside the public sources reviewed?'\n  });\n  if (item.json.unknowns?.length) findings.push({\n    finding_id: `F-IMP-${String(findings.length + 1).padStart(3, '0')}`,\n    domain: 'impact_evidence',\n    finding: 'Some impact evidence characteristics remain unknown from the public sources reviewed.',\n    evidence_ids: evidence.map(ev => ev.evidence_id),\n    finding_type: 'unknown',\n    confidence: 0.5,\n    requires_validation: true,\n    validation_question: 'Which measurement details, if any, can the organization validate directly?'\n  });\n  return { json: { ...item.json, controlled_state: 'success', findings } };\n});\n"
+      },
+      "id": "build_findings",
+      "name": "BUILD_FINDINGS",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        2220,
+        260
+      ]
+    },
+    {
+      "parameters": {
+        "jsCode": "return items.map(item => {\n  if (item.json.controlled_state === 'request_failure') return item;\n  const evidenceIds = new Set((item.json.impact_evidence || []).map(ev => ev.evidence_id));\n  const sourceIds = new Set((item.json.sources || []).map(source => source.source_id));\n  const errors = [...(item.json.errors || [])];\n  for (const ev of item.json.impact_evidence || []) {\n    if (!(ev.source_ids || []).some(id => sourceIds.has(id))) {\n      errors.push({ stage: 'TRACEABILITY_CHECK', error_type: 'untraceable_evidence', message: `${ev.evidence_id} does not reference a known source` });\n    }\n  }\n  const findings = (item.json.findings || []).map(finding => ({\n    ...finding,\n    evidence_ids: (finding.evidence_ids || []).filter(id => evidenceIds.has(id))\n  }));\n  for (const finding of findings) {\n    if (finding.finding_type !== 'unknown' && !finding.evidence_ids.length) {\n      errors.push({ stage: 'TRACEABILITY_CHECK', error_type: 'untraceable_finding', message: `${finding.finding_id} has no valid evidence references` });\n    }\n  }\n  const controlledState = errors.length ? 'request_failure' : item.json.controlled_state;\n  return { json: { ...item.json, findings, errors, controlled_state: controlledState } };\n});\n"
+      },
+      "id": "traceability_check",
+      "name": "TRACEABILITY_CHECK",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        2500,
+        260
+      ]
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict"
+          },
+          "conditions": [
+            {
+              "id": "decision__traceability_failure_request_failure",
+              "leftValue": "={{ $json.controlled_state }}",
+              "rightValue": "request_failure",
+              "operator": {
+                "type": "string",
+                "operation": "equals"
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "id": "decision__traceability_failure",
+      "name": "DECISION__TRACEABILITY_FAILURE",
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2,
+      "position": [
+        2780,
+        260
+      ]
+    },
+    {
+      "parameters": {
+        "jsCode": "return items.map(item => ({ json: {\n  run_context: item.json.run_context || null,\n  controlled_state: item.json.controlled_state,\n  impact_taxonomy: item.json.impact_taxonomy || [],\n  sources: item.json.sources || [],\n  evidence: item.json.evidence || [],\n  impact_evidence: item.json.impact_evidence || [],\n  evidence_characteristics: item.json.evidence_characteristics || [],\n  findings: item.json.findings || [],\n  unknowns: item.json.unknowns || [],\n  contradictions: item.json.contradictions || [],\n  rag_metadata: {\n    retrieval_run_id: item.json.rag_context?.retrieval_run_id || null,\n    domains: item.json.rag_context?.domain ? [item.json.rag_context.domain] : [],\n    retrieved_context_ids: (item.json.rag_context?.contexts || []).map(ctx => ctx.context_id)\n  },\n  guardrails: [\n    'Activity, output, outcome, impact, indicator, and unknown are not interchangeable.',\n    'Absence of public evidence is not treated as evidence of organizational absence.',\n    'RAG context cannot add organization-specific facts.'\n  ],\n  errors: item.json.errors || []\n} }));\n"
+      },
+      "id": "output_traceability_failure",
+      "name": "OUTPUT_TRACEABILITY_FAILURE",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        3060,
+        80
+      ]
+    },
+    {
+      "parameters": {
+        "jsCode": "return items.map(item => ({ json: {\n  run_context: item.json.run_context || null,\n  controlled_state: item.json.controlled_state,\n  impact_taxonomy: item.json.impact_taxonomy || [],\n  sources: item.json.sources || [],\n  evidence: item.json.evidence || [],\n  impact_evidence: item.json.impact_evidence || [],\n  evidence_characteristics: item.json.evidence_characteristics || [],\n  findings: item.json.findings || [],\n  unknowns: item.json.unknowns || [],\n  contradictions: item.json.contradictions || [],\n  rag_metadata: {\n    retrieval_run_id: item.json.rag_context?.retrieval_run_id || null,\n    domains: item.json.rag_context?.domain ? [item.json.rag_context.domain] : [],\n    retrieved_context_ids: (item.json.rag_context?.contexts || []).map(ctx => ctx.context_id)\n  },\n  guardrails: [\n    'Activity, output, outcome, impact, indicator, and unknown are not interchangeable.',\n    'Absence of public evidence is not treated as evidence of organizational absence.',\n    'RAG context cannot add organization-specific facts.'\n  ],\n  errors: item.json.errors || []\n} }));\n"
       },
       "id": "output_contract__impact_findings",
       "name": "OUTPUT_CONTRACT__IMPACT_FINDINGS",
       "type": "n8n-nodes-base.code",
       "typeVersion": 2,
       "position": [
-        1760,
-        0
+        3060,
+        420
       ]
     }
   ],
@@ -112,59 +328,168 @@
       "main": [
         [
           {
-            "node": "INPUT_CONTRACT__IMPACT_EVIDENCE",
+            "node": "INPUT_CONTRACT",
             "type": "main",
             "index": 0
           }
         ]
       ]
     },
-    "INPUT_CONTRACT__IMPACT_EVIDENCE": {
+    "INPUT_CONTRACT": {
       "main": [
         [
           {
-            "node": "TODO_AGENT__IMPACT",
+            "node": "DECISION__INPUT_FAILURE",
             "type": "main",
             "index": 0
           }
         ]
       ]
     },
-    "TODO_AGENT__IMPACT": {
+    "DECISION__INPUT_FAILURE": {
       "main": [
         [
           {
-            "node": "CLASSIFY_FINDINGS",
+            "node": "OUTPUT_REQUEST_FAILURE",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "FILTER_IMPACT_EVIDENCE",
             "type": "main",
             "index": 0
           }
         ]
       ]
     },
-    "CLASSIFY_FINDINGS": {
+    "FILTER_IMPACT_EVIDENCE": {
       "main": [
         [
           {
-            "node": "EVIDENCE_CHECK",
+            "node": "DECISION__INSUFFICIENT_EVIDENCE",
             "type": "main",
             "index": 0
           }
         ]
       ]
     },
-    "EVIDENCE_CHECK": {
+    "DECISION__INSUFFICIENT_EVIDENCE": {
       "main": [
         [
           {
-            "node": "UNKNOWNS",
+            "node": "DETECT_UNKNOWNS__INSUFFICIENT",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "CLASSIFY_IMPACT_LEVEL",
             "type": "main",
             "index": 0
           }
         ]
       ]
     },
-    "UNKNOWNS": {
+    "DETECT_UNKNOWNS__INSUFFICIENT": {
       "main": [
+        [
+          {
+            "node": "BUILD_FINDINGS__INSUFFICIENT",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "BUILD_FINDINGS__INSUFFICIENT": {
+      "main": [
+        [
+          {
+            "node": "TRACEABILITY_CHECK__INSUFFICIENT",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "TRACEABILITY_CHECK__INSUFFICIENT": {
+      "main": [
+        [
+          {
+            "node": "OUTPUT_INSUFFICIENT_EVIDENCE",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "CLASSIFY_IMPACT_LEVEL": {
+      "main": [
+        [
+          {
+            "node": "ASSESS_EVIDENCE_CHARACTERISTICS",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "ASSESS_EVIDENCE_CHARACTERISTICS": {
+      "main": [
+        [
+          {
+            "node": "DETECT_UNKNOWNS",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "DETECT_UNKNOWNS": {
+      "main": [
+        [
+          {
+            "node": "BUILD_FINDINGS",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "BUILD_FINDINGS": {
+      "main": [
+        [
+          {
+            "node": "TRACEABILITY_CHECK",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "TRACEABILITY_CHECK": {
+      "main": [
+        [
+          {
+            "node": "DECISION__TRACEABILITY_FAILURE",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "DECISION__TRACEABILITY_FAILURE": {
+      "main": [
+        [
+          {
+            "node": "OUTPUT_TRACEABILITY_FAILURE",
+            "type": "main",
+            "index": 0
+          }
+        ],
         [
           {
             "node": "OUTPUT_CONTRACT__IMPACT_FINDINGS",
