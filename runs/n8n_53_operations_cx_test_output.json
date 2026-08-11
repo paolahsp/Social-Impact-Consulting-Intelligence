@@ -1,76 +1,50 @@
 {
   "findings": [
     {
-      "finding_id": "F-001",
+      "finding_id": "F-OPS-001",
       "domain": "operations_cx",
-      "finding": "The organization provides a digital entry point for prospective volunteers through its website.",
+      "finding": "The organization provides a publicly visible digital entry point for prospective volunteers.",
       "evidence_ids": [
         "EV-001"
       ],
       "finding_type": "observed",
       "confidence": 0.86,
       "requires_validation": false,
-      "validation_question": null
+      "validation_question": null,
+      "journey": "volunteer",
+      "journey_stage": "application",
+      "journey_stage_status": "observed"
     },
     {
-      "finding_id": "F-002",
+      "finding_id": "F-OPS-002",
       "domain": "operations_cx",
-      "finding": "Observable communication mechanism: Volunteer applications are collected through a public website form.",
+      "finding": "Public evidence does not establish the internal volunteer process at the follow_up stage.",
       "evidence_ids": [
-        "EV-001"
-      ],
-      "finding_type": "observed",
-      "confidence": 0.85,
-      "requires_validation": false,
-      "validation_question": null
-    },
-    {
-      "finding_id": "F-003",
-      "domain": "operations_cx",
-      "finding": "The internal volunteer intake and qualification process after application submission is not publicly described.",
-      "evidence_ids": [
-        "EV-001"
+        "EV-003"
       ],
       "finding_type": "unknown",
-      "confidence": 0.7,
+      "confidence": 0.55,
       "requires_validation": true,
-      "validation_question": "After a volunteer submits an application, what is the internal process for review, qualification, and onboarding?"
+      "validation_question": "What happens internally after a volunteer application is submitted, including assignment, acknowledgement, and follow-up?",
+      "journey": "volunteer",
+      "journey_stage": "follow_up",
+      "journey_stage_status": "unknown"
     },
     {
-      "finding_id": "F-004",
+      "finding_id": "F-OPS-003",
       "domain": "operations_cx",
-      "finding": "The organization's internal approach to workflow automation cannot be determined from public information.",
+      "finding": "The handoffs between public volunteer application submission and first follow-up may involve internal coordination steps that are not visible in public evidence.",
       "evidence_ids": [
-        "EV-001"
+        "EV-001",
+        "EV-003"
       ],
-      "finding_type": "unknown",
-      "confidence": 0.5,
+      "finding_type": "hypothesis",
+      "confidence": 0.42,
       "requires_validation": true,
-      "validation_question": "Are volunteer and donor workflows currently automated or managed manually?"
-    },
-    {
-      "finding_id": "F-005",
-      "domain": "operations_cx",
-      "finding": "The organization's internal approach to data integration cannot be determined from public information.",
-      "evidence_ids": [
-        "EV-001"
-      ],
-      "finding_type": "unknown",
-      "confidence": 0.5,
-      "requires_validation": true,
-      "validation_question": "How is stakeholder data integrated across different systems?"
-    },
-    {
-      "finding_id": "F-006",
-      "domain": "operations_cx",
-      "finding": "The organization's internal approach to follow-up tracking cannot be determined from public information.",
-      "evidence_ids": [
-        "EV-001"
-      ],
-      "finding_type": "unknown",
-      "confidence": 0.5,
-      "requires_validation": true,
-      "validation_question": "How does the organization track follow-up communications with stakeholders?"
+      "validation_question": "How are volunteer applications assigned, acknowledged, qualified, and followed up after submission?",
+      "journey": "volunteer",
+      "journey_stage": "application_to_follow_up",
+      "journey_stage_status": "hypothesis"
     }
   ]
 }

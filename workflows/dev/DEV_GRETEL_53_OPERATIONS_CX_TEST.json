@@ -1,0 +1,137 @@
+{
+  "name": "DEV_GRETEL_53_OPERATIONS_CX_TEST",
+  "nodes": [
+    {
+      "parameters": {
+        "content": "DEV_GRETEL_53_OPERATIONS_CX_TEST\nImport after 53, link its Execute Sub-workflow node, then run manually.\nThe test proves leaf output and later composition with the unchanged Paola envelope.\nNo workflow IDs, credentials, or production data are committed.",
+        "height": 350,
+        "width": 580,
+        "color": 4
+      },
+      "id": "00_readme__dev_workflow",
+      "name": "00_README__DEV_WORKFLOW",
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [
+        -520,
+        -360
+      ]
+    },
+    {
+      "parameters": {},
+      "id": "start__manual_test_trigger",
+      "name": "START__MANUAL_TEST_TRIGGER",
+      "type": "n8n-nodes-base.manualTrigger",
+      "typeVersion": 1,
+      "position": [
+        0,
+        0
+      ]
+    },
+    {
+      "parameters": {
+        "jsCode": "// DEV fixture embedded from fixtures/paola_track_output.json.\nconst fixture = {\"run_context\":{\"run_id\":\"RUN-FICTIONAL-001\",\"organization\":{\"name\":\"Fictional River Learning Collective\",\"website\":\"https://fictional-river-learning.example.org\",\"country\":\"Germany\",\"mission_area\":\"youth education\"},\"current_challenge\":\"Preparing for a pre-engagement diagnostic workshop\",\"uploaded_document_refs\":[],\"status\":\"analyzing\",\"started_at\":\"2026-08-09T09:00:00Z\",\"errors\":[]},\"sources\":[{\"source_id\":\"SRC-001\",\"title\":\"Fictional River Learning Collective Volunteer Page\",\"url\":\"https://fictional-river-learning.example.org/volunteer\",\"source_type\":\"official_website\",\"publisher\":\"Fictional River Learning Collective\",\"publication_date\":null,\"retrieved_at\":\"2026-08-09T09:10:00Z\",\"authority_level\":\"official\",\"freshness\":\"current\",\"is_official\":true},{\"source_id\":\"SRC-002\",\"title\":\"Fictional River Learning Collective Annual Snapshot\",\"url\":\"https://fictional-river-learning.example.org/annual-snapshot\",\"source_type\":\"public_report\",\"publisher\":\"Fictional River Learning Collective\",\"publication_date\":\"2026-03-01\",\"retrieved_at\":\"2026-08-09T09:14:00Z\",\"authority_level\":\"official\",\"freshness\":\"recent\",\"is_official\":true}],\"evidence\":[{\"evidence_id\":\"EV-001\",\"run_id\":\"RUN-FICTIONAL-001\",\"claim\":\"Volunteer applications are collected through a public website form.\",\"source_ids\":[\"SRC-001\"],\"domain\":\"operations_cx\",\"evidence_type\":\"fact\",\"confidence\":0.86,\"status\":\"supported\",\"contradiction_ids\":[],\"requires_validation\":false},{\"evidence_id\":\"EV-002\",\"run_id\":\"RUN-FICTIONAL-001\",\"claim\":\"The organization describes grant funding and small donor support in its annual snapshot.\",\"source_ids\":[\"SRC-002\"],\"domain\":\"revenue_resilience\",\"evidence_type\":\"fact\",\"confidence\":0.78,\"status\":\"supported\",\"contradiction_ids\":[],\"requires_validation\":false},{\"evidence_id\":\"EV-003\",\"run_id\":\"RUN-FICTIONAL-001\",\"claim\":\"The internal volunteer follow-up process is not described in public sources.\",\"source_ids\":[\"SRC-001\"],\"domain\":\"operations_cx\",\"evidence_type\":\"unknown\",\"confidence\":0.7,\"status\":\"unknown\",\"contradiction_ids\":[],\"requires_validation\":true}],\"findings\":[{\"finding_id\":\"F-001\",\"domain\":\"operations_cx\",\"finding\":\"The public volunteer journey includes an online application form.\",\"evidence_ids\":[\"EV-001\"],\"finding_type\":\"observed\",\"confidence\":0.82,\"requires_validation\":false,\"validation_question\":null},{\"finding_id\":\"F-002\",\"domain\":\"revenue_resilience\",\"finding\":\"Public reporting indicates more than one revenue signal, but the concentration of funding is not publicly visible.\",\"evidence_ids\":[\"EV-002\"],\"finding_type\":\"inferred\",\"confidence\":0.58,\"requires_validation\":true,\"validation_question\":\"What share of annual income comes from the largest funding source?\"}],\"unknowns\":[{\"unknown_id\":\"UNK-001\",\"domain\":\"operations_cx\",\"description\":\"The internal follow-up process after volunteer form submission is not publicly visible.\",\"evidence_ids\":[\"EV-003\"]},{\"unknown_id\":\"UNK-002\",\"domain\":\"revenue_resilience\",\"description\":\"Funding concentration cannot be determined from the public annual snapshot.\",\"evidence_ids\":[\"EV-002\"]}],\"contradictions\":[],\"rag_metadata\":{\"retrieval_run_id\":\"RAG-FICTIONAL-001\",\"domains\":[\"revenue_resilience\",\"operations_cx\"],\"retrieved_context_ids\":[\"FRAMEWORK-REV-001\",\"FRAMEWORK-OPS-001\"]}};\nreturn [{ json: fixture }];\n"
+      },
+      "id": "dev_input__paola_track_fixture",
+      "name": "DEV_INPUT__PAOLA_TRACK_FIXTURE",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        260,
+        0
+      ]
+    },
+    {
+      "parameters": {
+        "workflowId": "",
+        "options": {}
+      },
+      "id": "todo_link_subworkflow__53_operations_cx",
+      "name": "TODO_LINK_SUBWORKFLOW__53_OPERATIONS_CX",
+      "type": "n8n-nodes-base.executeWorkflow",
+      "typeVersion": 1,
+      "position": [
+        560,
+        0
+      ],
+      "notes": "AFTER IMPORT: select 53_OPERATIONS_CX_AGENT. No live workflow ID is committed."
+    },
+    {
+      "parameters": {
+        "jsCode": "const leaf = items[0]?.json ?? {};\nconst original = $('DEV_INPUT__PAOLA_TRACK_FIXTURE').first().json;\nif (!Array.isArray(leaf.findings)) throw new Error('DEV expected 53 leaf findings[]');\nconst allIds = [...original.findings.map(f => f.finding_id), ...leaf.findings.map(f => f.finding_id)];\nif (new Set(allIds).size !== allIds.length) throw new Error('DEV composition found a finding ID collision');\nconst evidenceIds = new Set(original.evidence.map(ev => ev.evidence_id));\nif (!leaf.findings.every(f => f.evidence_ids.every(id => evidenceIds.has(id)))) throw new Error('DEV composition found dangling evidence reference');\nconst composed = { ...original, findings: [...original.findings, ...leaf.findings] };\nreturn [{ json: {\n  leaf_output: leaf,\n  composed_payload: composed,\n  composition_check: {\n    upstream_context_preserved: ['run_context','sources','evidence','unknowns','contradictions','rag_metadata'].every(key => composed[key] === original[key]),\n    upstream_finding_count: original.findings.length,\n    operations_finding_count: leaf.findings.length,\n    composed_finding_count: composed.findings.length,\n    finding_ids_unique: true,\n    evidence_references_valid: true\n  }\n} }];\n"
+      },
+      "id": "compose__53_findings_with_original_envelope",
+      "name": "COMPOSE__53_FINDINGS_WITH_ORIGINAL_ENVELOPE",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        860,
+        0
+      ]
+    },
+    {
+      "parameters": {
+        "jsCode": "const result = items[0].json;\nconst findings = result.leaf_output.findings;\nfor (const type of ['observed', 'unknown', 'hypothesis']) {\n  if (!findings.some(finding => finding.finding_type === type)) throw new Error(`DEV fixture requires one ${type} finding`);\n}\nif (!result.composition_check.upstream_context_preserved) throw new Error('DEV composition lost Paola context');\nreturn items;\n"
+      },
+      "id": "final__assert_53_and_composition",
+      "name": "FINAL__ASSERT_53_AND_COMPOSITION",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        1160,
+        0
+      ]
+    }
+  ],
+  "connections": {
+    "START__MANUAL_TEST_TRIGGER": {
+      "main": [
+        [
+          {
+            "node": "DEV_INPUT__PAOLA_TRACK_FIXTURE",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "DEV_INPUT__PAOLA_TRACK_FIXTURE": {
+      "main": [
+        [
+          {
+            "node": "TODO_LINK_SUBWORKFLOW__53_OPERATIONS_CX",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "TODO_LINK_SUBWORKFLOW__53_OPERATIONS_CX": {
+      "main": [
+        [
+          {
+            "node": "COMPOSE__53_FINDINGS_WITH_ORIGINAL_ENVELOPE",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "COMPOSE__53_FINDINGS_WITH_ORIGINAL_ENVELOPE": {
+      "main": [
+        [
+          {
+            "node": "FINAL__ASSERT_53_AND_COMPOSITION",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": false,
+  "settings": {
+    "executionOrder": "v1"
+  },
+  "pinData": {}
+}

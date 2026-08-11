@@ -3,9 +3,9 @@
   "nodes": [
     {
       "parameters": {
-        "content": "PURPOSE\nAssess publicly observable operations and stakeholder experience signals.\n\nOWNER\nGRETEL TRACK B\n\nINPUT CONTRACT\npublic operations/CX evidence plus operations RAG context\n\nOUTPUT CONTRACT\nfinding.schema.json[] for operations/CX with validation questions\n\nSTATUS\nSkeleton only. Inactive by default. No credentials. Configure TODO nodes after import.",
-        "height": 340,
-        "width": 520,
+        "content": "PURPOSE\nConvert public Operations/CX evidence into traceable observed, inferred, hypothesis, and unknown findings.\n\nOWNER\nGRETEL TRACK B\n\nINPUT\nFlat Paola track handoff.\n\nOUTPUT\n{ findings: finding.schema.json[] }\n\nSTATUS\nPhase 2C repository-ready. Inactive. No credentials or workflow IDs.",
+        "height": 390,
+        "width": 600,
         "color": 4
       },
       "id": "00_readme__purpose_owner_contracts_status",
@@ -13,8 +13,24 @@
       "type": "n8n-nodes-base.stickyNote",
       "typeVersion": 1,
       "position": [
-        -420,
-        -320
+        -580,
+        -420
+      ]
+    },
+    {
+      "parameters": {
+        "content": "Evidence Input -> strict Operations/CX Domain Filter -> Journey Signal Extraction -> Observed / Inferred / Hypothesis / Unknown Classification -> modular Finding Construction -> ID + evidence validation -> Leaf Output.\n\nOBSERVABLE SIGNAL != INTERNAL PROCESS FACT\nJourney before technology. No recommendations.",
+        "height": 360,
+        "width": 600,
+        "color": 5
+      },
+      "id": "note__visible_operations_path",
+      "name": "NOTE__VISIBLE_OPERATIONS_PATH",
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [
+        -580,
+        20
       ]
     },
     {
@@ -30,10 +46,10 @@
     },
     {
       "parameters": {
-        "jsCode": "// INPUT_CONTRACT__PUBLIC_OPERATIONS_EVIDENCE\n// Accept evidence array and sources from Paola track output.\n// Input structure: { evidence: [], sources: [], run_context: {} }\n// Pass through with validation.\nif (!Array.isArray($input.all()[0].evidence)) {\n  throw new Error('Input must contain evidence array');\n}\nreturn $input.all();\n"
+        "jsCode": "const payload = items[0]?.json;\nif (!payload || typeof payload !== 'object' || Array.isArray(payload)) {\n  throw new Error('53 input requires one canonical n8n item: { json: payload }');\n}\nfor (const key of ['sources', 'evidence', 'findings', 'unknowns', 'contradictions']) {\n  if (!Array.isArray(payload[key])) throw new Error(`53 input requires ${key}[]`);\n}\nif (!payload.run_context || typeof payload.run_context !== 'object' || !payload.run_context.run_id) {\n  throw new Error('53 input requires run_context.run_id');\n}\nif (!payload.rag_metadata || typeof payload.rag_metadata !== 'object' || Array.isArray(payload.rag_metadata)) {\n  throw new Error('53 input requires rag_metadata object');\n}\nconst evidenceIds = payload.evidence.map(ev => ev?.evidence_id);\nif (evidenceIds.some(id => typeof id !== 'string' || !/^EV-/.test(id))) {\n  throw new Error('53 input evidence records require valid evidence_id values');\n}\nif (new Set(evidenceIds).size !== evidenceIds.length) throw new Error('53 input contains duplicate evidence IDs');\nconst findingIds = payload.findings.map(finding => finding?.finding_id);\nif (findingIds.some(id => typeof id !== 'string' || !/^F-/.test(id))) {\n  throw new Error('53 input findings require valid finding_id values');\n}\nif (new Set(findingIds).size !== findingIds.length) throw new Error('53 input contains duplicate finding IDs');\nreturn [{ json: { context: payload } }];\n"
       },
-      "id": "input_contract__public_operations_evidence",
-      "name": "INPUT_CONTRACT__PUBLIC_OPERATIONS_EVIDENCE",
+      "id": "evidence_input__paola_track_handoff",
+      "name": "EVIDENCE_INPUT__PAOLA_TRACK_HANDOFF",
       "type": "n8n-nodes-base.code",
       "typeVersion": 2,
       "position": [
@@ -43,10 +59,10 @@
     },
     {
       "parameters": {
-        "jsCode": "// FILTER_OPERATIONS_DOMAIN\n// Extract evidence relevant to operations_cx domain.\nconst input = $input.all()[0];\nconst evidence = input.evidence || [];\nconst sources = input.sources || [];\n\n// Keywords indicating operations/CX relevance\nconst opsKeywords = [\n  'volunteer', 'donor', 'application', 'form', 'process', 'workflow',\n  'journey', 'follow-up', 'followup', 'contact', 'email', 'phone',\n  'communication', 'automation', 'crm', 'database', 'tracking',\n  'onboarding', 'stakeholder', 'experience', 'customer'\n];\n\nconst opsEvidence = evidence.filter(ev => {\n  const claim = (ev.claim || '').toLowerCase();\n  const domain = ev.domain || '';\n  return domain === 'operations_cx' || \n         opsKeywords.some(kw => claim.includes(kw));\n});\n\nreturn [{ evidence: opsEvidence, sources: sources, run_context: input.run_context, all_evidence: evidence }];\n"
+        "jsCode": "const context = items[0].json.context;\nconst evidenceById = new Map(context.evidence.map(ev => [ev.evidence_id, ev]));\nfor (const ev of context.evidence) {\n  for (const linkedId of ev.contradiction_ids || []) {\n    if (!evidenceById.has(linkedId)) throw new Error(`Evidence ${ev.evidence_id} references missing contradiction evidence ${linkedId}`);\n  }\n}\nconst operationsEvidence = context.evidence.filter(ev => ev.domain === 'operations_cx');\nconst operationsEvidenceIds = new Set(operationsEvidence.map(ev => ev.evidence_id));\nconst operationsUnknowns = context.unknowns.filter(unknown =>\n  unknown?.domain === 'operations_cx' ||\n  (unknown?.evidence_ids || []).some(id => operationsEvidenceIds.has(id))\n);\nconst operationsContradictions = context.contradictions.filter(contradiction => {\n  const ids = [...(contradiction?.evidence_ids || []), ...(contradiction?.contradiction_ids || [])];\n  return ids.some(id => operationsEvidenceIds.has(id));\n});\nfor (const ev of operationsEvidence) {\n  if (ev.status === 'contradicted' || (ev.contradiction_ids || []).length) {\n    operationsContradictions.push({\n      evidence_ids: [ev.evidence_id, ...(ev.contradiction_ids || [])],\n      description: `Contradiction state attached to ${ev.evidence_id}`\n    });\n  }\n}\nreturn [{ json: {\n  context,\n  operations_evidence: operationsEvidence,\n  operations_unknowns: operationsUnknowns,\n  operations_contradictions: operationsContradictions\n} }];\n"
       },
-      "id": "todo_agent__operations_cx",
-      "name": "FILTER_OPERATIONS_DOMAIN",
+      "id": "domain_filter__operations_cx_only",
+      "name": "DOMAIN_FILTER__OPERATIONS_CX_ONLY",
       "type": "n8n-nodes-base.code",
       "typeVersion": 2,
       "position": [
@@ -56,10 +72,10 @@
     },
     {
       "parameters": {
-        "jsCode": "// CLASSIFY_EVIDENCE\n// Classify evidence as observable (fact), inferred, unknown, or hypothesis.\nconst input = $input.all()[0];\nconst evidence = input.evidence || [];\nconst classified = {};\n\nevidence.forEach(ev => {\n  const type = ev.evidence_type || 'unknown';\n  if (!classified[type]) classified[type] = [];\n  classified[type].push(ev);\n});\n\nreturn [{ \n  observable: classified.fact || [],\n  inferred_signals: classified.inferred || [],\n  unknowns: classified.unknown || [],\n  sources: input.sources,\n  run_context: input.run_context,\n  all_evidence: input.all_evidence\n}];\n"
+        "jsCode": "function journey(claim) {\n  if (/\\bvolunteer|volunteering\\b/i.test(claim)) return 'volunteer';\n  if (/\\bdonor|donation|donate|giving|contribute\\b/i.test(claim)) return 'donor';\n  return 'stakeholder';\n}\nfunction stage(claim, journeyName) {\n  if (/follow[- ]?up|first response|re-?engag/i.test(claim)) return 'follow_up';\n  if (/acknowledg|confirm|receipt/i.test(claim)) return 'acknowledgement';\n  if (/qualif|screen|interview|review/i.test(claim)) return 'qualification';\n  if (/onboard|orientation/i.test(claim)) return 'onboarding';\n  if (/feedback|survey/i.test(claim)) return 'feedback';\n  if (/application|apply|form|submit/i.test(claim) && journeyName === 'volunteer') return 'application';\n  if (/donat|donate|giving|contribute|payment/i.test(claim) && journeyName === 'donor') return 'donation';\n  if (/impact (update|report)|newsletter/i.test(claim)) return 'impact_communication';\n  if (/email|phone|contact|message|chat/i.test(claim)) return 'contact';\n  if (/participat|program|role/i.test(claim)) return 'participation';\n  return 'visible_signal';\n}\nfunction classification(ev) {\n  const contradicted = ev.status === 'contradicted' || (ev.contradiction_ids || []).length > 0;\n  if (contradicted || ev.evidence_type === 'unknown' || ev.status === 'unknown' || ev.status === 'insufficient_evidence') return 'unknown';\n  if (ev.evidence_type === 'hypothesis') return 'hypothesis';\n  if (ev.evidence_type === 'inference' || ev.status === 'partially_supported') return 'inferred';\n  if (ev.evidence_type === 'fact' && ev.status === 'supported' && ev.requires_validation === false) return 'observed';\n  return 'unknown';\n}\nconst signals = items[0].json.operations_evidence.map(ev => {\n  const journeyName = journey(ev.claim || '');\n  const signalClass = classification(ev);\n  return {\n    evidence_id: ev.evidence_id,\n    claim: ev.claim || '',\n    journey: journeyName,\n    stage: stage(ev.claim || '', journeyName),\n    classification: signalClass,\n    confidence: Number(ev.confidence || 0),\n    requires_validation: signalClass !== 'observed' || ev.requires_validation === true\n  };\n});\nreturn [{ json: { ...items[0].json, journey_signals: signals } }];\n"
       },
-      "id": "observable_finding",
-      "name": "CLASSIFY_EVIDENCE",
+      "id": "journey_signal_extraction",
+      "name": "JOURNEY_SIGNAL_EXTRACTION",
       "type": "n8n-nodes-base.code",
       "typeVersion": 2,
       "position": [
@@ -69,10 +85,10 @@
     },
     {
       "parameters": {
-        "jsCode": "// BUILD_FINDINGS\n// Construct findings from classified evidence.\nconst input = $input.all()[0];\nconst findings = [];\nlet findingCounter = 0;\n\nconst makeId = () => `F-${String(++findingCounter).padStart(3, '0')}`;\n\n// Observable findings (type: fact → finding_type: observed)\ninput.observable.forEach(ev => {\n  const claim = ev.claim || '';\n  const confidence = ev.confidence || 0.7;\n  \n  // Pattern: digital entry points\n  if (claim.toLowerCase().includes('application') || claim.toLowerCase().includes('form')) {\n    if (claim.toLowerCase().includes('volunteer')) {\n      findings.push({\n        finding_id: makeId(),\n        domain: 'operations_cx',\n        finding: 'The organization provides a digital entry point for prospective volunteers through its website.',\n        evidence_ids: [ev.evidence_id],\n        finding_type: 'observed',\n        confidence: Math.min(confidence, 0.9),\n        requires_validation: false,\n        validation_question: null\n      });\n    }\n  }\n  \n  // Pattern: communication mechanisms\n  if (claim.toLowerCase().match(/(email|phone|contact|communication|website)/)) {\n    findings.push({\n      finding_id: makeId(),\n      domain: 'operations_cx',\n      finding: `Observable communication mechanism: ${claim}`,\n      evidence_ids: [ev.evidence_id],\n      finding_type: 'observed',\n      confidence: Math.min(confidence, 0.85),\n      requires_validation: false,\n      validation_question: null\n    });\n  }\n});\n\n// Inferred findings (multiple signals suggest pattern)\nif (input.observable.length >= 2) {\n  const volunteerEvidence = input.observable.filter(e => e.claim.toLowerCase().includes('volunteer'));\n  if (volunteerEvidence.length >= 2) {\n    findings.push({\n      finding_id: makeId(),\n      domain: 'operations_cx',\n      finding: 'The organization has established processes for volunteer recruitment and engagement, evidenced by public volunteer channels.',\n      evidence_ids: volunteerEvidence.slice(0, 2).map(e => e.evidence_id),\n      finding_type: 'inferred',\n      confidence: 0.65,\n      requires_validation: true,\n      validation_question: 'Can you describe the complete volunteer journey from initial interest to active participation?'\n    });\n  }\n}\n\n// Unknown findings (public signals imply hidden internal processes)\ninput.observable.forEach(ev => {\n  const claim = ev.claim.toLowerCase();\n  \n  // Application exists → internal process is unknown\n  if (claim.includes('application') || claim.includes('form')) {\n    if (claim.includes('volunteer')) {\n      findings.push({\n        finding_id: makeId(),\n        domain: 'operations_cx',\n        finding: 'The internal volunteer intake and qualification process after application submission is not publicly described.',\n        evidence_ids: [ev.evidence_id],\n        finding_type: 'unknown',\n        confidence: 0.7,\n        requires_validation: true,\n        validation_question: 'After a volunteer submits an application, what is the internal process for review, qualification, and onboarding?'\n      });\n    }\n  }\n});\n\n// Generic unknowns for processes always hidden\nif (input.observable.length >= 2) {\n  const genericUnknowns = [\n    {\n      finding: 'The organization\\'s internal approach to workflow automation cannot be determined from public information.',\n      question: 'Are volunteer and donor workflows currently automated or managed manually?'\n    },\n    {\n      finding: 'The organization\\'s internal approach to data integration cannot be determined from public information.',\n      question: 'How is stakeholder data integrated across different systems?'\n    },\n    {\n      finding: 'The organization\\'s internal approach to follow-up tracking cannot be determined from public information.',\n      question: 'How does the organization track follow-up communications with stakeholders?'\n    }\n  ];\n  \n  genericUnknowns.forEach(u => {\n    findings.push({\n      finding_id: makeId(),\n      domain: 'operations_cx',\n      finding: u.finding,\n      evidence_ids: [input.observable[0].evidence_id],\n      finding_type: 'unknown',\n      confidence: 0.5,\n      requires_validation: true,\n      validation_question: u.question\n    });\n  });\n}\n\nreturn [{ findings: findings, finding_count: findings.length }];\n"
+        "jsCode": "const buckets = { observed: [], inferred: [], hypothesis: [], unknown: [] };\nfor (const signal of items[0].json.journey_signals) buckets[signal.classification].push(signal);\nconst journeyMap = items[0].json.journey_signals.map(signal => ({\n  journey: signal.journey,\n  stage: signal.stage,\n  status: signal.classification,\n  evidence_ids: [signal.evidence_id]\n}));\nreturn [{ json: { ...items[0].json, classified_signals: buckets, journey_map: journeyMap } }];\n"
       },
-      "id": "hypothesis_builder",
-      "name": "BUILD_FINDINGS",
+      "id": "classify__observed_inferred_hypothesis_unknown",
+      "name": "CLASSIFY__OBSERVED_INFERRED_HYPOTHESIS_UNKNOWN",
       "type": "n8n-nodes-base.code",
       "typeVersion": 2,
       "position": [
@@ -82,10 +98,10 @@
     },
     {
       "parameters": {
-        "jsCode": "// VALIDATE_FINDINGS\n// Verify findings comply with contract.\nconst input = $input.all()[0];\nconst findings = input.findings || [];\nconst errors = [];\n\nfindings.forEach((f, i) => {\n  if (!f.finding_id || !f.finding_id.startsWith('F-')) {\n    errors.push(`Finding[${i}]: invalid ID`);\n  }\n  if (f.domain !== 'operations_cx') {\n    errors.push(`Finding[${i}]: domain must be operations_cx`);\n  }\n  if (!['observed', 'inferred', 'unknown', 'hypothesis'].includes(f.finding_type)) {\n    errors.push(`Finding[${i}]: invalid finding_type`);\n  }\n  if (!(f.confidence >= 0 && f.confidence <= 1)) {\n    errors.push(`Finding[${i}]: confidence must be 0-1`);\n  }\n  if (typeof f.requires_validation !== 'boolean') {\n    errors.push(`Finding[${i}]: requires_validation must be boolean`);\n  }\n  if (f.requires_validation && !f.validation_question) {\n    errors.push(`Finding[${i}]: requires_validation=true but no validation_question`);\n  }\n});\n\nif (errors.length > 0) {\n  throw new Error(`Validation failed: ${errors.join('; ')}`);\n}\n\nreturn input;\n"
+        "jsCode": "function statement(signal) {\n  if (signal.journey === 'volunteer' && signal.stage === 'application') {\n    return 'The organization provides a publicly visible digital entry point for prospective volunteers.';\n  }\n  if (signal.journey === 'donor' && signal.stage === 'donation') {\n    return 'The organization provides a publicly visible donation entry point.';\n  }\n  if (signal.stage === 'contact') return 'The organization publishes a stakeholder contact route.';\n  return `A publicly visible ${signal.journey} journey signal is present at the ${signal.stage} stage.`;\n}\nconst grouped = new Map();\nfor (const signal of items[0].json.classified_signals.observed) {\n  const key = `${signal.journey}:${signal.stage}`;\n  if (!grouped.has(key)) grouped.set(key, []);\n  grouped.get(key).push(signal);\n}\nconst candidates = [];\nfor (const group of grouped.values()) {\n  const first = group[0];\n  candidates.push({\n    domain: 'operations_cx',\n    finding: statement(first),\n    evidence_ids: [...new Set(group.map(signal => signal.evidence_id))],\n    finding_type: 'observed',\n    confidence: Math.min(0.9, ...group.map(signal => signal.confidence)),\n    requires_validation: false,\n    validation_question: null,\n    journey: first.journey,\n    journey_stage: first.stage,\n    journey_stage_status: 'observed'\n  });\n}\nreturn [{ json: { ...items[0].json, candidate_findings: candidates } }];\n"
       },
-      "id": "validation_question",
-      "name": "VALIDATE_FINDINGS",
+      "id": "build__observed_findings",
+      "name": "BUILD__OBSERVED_FINDINGS",
       "type": "n8n-nodes-base.code",
       "typeVersion": 2,
       "position": [
@@ -95,14 +111,66 @@
     },
     {
       "parameters": {
-        "jsCode": "// OUTPUT_CONTRACT__OPERATIONS_CX_FINDINGS\n// Return structured findings array.\nconst input = $input.all()[0];\nreturn [{ findings: input.findings }];\n"
+        "jsCode": "function question(journey, stage) {\n  if (journey === 'volunteer' && ['application', 'acknowledgement', 'follow_up'].includes(stage)) {\n    return 'What happens internally after a volunteer application is submitted, including assignment, acknowledgement, and follow-up?';\n  }\n  if (journey === 'donor') return 'What happens after a donation is received, including confirmation, follow-up, and re-engagement?';\n  return `How does the ${journey} journey work internally at and after the ${stage} stage?`;\n}\nconst candidates = [...items[0].json.candidate_findings];\nconst usedUnknownEvidence = new Set();\nfor (const signal of [...items[0].json.classified_signals.inferred, ...items[0].json.classified_signals.unknown]) {\n  const type = signal.classification === 'inferred' ? 'inferred' : 'unknown';\n  const text = type === 'inferred'\n    ? `Public signals suggest a ${signal.journey} journey pattern at the ${signal.stage} stage, but the pattern requires validation.`\n    : `Public evidence does not establish the internal ${signal.journey} process at the ${signal.stage} stage.`;\n  candidates.push({\n    domain: 'operations_cx', finding: text, evidence_ids: [signal.evidence_id], finding_type: type,\n    confidence: Math.min(type === 'inferred' ? 0.6 : 0.55, signal.confidence || 0.4),\n    requires_validation: true, validation_question: question(signal.journey, signal.stage),\n    journey: signal.journey, journey_stage: signal.stage, journey_stage_status: type\n  });\n  if (type === 'unknown') usedUnknownEvidence.add(signal.evidence_id);\n}\nconst actualEvidenceIds = new Set(items[0].json.operations_evidence.map(ev => ev.evidence_id));\nfor (const unknown of items[0].json.operations_unknowns) {\n  const ids = [...new Set((unknown.evidence_ids || []).filter(id => actualEvidenceIds.has(id)))];\n  if (!ids.length || ids.every(id => usedUnknownEvidence.has(id))) continue;\n  candidates.push({\n    domain: 'operations_cx',\n    finding: `Public evidence leaves an Operations/CX process unknown: ${unknown.description}`,\n    evidence_ids: ids, finding_type: 'unknown', confidence: 0.45, requires_validation: true,\n    validation_question: 'What is the current internal process for this publicly unobservable part of the stakeholder journey?',\n    journey: 'stakeholder', journey_stage: 'unknown_internal_process', journey_stage_status: 'unknown'\n  });\n}\nfor (const contradiction of items[0].json.operations_contradictions) {\n  const ids = [...new Set([...(contradiction.evidence_ids || []), ...(contradiction.contradiction_ids || [])].filter(id => actualEvidenceIds.has(id)))];\n  if (!ids.length) continue;\n  candidates.push({\n    domain: 'operations_cx', finding: 'Public Operations/CX evidence is contradictory, so the current process state cannot be determined.',\n    evidence_ids: ids, finding_type: 'unknown', confidence: 0.35, requires_validation: true,\n    validation_question: 'Which description of the current stakeholder process is accurate, and what explains the conflicting public signals?',\n    journey: 'stakeholder', journey_stage: 'contradiction', journey_stage_status: 'unknown'\n  });\n}\nreturn [{ json: { ...items[0].json, candidate_findings: candidates } }];\n"
+      },
+      "id": "build__inferred_and_unknown_findings",
+      "name": "BUILD__INFERRED_AND_UNKNOWN_FINDINGS",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        1760,
+        0
+      ]
+    },
+    {
+      "parameters": {
+        "jsCode": "const candidates = [...items[0].json.candidate_findings];\nconst observed = items[0].json.classified_signals.observed;\nconst unknown = items[0].json.classified_signals.unknown;\nconst volunteerEntry = observed.find(signal => signal.journey === 'volunteer' && signal.stage === 'application');\nconst volunteerGap = unknown.find(signal => signal.journey === 'volunteer' && ['acknowledgement', 'qualification', 'onboarding', 'follow_up'].includes(signal.stage));\nif (volunteerEntry && volunteerGap) {\n  candidates.push({\n    domain: 'operations_cx',\n    finding: 'The handoffs between public volunteer application submission and first follow-up may involve internal coordination steps that are not visible in public evidence.',\n    evidence_ids: [...new Set([volunteerEntry.evidence_id, volunteerGap.evidence_id])],\n    finding_type: 'hypothesis', confidence: 0.42, requires_validation: true,\n    validation_question: 'How are volunteer applications assigned, acknowledged, qualified, and followed up after submission?',\n    journey: 'volunteer', journey_stage: 'application_to_follow_up', journey_stage_status: 'hypothesis'\n  });\n}\nconst donorEntry = observed.find(signal => signal.journey === 'donor' && signal.stage === 'donation');\nconst donorGap = unknown.find(signal => signal.journey === 'donor');\nif (donorEntry && donorGap) {\n  candidates.push({\n    domain: 'operations_cx',\n    finding: 'The handoffs after the public donation step may include internal coordination that is not visible in public evidence.',\n    evidence_ids: [...new Set([donorEntry.evidence_id, donorGap.evidence_id])],\n    finding_type: 'hypothesis', confidence: 0.4, requires_validation: true,\n    validation_question: 'How are donations confirmed, assigned for follow-up, and connected to later donor communication?',\n    journey: 'donor', journey_stage: 'donation_to_reengagement', journey_stage_status: 'hypothesis'\n  });\n}\nreturn [{ json: { ...items[0].json, candidate_findings: candidates } }];\n"
+      },
+      "id": "build__validation_hypotheses",
+      "name": "BUILD__VALIDATION_HYPOTHESES",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        2060,
+        0
+      ]
+    },
+    {
+      "parameters": {
+        "jsCode": "const usedIds = new Set(items[0].json.context.findings.map(finding => finding.finding_id));\nlet counter = 0;\nfunction nextId() {\n  let id;\n  do id = `F-OPS-${String(++counter).padStart(3, '0')}`; while (usedIds.has(id));\n  usedIds.add(id);\n  return id;\n}\nconst seen = new Set();\nconst findings = [];\nfor (const candidate of items[0].json.candidate_findings) {\n  const evidenceIds = [...new Set(candidate.evidence_ids)].sort();\n  const key = `${candidate.finding_type}|${candidate.finding}|${evidenceIds.join(',')}`;\n  if (seen.has(key)) continue;\n  seen.add(key);\n  findings.push({ finding_id: nextId(), ...candidate, evidence_ids: evidenceIds });\n}\nreturn [{ json: { ...items[0].json, findings } }];\n"
+      },
+      "id": "assign__collision_free_finding_ids",
+      "name": "ASSIGN__COLLISION_FREE_FINDING_IDS",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        2360,
+        0
+      ]
+    },
+    {
+      "parameters": {
+        "jsCode": "const payload = items[0].json;\nconst evidenceById = new Map(payload.context.evidence.map(ev => [ev.evidence_id, ev]));\nconst upstreamIds = new Set(payload.context.findings.map(finding => finding.finding_id));\nconst generatedIds = new Set();\nconst required = ['finding_id', 'domain', 'finding', 'evidence_ids', 'finding_type', 'confidence', 'requires_validation', 'validation_question'];\nconst allowedTypes = new Set(['observed', 'inferred', 'hypothesis', 'unknown']);\nconst technologyFirst = /\\brecommend|\\bimplement|\\binstall|\\badopt|\\bpurchase|\\bsalesforce|\\bneeds? (?:a )?crm|\\breplace (?:the )?system/i;\nfor (const finding of payload.findings) {\n  if (!required.every(key => Object.prototype.hasOwnProperty.call(finding, key))) throw new Error('53 finding missing required contract field');\n  if (!/^F-OPS-/.test(finding.finding_id) || upstreamIds.has(finding.finding_id) || generatedIds.has(finding.finding_id)) throw new Error(`53 finding ID collision: ${finding.finding_id}`);\n  generatedIds.add(finding.finding_id);\n  if (finding.domain !== 'operations_cx' || !allowedTypes.has(finding.finding_type)) throw new Error('53 finding domain or type invalid');\n  if (typeof finding.finding !== 'string' || !finding.finding.trim()) throw new Error('53 finding text is required');\n  if (!Number.isFinite(finding.confidence) || finding.confidence < 0 || finding.confidence > 1) throw new Error('53 finding confidence must be 0-1');\n  if (typeof finding.requires_validation !== 'boolean') throw new Error('53 finding requires_validation must be boolean');\n  if (!Array.isArray(finding.evidence_ids) || !finding.evidence_ids.length) throw new Error('53 findings require evidence traceability');\n  for (const evidenceId of finding.evidence_ids) {\n    const evidence = evidenceById.get(evidenceId);\n    if (!evidence) throw new Error(`53 finding references missing evidence ${evidenceId}`);\n    if (evidence.domain !== 'operations_cx') throw new Error(`53 finding references cross-domain evidence ${evidenceId}`);\n  }\n  if (finding.finding_type === 'observed') {\n    if (finding.requires_validation || finding.validation_question !== null) throw new Error('Observed findings must remain directly observable');\n    for (const evidenceId of finding.evidence_ids) {\n      const evidence = evidenceById.get(evidenceId);\n      if (evidence.evidence_type !== 'fact' || evidence.status !== 'supported' || evidence.requires_validation !== false || (evidence.contradiction_ids || []).length) {\n        throw new Error('Observed finding is not supported by uncontradicted fact evidence');\n      }\n    }\n  } else if (!finding.requires_validation || typeof finding.validation_question !== 'string' || !finding.validation_question.trim()) {\n    throw new Error(`${finding.finding_type} findings must require a validation question`);\n  }\n  if (finding.finding_type === 'hypothesis' && !/\\bmay\\b|\\bmight\\b|\\bcould\\b/i.test(finding.finding)) throw new Error('Hypothesis wording must remain conditional');\n  if (technologyFirst.test(finding.finding)) throw new Error('53 must not produce technology-first recommendations');\n}\nreturn [{ json: payload }];\n"
+      },
+      "id": "validate__finding_contract_and_traceability",
+      "name": "VALIDATE__FINDING_CONTRACT_AND_TRACEABILITY",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        2660,
+        0
+      ]
+    },
+    {
+      "parameters": {
+        "jsCode": "return [{ json: { findings: items[0].json.findings } }];\n"
       },
       "id": "output_contract__operations_cx_findings",
       "name": "OUTPUT_CONTRACT__OPERATIONS_CX_FINDINGS",
       "type": "n8n-nodes-base.code",
       "typeVersion": 2,
       "position": [
-        1760,
+        2960,
         0
       ]
     }
@@ -112,58 +180,102 @@
       "main": [
         [
           {
-            "node": "INPUT_CONTRACT__PUBLIC_OPERATIONS_EVIDENCE",
+            "node": "EVIDENCE_INPUT__PAOLA_TRACK_HANDOFF",
             "type": "main",
             "index": 0
           }
         ]
       ]
     },
-    "INPUT_CONTRACT__PUBLIC_OPERATIONS_EVIDENCE": {
+    "EVIDENCE_INPUT__PAOLA_TRACK_HANDOFF": {
       "main": [
         [
           {
-            "node": "FILTER_OPERATIONS_DOMAIN",
+            "node": "DOMAIN_FILTER__OPERATIONS_CX_ONLY",
             "type": "main",
             "index": 0
           }
         ]
       ]
     },
-    "FILTER_OPERATIONS_DOMAIN": {
+    "DOMAIN_FILTER__OPERATIONS_CX_ONLY": {
       "main": [
         [
           {
-            "node": "CLASSIFY_EVIDENCE",
+            "node": "JOURNEY_SIGNAL_EXTRACTION",
             "type": "main",
             "index": 0
           }
         ]
       ]
     },
-    "CLASSIFY_EVIDENCE": {
+    "JOURNEY_SIGNAL_EXTRACTION": {
       "main": [
         [
           {
-            "node": "BUILD_FINDINGS",
+            "node": "CLASSIFY__OBSERVED_INFERRED_HYPOTHESIS_UNKNOWN",
             "type": "main",
             "index": 0
           }
         ]
       ]
     },
-    "BUILD_FINDINGS": {
+    "CLASSIFY__OBSERVED_INFERRED_HYPOTHESIS_UNKNOWN": {
       "main": [
         [
           {
-            "node": "VALIDATE_FINDINGS",
+            "node": "BUILD__OBSERVED_FINDINGS",
             "type": "main",
             "index": 0
           }
         ]
       ]
     },
-    "VALIDATE_FINDINGS": {
+    "BUILD__OBSERVED_FINDINGS": {
+      "main": [
+        [
+          {
+            "node": "BUILD__INFERRED_AND_UNKNOWN_FINDINGS",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "BUILD__INFERRED_AND_UNKNOWN_FINDINGS": {
+      "main": [
+        [
+          {
+            "node": "BUILD__VALIDATION_HYPOTHESES",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "BUILD__VALIDATION_HYPOTHESES": {
+      "main": [
+        [
+          {
+            "node": "ASSIGN__COLLISION_FREE_FINDING_IDS",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "ASSIGN__COLLISION_FREE_FINDING_IDS": {
+      "main": [
+        [
+          {
+            "node": "VALIDATE__FINDING_CONTRACT_AND_TRACEABILITY",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "VALIDATE__FINDING_CONTRACT_AND_TRACEABILITY": {
       "main": [
         [
           {

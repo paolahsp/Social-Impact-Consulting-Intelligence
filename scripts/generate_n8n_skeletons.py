@@ -1328,6 +1328,12 @@ def main():
         configure_gretel_p0_workflows(ROOT)
     except ImportError:
         pass
+    try:
+        from configure_gretel_53_n8n_exports import configure_gretel_53_workflows
+
+        configure_gretel_53_workflows(ROOT)
+    except ImportError:
+        pass
     print(f"Generated {len(WORKFLOWS)} workflows and {len(SCHEMAS)} schemas.")
 
 
