@@ -42,9 +42,14 @@ Acceptance criteria:
 
 Before live services are configured, use `fixtures/paola_track_output.json` as Gretel's input fixture and confirm that Gretel's transformation workflows can produce objects shaped like `fixtures/gretel_track_output.json`.
 
+## Workflow 60 Orchestration Tests
+
+- Run `python3 scripts/test_n8n_60_transformation.py` to exercise workflow 60's input, applicability, merge, cumulative post-child guards, final six-collection gate, exact output, and controlled-failure behavior while calling the existing workflow 53 and 61-66 offline harnesses as child boundaries. The harness removes one previously produced collection at every 61-66 boundary and verifies the exact missing collection, failed child, completed workflows, and surviving partial state.
+- Import `DEV_GRETEL_60_TRANSFORMATION_TEST` after linking workflow 60 to 53 and 61-66. Link its three current Execute Sub-workflow nodes to workflow 60; one manual execution must pass normal, insufficient-evidence, and controlled-child-failure branches.
+- Repository validation is not live n8n validation. Record live success only after the DEV workflow and all nested executions complete successfully in the target n8n instance.
+
 ## Safety Checks
 
 - No credentials in workflow JSON.
 - No live Salesforce, WhatsApp, Telegram, CRM, or internal-data integrations.
 - Unknown public evidence remains `unknown` or `requires_validation`.
-

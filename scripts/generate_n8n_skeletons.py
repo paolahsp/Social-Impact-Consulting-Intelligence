@@ -1172,7 +1172,7 @@ WORKFLOW_MAP_ROWS = [
     ("52_IMPACT_EVIDENCE_AGENT", "PAOLA TRACK A", "Impact and evidence analysis", "Impact evidence/RAG", "Impact findings", "40", "Impact agent"),
     ("53_OPERATIONS_CX_AGENT", "GRETEL TRACK B", "Operations and CX analysis", "Operations evidence/RAG", "Operations findings", "40", "Operations/CX agent"),
     ("54_EVIDENCE_GAP_RESEARCH", "PAOLA TRACK A", "Targeted evidence gap research", "Missing evidence request", "New evidence/unknown", "Research providers", "Targeted research API"),
-    ("60_TRANSFORMATION_ORCHESTRATOR", "GRETEL TRACK B", "Coordinates transformation child workflows", "Findings/evidence", "Recommendations/roadmap/questions", "61,62,63,64,65,66", "Sub-workflow links"),
+    ("60_TRANSFORMATION_ORCHESTRATOR", "GRETEL TRACK B", "Coordinates transformation child workflows", "Paola handoff", "Gretel Track output", "53,61,62,63,64,65,66", "Sub-workflow links"),
     ("61_HYPOTHESIS_BUILDER", "GRETEL TRACK B", "Builds explicit hypotheses without upgrading them to facts", "Findings/evidence", "Hypotheses", "50,30", "Hypothesis builder agent"),
     ("62_ROOT_CAUSE_DIAGNOSIS", "GRETEL TRACK B", "Distinguishes observed problems, likely causes, validated causes, and unknowns", "Findings/hypotheses", "Diagnoses", "61", "Root cause agent"),
     ("63_ACTION_DESIGN", "GRETEL TRACK B", "Designs justified actions only where supported", "Diagnoses/priorities", "Actions", "62", "Action design agent"),
@@ -1332,6 +1332,12 @@ def main():
         from configure_gretel_53_n8n_exports import configure_gretel_53_workflows
 
         configure_gretel_53_workflows(ROOT)
+    except ImportError:
+        pass
+    try:
+        from configure_gretel_60_n8n_exports import configure_gretel_60_workflows
+
+        configure_gretel_60_workflows(ROOT)
     except ImportError:
         pass
     print(f"Generated {len(WORKFLOWS)} workflows and {len(SCHEMAS)} schemas.")

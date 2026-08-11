@@ -63,6 +63,7 @@ REQUIRED_DOCS = [
     ROOT / "docs" / "PAOLA_P0_N8N_IMPORT.md",
     ROOT / "docs" / "GRETEL_P0_N8N_IMPORT.md",
     ROOT / "docs" / "GRETEL_53_N8N_IMPORT.md",
+    ROOT / "docs" / "GRETEL_60_N8N_IMPORT.md",
     ROOT / "tests" / "PHASE2_TEST_PLAN.md",
     ROOT / "stack_decision.md",
 ]
@@ -71,6 +72,7 @@ REQUIRED_DEV_WORKFLOWS = [
     ROOT / "workflows" / "dev" / "DEV_PAOLA_P0_LIVE_TEST.json",
     ROOT / "workflows" / "dev" / "DEV_GRETEL_P0_LIVE_TEST.json",
     ROOT / "workflows" / "dev" / "DEV_GRETEL_53_OPERATIONS_CX_TEST.json",
+    ROOT / "workflows" / "dev" / "DEV_GRETEL_60_TRANSFORMATION_TEST.json",
 ]
 
 REQUIRED_FIXTURES = [
@@ -140,6 +142,45 @@ def has_terminal_output(workflow):
     return False
 
 
+def validate_gretel_60_execute_nodes(path, workflow, errors):
+    expected_counts = {
+        "60_TRANSFORMATION_ORCHESTRATOR.json": 7,
+        "DEV_GRETEL_60_TRANSFORMATION_TEST.json": 3,
+    }
+    if path.name not in expected_counts:
+        return
+    execute_nodes = [
+        node for node in workflow.get("nodes", [])
+        if node.get("type") == "n8n-nodes-base.executeWorkflow"
+    ]
+    if len(execute_nodes) != expected_counts[path.name]:
+        fail(errors, f"{path.name}: expected {expected_counts[path.name]} current Execute Sub-workflow nodes")
+    for node in execute_nodes:
+        parameters = node.get("parameters", {})
+        selector = parameters.get("workflowId")
+        label = f"{path.name} / {node.get('name', '(unnamed)')}"
+        if node.get("typeVersion") != 1.3:
+            fail(errors, f"{label}: Execute Sub-workflow typeVersion must be 1.3")
+        if parameters.get("source") != "database":
+            fail(errors, f"{label}: source must be database")
+        if not isinstance(selector, dict) or selector.get("__rl") is not True:
+            fail(errors, f"{label}: workflowId must use the current resource-locator object")
+        elif selector.get("value") != "" or selector.get("mode") != "list":
+            fail(errors, f"{label}: workflow selector must be an empty manual list selection")
+        if parameters.get("mode") != "once":
+            fail(errors, f"{label}: mode must be once")
+        if parameters.get("options", {}).get("waitForSubWorkflow") is not True:
+            fail(errors, f"{label}: must wait for sub-workflow completion")
+        if "workflowInputs" in parameters:
+            fail(errors, f"{label}: workflowInputs must be omitted for accept-all-data child triggers")
+        if path.name == "60_TRANSFORMATION_ORCHESTRATOR.json":
+            if node.get("onError") != "continueErrorOutput":
+                fail(errors, f"{label}: current n8n error output must be enabled")
+            outputs = workflow.get("connections", {}).get(node.get("name"), {}).get("main", [])
+            if len(outputs) != 2 or not outputs[0] or not outputs[1]:
+                fail(errors, f"{label}: success and error outputs must both be connected")
+
+
 def validate_workflow(path, workflow, errors):
     if not isinstance(workflow, dict):
         fail(errors, f"{path.name}: workflow JSON must be an object")
@@ -182,6 +223,7 @@ def validate_workflow(path, workflow, errors):
                         errors,
                         f"{path.name}: connection from {source_name} output {output_index} references missing node {target}",
                     )
+    validate_gretel_60_execute_nodes(path, workflow, errors)
 
 
 def main():
