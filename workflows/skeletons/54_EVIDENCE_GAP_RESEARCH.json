@@ -3,9 +3,9 @@
   "nodes": [
     {
       "parameters": {
-        "content": "PURPOSE\nPerform targeted research only when an important evidence gap exists.\n\nOWNER\nPAOLA TRACK A\n\nINPUT CONTRACT\nmissing_evidence_request with retry_count, max_retries, reason_for_retry\n\nOUTPUT CONTRACT\nnew evidence or UNKNOWN marker\n\nSTATUS\nSkeleton only. Inactive by default. No credentials. Configure TODO nodes after import.",
-        "height": 340,
-        "width": 520,
+        "content": "PURPOSE\nResolve a specific UNKNOWN only when additional public research can reasonably help.\n\nOWNER\nPAOLA TRACK A\n\nINPUT CONTRACT\nrun_context + sources + evidence + missing_evidence_request with retry_count, max_retries, reason_for_retry\n\nOUTPUT CONTRACT\nworkflow-local targeted result: new_sources OR preserved unknown. No competing shared schema.\n\nSTATUS\nRepository-ready controller. Reuses workflow 21 through Execute Sub-workflow. Inactive by default.",
+        "height": 430,
+        "width": 760,
         "color": 4
       },
       "id": "00_readme__purpose_owner_contracts_status",
@@ -13,8 +13,24 @@
       "type": "n8n-nodes-base.stickyNote",
       "typeVersion": 1,
       "position": [
-        -420,
-        -320
+        -660,
+        -560
+      ]
+    },
+    {
+      "parameters": {
+        "content": "UNKNOWN -> can public research answer? -> targeted research or client validation.\n\nA new URL is not automatically evidence. If research finds nothing, preserve UNKNOWN. Absence of public evidence is not evidence of absence.",
+        "height": 300,
+        "width": 760,
+        "color": 6
+      },
+      "id": "note__evidence_gap_boundaries",
+      "name": "NOTE__EVIDENCE_GAP_BOUNDARIES",
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [
+        -660,
+        -80
       ]
     },
     {
@@ -30,24 +46,43 @@
     },
     {
       "parameters": {
-        "jsCode": "// SKELETON_PLACEHOLDER: INPUT_CONTRACT__MISSING_EVIDENCE_REQUEST\n// Accept missing evidence request and retry metadata.\n// TODO: Replace this placeholder with configured production logic.\n// Contract discipline: preserve FACT / INFERENCE / HYPOTHESIS / UNKNOWN boundaries.\nreturn items;\n"
+        "jsCode": "function toInt(value, fallback) {\n  const parsed = Number(value);\n  return Number.isInteger(parsed) && parsed >= 0 ? parsed : fallback;\n}\nfunction normalizeRequest(value) {\n  const request = value || {};\n  const retryCount = toInt(request.retry_count, 0);\n  const maxRetries = toInt(request.max_retries, 1);\n  return {\n    gap_id: request.gap_id || null,\n    domain: request.domain || null,\n    question: request.question || request.description || null,\n    description: request.description || request.question || null,\n    gap_type: request.gap_type || 'unspecified',\n    current_evidence_ids: Array.isArray(request.current_evidence_ids) ? request.current_evidence_ids : [],\n    retry_count: retryCount,\n    max_retries: maxRetries,\n    reason_for_retry: request.reason_for_retry || null\n  };\n}\nreturn items.map(item => {\n  const payload = item.json || {};\n  const nested = payload.paola_track_output || payload;\n  const runContext = nested.run_context || payload.run_context || {};\n  const sources = Array.isArray(nested.sources) ? nested.sources : [];\n  const evidence = Array.isArray(nested.evidence) ? nested.evidence : [];\n  const request = normalizeRequest(payload.missing_evidence_request || nested.missing_evidence_request);\n  const errors = [];\n  if (!runContext.run_id) errors.push({ stage: 'INPUT_CONTRACT', error_type: 'invalid_input', message: 'run_context.run_id is required' });\n  if (!runContext.organization?.name || !runContext.organization?.website || !runContext.organization?.country) {\n    errors.push({ stage: 'INPUT_CONTRACT', error_type: 'invalid_input', message: 'run_context.organization name, website, and country are required' });\n  }\n  if (!request.gap_id) errors.push({ stage: 'INPUT_CONTRACT', error_type: 'invalid_input', message: 'missing_evidence_request.gap_id is required' });\n  if (!request.domain) errors.push({ stage: 'INPUT_CONTRACT', error_type: 'invalid_input', message: 'missing_evidence_request.domain is required' });\n  if (!request.question) errors.push({ stage: 'INPUT_CONTRACT', error_type: 'invalid_input', message: 'missing_evidence_request.question or description is required' });\n  if (request.max_retries < 0 || request.retry_count < 0) errors.push({ stage: 'INPUT_CONTRACT', error_type: 'invalid_input', message: 'retry_count and max_retries must be non-negative integers' });\n  if (!request.reason_for_retry) errors.push({ stage: 'INPUT_CONTRACT', error_type: 'invalid_input', message: 'reason_for_retry is required' });\n  const controlledState = errors.length ? 'invalid_input' : (request.retry_count >= request.max_retries ? 'retry_exhausted' : 'ready');\n  return {\n    json: {\n      run_context: runContext,\n      sources,\n      evidence,\n      missing_evidence_request: request,\n      controlled_state: controlledState,\n      retry_count: request.retry_count,\n      max_retries: request.max_retries,\n      reason_for_retry: request.reason_for_retry,\n      research_attempted: false,\n      new_sources: [],\n      new_evidence: [],\n      requires_client_validation: false,\n      rerun_required: false,\n      rerun_domain: null,\n      errors\n    }\n  };\n});\n"
       },
       "id": "input_contract__missing_evidence_request",
       "name": "INPUT_CONTRACT__MISSING_EVIDENCE_REQUEST",
       "type": "n8n-nodes-base.code",
       "typeVersion": 2,
       "position": [
-        260,
+        280,
         0
       ]
     },
     {
       "parameters": {
-        "jsCode": "// SKELETON_PLACEHOLDER: DECISION__CAN_PUBLIC_RESEARCH_ANSWER\n// Decide whether public research can answer the gap.\n// TODO: Replace this placeholder with configured production logic.\n// Contract discipline: preserve FACT / INFERENCE / HYPOTHESIS / UNKNOWN boundaries.\nreturn items;\n"
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict"
+          },
+          "conditions": [
+            {
+              "id": "decision__invalid_input_invalid_input",
+              "leftValue": "={{ $json.controlled_state }}",
+              "rightValue": "invalid_input",
+              "operator": {
+                "type": "string",
+                "operation": "equals"
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
       },
-      "id": "decision__can_public_research_answer",
-      "name": "DECISION__CAN_PUBLIC_RESEARCH_ANSWER",
-      "type": "n8n-nodes-base.code",
+      "id": "decision__invalid_input",
+      "name": "DECISION__INVALID_INPUT",
+      "type": "n8n-nodes-base.if",
       "typeVersion": 2,
       "position": [
         560,
@@ -56,96 +91,317 @@
     },
     {
       "parameters": {
-        "jsCode": "// SKELETON_PLACEHOLDER: MARK_UNKNOWN\n// When public research cannot answer, mark UNKNOWN for client validation.\n// TODO: Replace this placeholder with configured production logic.\n// Contract discipline: preserve FACT / INFERENCE / HYPOTHESIS / UNKNOWN boundaries.\nreturn items;\n"
+        "jsCode": "return items.map(item => ({ json: {\n  run_context: item.json.run_context || null,\n  missing_evidence_request: item.json.missing_evidence_request || null,\n  controlled_state: item.json.controlled_state,\n  can_public_research_answer: Boolean(item.json.can_public_research_answer),\n  answerability_reason: item.json.answerability_reason || null,\n  targeted_query: item.json.targeted_query || null,\n  query_strategy: item.json.query_strategy || null,\n  search_controlled_state: item.json.search_controlled_state || null,\n  new_sources: item.json.new_sources || [],\n  new_evidence: item.json.new_evidence || [],\n  rejected_sources: item.json.rejected_sources || [],\n  unknown_marker: item.json.unknown_marker || null,\n  retry_count: item.json.retry_count,\n  max_retries: item.json.max_retries,\n  reason_for_retry: item.json.reason_for_retry || null,\n  research_attempted: Boolean(item.json.research_attempted),\n  rerun_required: Boolean(item.json.rerun_required),\n  rerun_domain: item.json.rerun_domain || null,\n  requires_client_validation: Boolean(item.json.requires_client_validation),\n  source_evidence_boundary: 'A new source is not treated as gap-resolving evidence until downstream extraction/evidence processing validates attributable facts.',\n  errors: item.json.errors || []\n} }));\n"
       },
-      "id": "mark_unknown",
-      "name": "MARK_UNKNOWN",
+      "id": "output_invalid_input",
+      "name": "OUTPUT_INVALID_INPUT",
       "type": "n8n-nodes-base.code",
       "typeVersion": 2,
       "position": [
-        860,
-        0
+        840,
+        -360
       ]
     },
     {
       "parameters": {
-        "jsCode": "// SKELETON_PLACEHOLDER: BUILD_TARGETED_QUERY\n// Build a focused query for answerable public gaps.\n// TODO: Replace this placeholder with configured production logic.\n// Contract discipline: preserve FACT / INFERENCE / HYPOTHESIS / UNKNOWN boundaries.\nreturn items;\n"
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict"
+          },
+          "conditions": [
+            {
+              "id": "decision__retry_exhausted_retry_exhausted",
+              "leftValue": "={{ $json.controlled_state }}",
+              "rightValue": "retry_exhausted",
+              "operator": {
+                "type": "string",
+                "operation": "equals"
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "id": "decision__retry_exhausted",
+      "name": "DECISION__RETRY_EXHAUSTED",
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2,
+      "position": [
+        840,
+        40
+      ]
+    },
+    {
+      "parameters": {
+        "jsCode": "return items.map(item => {\n  const request = item.json.missing_evidence_request || {};\n  return {\n    json: {\n      ...item.json,\n      controlled_state: item.json.controlled_state || 'unknown_preserved',\n      unknown_marker: {\n        unknown_id: request.gap_id || 'GAP-UNKNOWN',\n        domain: request.domain || null,\n        description: 'The evidence gap remains unresolved from the public sources reviewed.',\n        reason: item.json.reason_for_preserving_unknown || 'Public research cannot reasonably answer this gap.',\n        evidence_ids: request.current_evidence_ids || []\n      },\n      requires_client_validation: true,\n      rerun_required: false,\n      rerun_domain: null,\n      new_sources: item.json.new_sources || [],\n      new_evidence: []\n    }\n  };\n});\n"
+      },
+      "id": "mark_unknown__retry_exhausted",
+      "name": "MARK_UNKNOWN__RETRY_EXHAUSTED",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        1120,
+        -180
+      ]
+    },
+    {
+      "parameters": {
+        "jsCode": "return items.map(item => ({ json: {\n  run_context: item.json.run_context || null,\n  missing_evidence_request: item.json.missing_evidence_request || null,\n  controlled_state: item.json.controlled_state,\n  can_public_research_answer: Boolean(item.json.can_public_research_answer),\n  answerability_reason: item.json.answerability_reason || null,\n  targeted_query: item.json.targeted_query || null,\n  query_strategy: item.json.query_strategy || null,\n  search_controlled_state: item.json.search_controlled_state || null,\n  new_sources: item.json.new_sources || [],\n  new_evidence: item.json.new_evidence || [],\n  rejected_sources: item.json.rejected_sources || [],\n  unknown_marker: item.json.unknown_marker || null,\n  retry_count: item.json.retry_count,\n  max_retries: item.json.max_retries,\n  reason_for_retry: item.json.reason_for_retry || null,\n  research_attempted: Boolean(item.json.research_attempted),\n  rerun_required: Boolean(item.json.rerun_required),\n  rerun_domain: item.json.rerun_domain || null,\n  requires_client_validation: Boolean(item.json.requires_client_validation),\n  source_evidence_boundary: 'A new source is not treated as gap-resolving evidence until downstream extraction/evidence processing validates attributable facts.',\n  errors: item.json.errors || []\n} }));\n"
+      },
+      "id": "output_retry_exhausted",
+      "name": "OUTPUT_RETRY_EXHAUSTED",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        1400,
+        -180
+      ]
+    },
+    {
+      "parameters": {
+        "jsCode": "const publicSignals = [\n  'annual report', 'audited', 'financial statements', 'financial report', 'form 990', '990',\n  'funding', 'funder', 'grant', 'donor', 'revenue', 'public report', 'impact report',\n  'methodology', 'evaluation', 'outcome', 'indicator', 'kpi', 'partnership', 'strategy',\n  'program reach', 'people reached', 'published', 'publicly reported'\n];\nconst privateSignals = [\n  'internal', 'handoff', 'handoffs', 'crm', 'staff workload', 'response time',\n  'unpublished', 'beneficiary-level private', 'private data', 'team sentiment',\n  'process friction', 'after a stakeholder submits', 'after someone submits',\n  'workflow ownership', 'internal workflow', 'configuration'\n];\nreturn items.map(item => {\n  if (item.json.controlled_state !== 'ready') return item;\n  const request = item.json.missing_evidence_request;\n  const text = `${request.domain || ''} ${request.gap_type || ''} ${request.question || ''} ${request.description || ''}`.toLowerCase();\n  const privateMatch = privateSignals.find(signal => text.includes(signal));\n  const publicMatch = publicSignals.find(signal => text.includes(signal));\n  const answerable = Boolean(publicMatch && !privateMatch);\n  return {\n    json: {\n      ...item.json,\n      can_public_research_answer: answerable,\n      answerability_state: answerable ? 'public_answerable' : 'unknown_preserved',\n      answerability_reason: answerable\n        ? `Gap contains public research signal: ${publicMatch}`\n        : (privateMatch ? `Gap appears private/internal: ${privateMatch}` : 'No reliable public research path identified'),\n      reason_for_preserving_unknown: answerable ? null : 'Public research cannot reasonably answer this specific evidence gap.'\n    }\n  };\n});\n"
+      },
+      "id": "can_public_research_answer",
+      "name": "CAN_PUBLIC_RESEARCH_ANSWER",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        1120,
+        220
+      ]
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict"
+          },
+          "conditions": [
+            {
+              "id": "decision__public_answerable_public_answerable",
+              "leftValue": "={{ $json.answerability_state }}",
+              "rightValue": "public_answerable",
+              "operator": {
+                "type": "string",
+                "operation": "equals"
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "id": "decision__public_answerable",
+      "name": "DECISION__PUBLIC_ANSWERABLE",
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2,
+      "position": [
+        1400,
+        220
+      ]
+    },
+    {
+      "parameters": {
+        "jsCode": "return items.map(item => {\n  const request = item.json.missing_evidence_request || {};\n  return {\n    json: {\n      ...item.json,\n      controlled_state: item.json.controlled_state || 'unknown_preserved',\n      unknown_marker: {\n        unknown_id: request.gap_id || 'GAP-UNKNOWN',\n        domain: request.domain || null,\n        description: 'The evidence gap remains unresolved from the public sources reviewed.',\n        reason: item.json.reason_for_preserving_unknown || 'Public research cannot reasonably answer this gap.',\n        evidence_ids: request.current_evidence_ids || []\n      },\n      requires_client_validation: true,\n      rerun_required: false,\n      rerun_domain: null,\n      new_sources: item.json.new_sources || [],\n      new_evidence: []\n    }\n  };\n});\n"
+      },
+      "id": "mark_unknown__not_publicly_answerable",
+      "name": "MARK_UNKNOWN__NOT_PUBLICLY_ANSWERABLE",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        1680,
+        20
+      ]
+    },
+    {
+      "parameters": {
+        "jsCode": "return items.map(item => ({ json: {\n  run_context: item.json.run_context || null,\n  missing_evidence_request: item.json.missing_evidence_request || null,\n  controlled_state: item.json.controlled_state,\n  can_public_research_answer: Boolean(item.json.can_public_research_answer),\n  answerability_reason: item.json.answerability_reason || null,\n  targeted_query: item.json.targeted_query || null,\n  query_strategy: item.json.query_strategy || null,\n  search_controlled_state: item.json.search_controlled_state || null,\n  new_sources: item.json.new_sources || [],\n  new_evidence: item.json.new_evidence || [],\n  rejected_sources: item.json.rejected_sources || [],\n  unknown_marker: item.json.unknown_marker || null,\n  retry_count: item.json.retry_count,\n  max_retries: item.json.max_retries,\n  reason_for_retry: item.json.reason_for_retry || null,\n  research_attempted: Boolean(item.json.research_attempted),\n  rerun_required: Boolean(item.json.rerun_required),\n  rerun_domain: item.json.rerun_domain || null,\n  requires_client_validation: Boolean(item.json.requires_client_validation),\n  source_evidence_boundary: 'A new source is not treated as gap-resolving evidence until downstream extraction/evidence processing validates attributable facts.',\n  errors: item.json.errors || []\n} }));\n"
+      },
+      "id": "output_unknown_preserved",
+      "name": "OUTPUT_UNKNOWN_PRESERVED",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        1960,
+        20
+      ]
+    },
+    {
+      "parameters": {
+        "jsCode": "function compact(value) {\n  return String(value || '').replace(/\\s+/g, ' ').trim();\n}\nfunction uniqueWords(parts) {\n  const out = [];\n  const seen = new Set();\n  for (const part of parts) {\n    for (const token of compact(part).split(' ')) {\n      const clean = token.replace(/[^\\w.-]/g, '');\n      const key = clean.toLowerCase();\n      if (!clean || seen.has(key)) continue;\n      seen.add(key);\n      out.push(clean);\n    }\n  }\n  return out.join(' ');\n}\nreturn items.map(item => {\n  const org = item.json.run_context.organization || {};\n  const request = item.json.missing_evidence_request;\n  const text = `${request.gap_type || ''} ${request.question || ''} ${request.description || ''}`.toLowerCase();\n  let hints = 'public report source';\n  if (/fund|grant|donor|revenue|financial|990|audited|audit/.test(text)) hints = 'audited financial statements funding concentration annual report form 990';\n  else if (/impact|outcome|methodolog|evaluation|longitudinal|indicator|kpi/.test(text)) hints = 'impact report outcome evaluation methodology longitudinal study indicators';\n  else if (/partner|partnership/.test(text)) hints = 'public partnership announcement annual report';\n  else if (/strategy|strategic/.test(text)) hints = 'strategy document strategic plan annual report';\n  else if (/program|reach|people served|people reached/.test(text)) hints = 'program reach annual report public results';\n  const targetedQuery = uniqueWords([org.name, org.country, request.question, request.gap_type, hints]);\n  return {\n    json: {\n      ...item.json,\n      targeted_query: targetedQuery,\n      query_strategy: {\n        organization_identity: org.name,\n        gap_subject: request.question,\n        source_hint: hints\n      }\n    }\n  };\n});\n"
       },
       "id": "build_targeted_query",
       "name": "BUILD_TARGETED_QUERY",
       "type": "n8n-nodes-base.code",
       "typeVersion": 2,
       "position": [
-        1160,
-        0
+        1680,
+        380
       ]
     },
     {
       "parameters": {
-        "jsCode": "// SKELETON_PLACEHOLDER: TODO_API__TARGETED_RESEARCH\n// Placeholder for targeted public research provider.\n// TODO: Replace this placeholder with configured production logic.\n// Contract discipline: preserve FACT / INFERENCE / HYPOTHESIS / UNKNOWN boundaries.\nreturn items;\n"
+        "jsCode": "return items.map(item => ({\n  json: {\n    ...item.json,\n    retry_count_before_attempt: item.json.retry_count,\n    retry_count: item.json.retry_count + 1,\n    missing_evidence_request: {\n      ...item.json.missing_evidence_request,\n      retry_count: item.json.retry_count + 1\n    },\n    research_attempted: true,\n    query: item.json.targeted_query\n  }\n}));\n"
       },
-      "id": "todo_api__targeted_research",
-      "name": "TODO_API__TARGETED_RESEARCH",
+      "id": "prepare_21_search_request",
+      "name": "PREPARE_21_SEARCH_REQUEST",
       "type": "n8n-nodes-base.code",
       "typeVersion": 2,
       "position": [
-        1460,
-        0
+        1960,
+        380
       ]
     },
     {
       "parameters": {
-        "jsCode": "// SKELETON_PLACEHOLDER: VALIDATE_NEW_SOURCE\n// Validate relevance and source quality.\n// TODO: Replace this placeholder with configured production logic.\n// Contract discipline: preserve FACT / INFERENCE / HYPOTHESIS / UNKNOWN boundaries.\nreturn items;\n"
+        "source": "database",
+        "workflowId": {
+          "__rl": true,
+          "value": "",
+          "mode": "list",
+          "cachedResultName": "21_WEB_SEARCH"
+        },
+        "workflowInputs": {
+          "mappingMode": "passThrough",
+          "value": {},
+          "matchingColumns": [],
+          "schema": [],
+          "attemptToConvertTypes": false,
+          "convertFieldsToString": true
+        },
+        "options": {
+          "waitForSubWorkflow": true
+        }
+      },
+      "id": "execute_subworkflow__21_web_search",
+      "name": "EXECUTE_SUBWORKFLOW__21_WEB_SEARCH",
+      "type": "n8n-nodes-base.executeWorkflow",
+      "typeVersion": 1.3,
+      "position": [
+        2240,
+        380
+      ],
+      "notes": "AFTER IMPORT: select the stored n8n workflow 21_WEB_SEARCH. Never invent an ID."
+    },
+    {
+      "parameters": {
+        "jsCode": "function normalizeUrl(value) {\n  try {\n    const url = new URL(String(value || '').trim());\n    url.hash = '';\n    url.search = '';\n    return url.toString().replace(/\\/$/, '').toLowerCase();\n  } catch {\n    return '';\n  }\n}\nfunction host(value) {\n  const match = String(value || '').match(/^https?:\\/\\/([^\\/?#]+)/i);\n  return match ? match[1].replace(/^www\\./, '').toLowerCase() : '';\n}\nfunction tokens(value) {\n  return String(value || '').toLowerCase().match(/[a-z0-9]+/g) || [];\n}\nfunction gapTerms(request) {\n  const text = `${request.domain || ''} ${request.gap_type || ''} ${request.question || ''} ${request.description || ''}`.toLowerCase();\n  const terms = ['annual','report','financial','funding','grant','donor','revenue','990','audit','audited','impact','outcome','evaluation','methodology','indicator','strategy','partnership','program','reach'];\n  return terms.filter(term => text.includes(term));\n}\nreturn items.map((item, index) => {\n  const baseItems = $items('PREPARE_21_SEARCH_REQUEST', 0);\n  const base = baseItems[index]?.json || item.json;\n  const returnedState = item.json.controlled_state || 'unknown';\n  const returnedErrors = item.json.errors || [];\n  const existingUrls = new Set((base.sources || []).map(source => normalizeUrl(source.url)).filter(Boolean));\n  const officialDomain = host(base.run_context?.organization?.website);\n  const orgTokens = tokens(base.run_context?.organization?.name).filter(token => token.length > 2);\n  const terms = gapTerms(base.missing_evidence_request);\n  const newSources = [];\n  const rejected_sources = [];\n  if (returnedState === 'request_failure') {\n    return {\n      json: {\n        ...base,\n        controlled_state: 'research_failure',\n        search_controlled_state: returnedState,\n        errors: [...(base.errors || []), ...returnedErrors, { stage: 'TARGETED_RESEARCH', error_type: 'research_failure', message: 'Workflow 21 returned request_failure' }]\n      }\n    };\n  }\n  for (const source of item.json.sources || []) {\n    const normalized = normalizeUrl(source.url);\n    const sourceText = `${source.title || ''} ${source.url || ''} ${source.search_snippet || ''}`.toLowerCase();\n    const sourceHost = host(source.url);\n    const validUrl = Boolean(normalized);\n    const duplicate = validUrl && existingUrls.has(normalized);\n    const orgRelevant = Boolean((officialDomain && sourceHost.endsWith(officialDomain)) || orgTokens.some(token => sourceText.includes(token)));\n    const gapRelevant = terms.length ? terms.some(term => sourceText.includes(term)) : false;\n    if (!validUrl || duplicate || !orgRelevant || !gapRelevant) {\n      rejected_sources.push({\n        title: source.title || null,\n        url: source.url || null,\n        reason: !validUrl ? 'invalid_url' : duplicate ? 'duplicate_existing_source' : !orgRelevant ? 'organization_mismatch' : 'gap_mismatch'\n      });\n      continue;\n    }\n    newSources.push({\n      ...source,\n      source_id: `SRC-GAP-${String(newSources.length + 1).padStart(3, '0')}`,\n      original_source_id: source.source_id || null,\n      discovered_by: '54_EVIDENCE_GAP_RESEARCH',\n      targeted_gap_id: base.missing_evidence_request.gap_id,\n      targeted_query: base.targeted_query,\n      source_validation: {\n        is_new_to_run: true,\n        organization_relevant: orgRelevant,\n        gap_relevant: gapRelevant,\n        source_vs_evidence_note: 'New source found; downstream extraction/evidence processing is required before treating the gap as resolved.'\n      }\n    });\n    if (newSources.length >= 5) break;\n  }\n  const controlledState = newSources.length ? 'new_source_found' : 'no_new_evidence';\n  return {\n    json: {\n      ...base,\n      controlled_state: controlledState,\n      search_controlled_state: returnedState,\n      new_sources: newSources,\n      new_evidence: [],\n      rejected_sources,\n      unknown_marker: newSources.length ? null : {\n        unknown_id: base.missing_evidence_request.gap_id,\n        domain: base.missing_evidence_request.domain,\n        description: 'The evidence gap remains unresolved from the public sources reviewed.',\n        evidence_ids: base.missing_evidence_request.current_evidence_ids || []\n      },\n      requires_client_validation: !newSources.length,\n      rerun_required: Boolean(newSources.length),\n      rerun_domain: newSources.length ? base.missing_evidence_request.domain : null\n    }\n  };\n});\n"
       },
       "id": "validate_new_source",
       "name": "VALIDATE_NEW_SOURCE",
       "type": "n8n-nodes-base.code",
       "typeVersion": 2,
       "position": [
-        1760,
-        0
+        2520,
+        380
       ]
     },
     {
       "parameters": {
-        "jsCode": "// SKELETON_PLACEHOLDER: NEW_EVIDENCE\n// Normalize new evidence for re-evaluation.\n// TODO: Replace this placeholder with configured production logic.\n// Contract discipline: preserve FACT / INFERENCE / HYPOTHESIS / UNKNOWN boundaries.\nreturn items;\n"
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict"
+          },
+          "conditions": [
+            {
+              "id": "decision__research_failure_research_failure",
+              "leftValue": "={{ $json.controlled_state }}",
+              "rightValue": "research_failure",
+              "operator": {
+                "type": "string",
+                "operation": "equals"
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
       },
-      "id": "new_evidence",
-      "name": "NEW_EVIDENCE",
+      "id": "decision__research_failure",
+      "name": "DECISION__RESEARCH_FAILURE",
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2,
+      "position": [
+        2800,
+        380
+      ]
+    },
+    {
+      "parameters": {
+        "jsCode": "return items.map(item => ({ json: {\n  run_context: item.json.run_context || null,\n  missing_evidence_request: item.json.missing_evidence_request || null,\n  controlled_state: item.json.controlled_state,\n  can_public_research_answer: Boolean(item.json.can_public_research_answer),\n  answerability_reason: item.json.answerability_reason || null,\n  targeted_query: item.json.targeted_query || null,\n  query_strategy: item.json.query_strategy || null,\n  search_controlled_state: item.json.search_controlled_state || null,\n  new_sources: item.json.new_sources || [],\n  new_evidence: item.json.new_evidence || [],\n  rejected_sources: item.json.rejected_sources || [],\n  unknown_marker: item.json.unknown_marker || null,\n  retry_count: item.json.retry_count,\n  max_retries: item.json.max_retries,\n  reason_for_retry: item.json.reason_for_retry || null,\n  research_attempted: Boolean(item.json.research_attempted),\n  rerun_required: Boolean(item.json.rerun_required),\n  rerun_domain: item.json.rerun_domain || null,\n  requires_client_validation: Boolean(item.json.requires_client_validation),\n  source_evidence_boundary: 'A new source is not treated as gap-resolving evidence until downstream extraction/evidence processing validates attributable facts.',\n  errors: item.json.errors || []\n} }));\n"
+      },
+      "id": "output_research_failure",
+      "name": "OUTPUT_RESEARCH_FAILURE",
       "type": "n8n-nodes-base.code",
       "typeVersion": 2,
       "position": [
-        2060,
-        0
+        3080,
+        180
       ]
     },
     {
       "parameters": {
-        "jsCode": "// TERMINAL_OUTPUT_NODE: RETURN_TO_EVALUATION\n// Return evidence or UNKNOWN marker to caller.\n// TODO: Replace this placeholder with configured production logic.\n// Contract discipline: preserve FACT / INFERENCE / HYPOTHESIS / UNKNOWN boundaries.\nreturn items;\n"
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict"
+          },
+          "conditions": [
+            {
+              "id": "decision__new_source_found_new_source_found",
+              "leftValue": "={{ $json.controlled_state }}",
+              "rightValue": "new_source_found",
+              "operator": {
+                "type": "string",
+                "operation": "equals"
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
       },
-      "id": "return_to_evaluation",
-      "name": "RETURN_TO_EVALUATION",
+      "id": "decision__new_source_found",
+      "name": "DECISION__NEW_SOURCE_FOUND",
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2,
+      "position": [
+        3080,
+        520
+      ]
+    },
+    {
+      "parameters": {
+        "jsCode": "return items.map(item => ({ json: {\n  run_context: item.json.run_context || null,\n  missing_evidence_request: item.json.missing_evidence_request || null,\n  controlled_state: item.json.controlled_state,\n  can_public_research_answer: Boolean(item.json.can_public_research_answer),\n  answerability_reason: item.json.answerability_reason || null,\n  targeted_query: item.json.targeted_query || null,\n  query_strategy: item.json.query_strategy || null,\n  search_controlled_state: item.json.search_controlled_state || null,\n  new_sources: item.json.new_sources || [],\n  new_evidence: item.json.new_evidence || [],\n  rejected_sources: item.json.rejected_sources || [],\n  unknown_marker: item.json.unknown_marker || null,\n  retry_count: item.json.retry_count,\n  max_retries: item.json.max_retries,\n  reason_for_retry: item.json.reason_for_retry || null,\n  research_attempted: Boolean(item.json.research_attempted),\n  rerun_required: Boolean(item.json.rerun_required),\n  rerun_domain: item.json.rerun_domain || null,\n  requires_client_validation: Boolean(item.json.requires_client_validation),\n  source_evidence_boundary: 'A new source is not treated as gap-resolving evidence until downstream extraction/evidence processing validates attributable facts.',\n  errors: item.json.errors || []\n} }));\n"
+      },
+      "id": "output_new_source_found",
+      "name": "OUTPUT_NEW_SOURCE_FOUND",
       "type": "n8n-nodes-base.code",
       "typeVersion": 2,
       "position": [
-        2360,
-        0
+        3360,
+        400
       ]
     },
     {
       "parameters": {
-        "content": "RETRY CONTROL\nRequired fields: retry_count, max_retries, reason_for_retry.\nNo infinite loops. Parent workflow must stop retrying when retry_count >= max_retries.",
-        "height": 190,
-        "width": 420,
-        "color": 4
+        "jsCode": "return items.map(item => ({ json: {\n  run_context: item.json.run_context || null,\n  missing_evidence_request: item.json.missing_evidence_request || null,\n  controlled_state: item.json.controlled_state,\n  can_public_research_answer: Boolean(item.json.can_public_research_answer),\n  answerability_reason: item.json.answerability_reason || null,\n  targeted_query: item.json.targeted_query || null,\n  query_strategy: item.json.query_strategy || null,\n  search_controlled_state: item.json.search_controlled_state || null,\n  new_sources: item.json.new_sources || [],\n  new_evidence: item.json.new_evidence || [],\n  rejected_sources: item.json.rejected_sources || [],\n  unknown_marker: item.json.unknown_marker || null,\n  retry_count: item.json.retry_count,\n  max_retries: item.json.max_retries,\n  reason_for_retry: item.json.reason_for_retry || null,\n  research_attempted: Boolean(item.json.research_attempted),\n  rerun_required: Boolean(item.json.rerun_required),\n  rerun_domain: item.json.rerun_domain || null,\n  requires_client_validation: Boolean(item.json.requires_client_validation),\n  source_evidence_boundary: 'A new source is not treated as gap-resolving evidence until downstream extraction/evidence processing validates attributable facts.',\n  errors: item.json.errors || []\n} }));\n"
       },
-      "id": "note__retry_limits",
-      "name": "NOTE__RETRY_LIMITS",
-      "type": "n8n-nodes-base.stickyNote",
-      "typeVersion": 1,
+      "id": "output_no_new_evidence",
+      "name": "OUTPUT_NO_NEW_EVIDENCE",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
       "position": [
-        460,
-        -260
+        3360,
+        620
       ]
     }
   ],
@@ -165,23 +421,94 @@
       "main": [
         [
           {
-            "node": "DECISION__CAN_PUBLIC_RESEARCH_ANSWER",
+            "node": "DECISION__INVALID_INPUT",
             "type": "main",
             "index": 0
           }
         ]
       ]
     },
-    "DECISION__CAN_PUBLIC_RESEARCH_ANSWER": {
+    "DECISION__INVALID_INPUT": {
+      "main": [
+        [
+          {
+            "node": "OUTPUT_INVALID_INPUT",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "DECISION__RETRY_EXHAUSTED",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "DECISION__RETRY_EXHAUSTED": {
+      "main": [
+        [
+          {
+            "node": "MARK_UNKNOWN__RETRY_EXHAUSTED",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "CAN_PUBLIC_RESEARCH_ANSWER",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "MARK_UNKNOWN__RETRY_EXHAUSTED": {
+      "main": [
+        [
+          {
+            "node": "OUTPUT_RETRY_EXHAUSTED",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "CAN_PUBLIC_RESEARCH_ANSWER": {
+      "main": [
+        [
+          {
+            "node": "DECISION__PUBLIC_ANSWERABLE",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "DECISION__PUBLIC_ANSWERABLE": {
       "main": [
         [
           {
             "node": "BUILD_TARGETED_QUERY",
             "type": "main",
             "index": 0
-          },
+          }
+        ],
+        [
           {
-            "node": "MARK_UNKNOWN",
+            "node": "MARK_UNKNOWN__NOT_PUBLICLY_ANSWERABLE",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "MARK_UNKNOWN__NOT_PUBLICLY_ANSWERABLE": {
+      "main": [
+        [
+          {
+            "node": "OUTPUT_UNKNOWN_PRESERVED",
             "type": "main",
             "index": 0
           }
@@ -192,14 +519,25 @@
       "main": [
         [
           {
-            "node": "TODO_API__TARGETED_RESEARCH",
+            "node": "PREPARE_21_SEARCH_REQUEST",
             "type": "main",
             "index": 0
           }
         ]
       ]
     },
-    "TODO_API__TARGETED_RESEARCH": {
+    "PREPARE_21_SEARCH_REQUEST": {
+      "main": [
+        [
+          {
+            "node": "EXECUTE_SUBWORKFLOW__21_WEB_SEARCH",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "EXECUTE_SUBWORKFLOW__21_WEB_SEARCH": {
       "main": [
         [
           {
@@ -214,29 +552,43 @@
       "main": [
         [
           {
-            "node": "NEW_EVIDENCE",
+            "node": "DECISION__RESEARCH_FAILURE",
             "type": "main",
             "index": 0
           }
         ]
       ]
     },
-    "NEW_EVIDENCE": {
+    "DECISION__RESEARCH_FAILURE": {
       "main": [
         [
           {
-            "node": "RETURN_TO_EVALUATION",
+            "node": "OUTPUT_RESEARCH_FAILURE",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "DECISION__NEW_SOURCE_FOUND",
             "type": "main",
             "index": 0
           }
         ]
       ]
     },
-    "MARK_UNKNOWN": {
+    "DECISION__NEW_SOURCE_FOUND": {
       "main": [
         [
           {
-            "node": "RETURN_TO_EVALUATION",
+            "node": "OUTPUT_NEW_SOURCE_FOUND",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "OUTPUT_NO_NEW_EVIDENCE",
             "type": "main",
             "index": 0
           }

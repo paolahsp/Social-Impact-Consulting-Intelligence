@@ -1340,6 +1340,12 @@ def main():
         configure_paola_52_workflows(ROOT)
     except ImportError:
         pass
+    try:
+        from configure_paola_54_evidence_gap_research import configure_paola_54_workflows
+
+        configure_paola_54_workflows(ROOT)
+    except ImportError:
+        pass
     print(f"Generated {len(WORKFLOWS)} workflows and {len(SCHEMAS)} schemas.")
 
 

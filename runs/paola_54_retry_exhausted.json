@@ -1,0 +1,57 @@
+{
+  "repository_execution_evidence": {
+    "verified_at": "2026-08-13T00:00:00Z",
+    "runner": "scripts/paola_54_evidence_gap_test.py",
+    "note": "Repository-local deterministic mirror of workflow 54 controller logic; live n8n verification must be recorded separately."
+  },
+  "run_context": {
+    "run_id": "RUN-LOCAL-54-RETRY-EXHAUSTED",
+    "organization": {
+      "name": "GiveDirectly",
+      "website": "https://www.givedirectly.org",
+      "country": "United States",
+      "mission_area": null
+    },
+    "current_challenge": "Resolve evidence gap",
+    "uploaded_document_refs": [],
+    "status": "created",
+    "started_at": "2026-08-13T00:00:00Z",
+    "errors": []
+  },
+  "missing_evidence_request": {
+    "gap_id": "GAP-REV-RETRY",
+    "domain": "revenue_resilience",
+    "question": "Can funding concentration be determined from additional public financial information?",
+    "description": "Can funding concentration be determined from additional public financial information?",
+    "gap_type": "public_financial_information",
+    "current_evidence_ids": [],
+    "retry_count": 1,
+    "max_retries": 1,
+    "reason_for_retry": "Existing evidence does not show funding concentration."
+  },
+  "controlled_state": "retry_exhausted",
+  "can_public_research_answer": false,
+  "answerability_reason": null,
+  "targeted_query": null,
+  "query_strategy": null,
+  "search_controlled_state": null,
+  "new_sources": [],
+  "new_evidence": [],
+  "rejected_sources": [],
+  "unknown_marker": {
+    "unknown_id": "GAP-REV-RETRY",
+    "domain": "revenue_resilience",
+    "description": "The evidence gap remains unresolved from the public sources reviewed.",
+    "reason": "retry_count is greater than or equal to max_retries; no additional research attempted.",
+    "evidence_ids": []
+  },
+  "retry_count": 1,
+  "max_retries": 1,
+  "reason_for_retry": "Existing evidence does not show funding concentration.",
+  "research_attempted": false,
+  "rerun_required": false,
+  "rerun_domain": null,
+  "requires_client_validation": true,
+  "source_evidence_boundary": "A new source is not treated as gap-resolving evidence until downstream extraction/evidence processing validates attributable facts.",
+  "errors": []
+}

@@ -64,6 +64,7 @@ REQUIRED_DOCS = [
     ROOT / "docs" / "PAOLA_22_WEBSITE_EXTRACTION.md",
     ROOT / "docs" / "PAOLA_23_DOCUMENT_PUBLIC_DATA_RESEARCH.md",
     ROOT / "docs" / "PAOLA_52_IMPACT_EVIDENCE.md",
+    ROOT / "docs" / "PAOLA_54_EVIDENCE_GAP_RESEARCH.md",
     ROOT / "tests" / "PHASE2_TEST_PLAN.md",
     ROOT / "stack_decision.md",
 ]
@@ -73,6 +74,7 @@ REQUIRED_DEV_WORKFLOWS = [
     ROOT / "workflows" / "dev" / "DEV_PAOLA_22_WEBSITE_EXTRACTION_TEST.json",
     ROOT / "workflows" / "dev" / "DEV_PAOLA_23_DOCUMENT_RESEARCH_TEST.json",
     ROOT / "workflows" / "dev" / "DEV_PAOLA_52_IMPACT_EVIDENCE_TEST.json",
+    ROOT / "workflows" / "dev" / "DEV_PAOLA_54_EVIDENCE_GAP_TEST.json",
 ]
 
 REQUIRED_FIXTURES = [

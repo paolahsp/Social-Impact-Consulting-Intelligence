@@ -1,0 +1,176 @@
+{
+  "repository_execution_evidence": {
+    "verified_at": "2026-08-13T00:00:00Z",
+    "runner": "scripts/paola_54_evidence_gap_test.py",
+    "note": "Repository-local deterministic mirror of workflow 54 controller logic; live n8n verification must be recorded separately."
+  },
+  "run_context": {
+    "run_id": "RUN-LOCAL-54-GIVEDIRECTLY-ANSWERABLE",
+    "organization": {
+      "name": "GiveDirectly",
+      "website": "https://www.givedirectly.org",
+      "country": "United States",
+      "mission_area": null
+    },
+    "current_challenge": "Resolve evidence gap",
+    "uploaded_document_refs": [],
+    "status": "created",
+    "started_at": "2026-08-13T00:00:00Z",
+    "errors": []
+  },
+  "missing_evidence_request": {
+    "gap_id": "GAP-REV-001",
+    "domain": "revenue_resilience",
+    "question": "Can funding concentration be determined from additional public financial information?",
+    "description": "Can funding concentration be determined from additional public financial information?",
+    "gap_type": "public_financial_information",
+    "current_evidence_ids": [],
+    "retry_count": 1,
+    "max_retries": 1,
+    "reason_for_retry": "Existing evidence does not show funding concentration."
+  },
+  "controlled_state": "new_source_found",
+  "can_public_research_answer": true,
+  "answerability_reason": "Gap contains public research signal: funding",
+  "targeted_query": "GiveDirectly United States Can funding concentration be determined from additional public financial information public_financial_information audited statements annual report form 990",
+  "query_strategy": {
+    "organization_identity": "GiveDirectly",
+    "gap_subject": "Can funding concentration be determined from additional public financial information?",
+    "source_hint": "audited financial statements funding concentration annual report form 990"
+  },
+  "search_controlled_state": "ok",
+  "new_sources": [
+    {
+      "source_id": "SRC-GAP-001",
+      "title": "All Financials by Year - GiveDirectly",
+      "url": "https://www.givedirectly.org/financials-by-year",
+      "source_type": "registry",
+      "publisher": "GiveDirectly",
+      "publication_date": null,
+      "retrieved_at": "2026-08-09T17:54:38Z",
+      "authority_level": "official",
+      "freshness": "unknown",
+      "is_official": true,
+      "search_snippet": "2018 GiveDirectly Policy Plan 2018 - RSIN: 8257 94 948 IRS Form 990 Financial Statements",
+      "search_provider": "duckduckgo_html",
+      "original_source_id": "SRC-001",
+      "discovered_by": "54_EVIDENCE_GAP_RESEARCH",
+      "targeted_gap_id": "GAP-REV-001",
+      "targeted_query": "GiveDirectly United States Can funding concentration be determined from additional public financial information public_financial_information audited statements annual report form 990",
+      "source_validation": {
+        "is_new_to_run": true,
+        "organization_relevant": true,
+        "gap_relevant": true,
+        "source_vs_evidence_note": "New source found; downstream extraction/evidence processing is required before treating the gap as resolved."
+      }
+    },
+    {
+      "source_id": "SRC-GAP-002",
+      "title": "Financials | GiveDirectly",
+      "url": "https://www.givedirectly.org/financials",
+      "source_type": "registry",
+      "publisher": "GiveDirectly",
+      "publication_date": null,
+      "retrieved_at": "2026-08-09T17:54:38Z",
+      "authority_level": "official",
+      "freshness": "unknown",
+      "is_official": true,
+      "search_snippet": "Non-profit finances are often opaque and complex. We aim to be transparent and straightforward. We update this page when we release the prior year's financial statements and 990 tax filing here \u2192\u2026",
+      "search_provider": "duckduckgo_html",
+      "original_source_id": "SRC-002",
+      "discovered_by": "54_EVIDENCE_GAP_RESEARCH",
+      "targeted_gap_id": "GAP-REV-001",
+      "targeted_query": "GiveDirectly United States Can funding concentration be determined from additional public financial information public_financial_information audited statements annual report form 990",
+      "source_validation": {
+        "is_new_to_run": true,
+        "organization_relevant": true,
+        "gap_relevant": true,
+        "source_vs_evidence_note": "New source found; downstream extraction/evidence processing is required before treating the gap as resolved."
+      }
+    },
+    {
+      "source_id": "SRC-GAP-003",
+      "title": "Givedirectly Inc - Nonprofit Explorer - ProPublica",
+      "url": "https://projects.propublica.org/nonprofits/organizations/271661997",
+      "source_type": "web_search_result",
+      "publisher": "projects.propublica.org",
+      "publication_date": null,
+      "retrieved_at": "2026-08-09T17:54:38Z",
+      "authority_level": "unknown",
+      "freshness": "unknown",
+      "is_official": false,
+      "search_snippet": "Since 2013, the IRS has released data culled from millions of nonprofit tax filings. Use this database to find organizations and see details like their executive compensation, revenue and expenses, as well as download tax filings going back as far as 2001.",
+      "search_provider": "duckduckgo_html",
+      "original_source_id": "SRC-003",
+      "discovered_by": "54_EVIDENCE_GAP_RESEARCH",
+      "targeted_gap_id": "GAP-REV-001",
+      "targeted_query": "GiveDirectly United States Can funding concentration be determined from additional public financial information public_financial_information audited statements annual report form 990",
+      "source_validation": {
+        "is_new_to_run": true,
+        "organization_relevant": true,
+        "gap_relevant": true,
+        "source_vs_evidence_note": "New source found; downstream extraction/evidence processing is required before treating the gap as resolved."
+      }
+    },
+    {
+      "source_id": "SRC-GAP-004",
+      "title": "Givedirectly \u2014 Financials & Trends (990)",
+      "url": "https://www.roundpaper.com/nonprofits/org/givedirectly-inc-271661997",
+      "source_type": "registry",
+      "publisher": "roundpaper.com",
+      "publication_date": null,
+      "retrieved_at": "2026-08-09T17:54:38Z",
+      "authority_level": "unknown",
+      "freshness": "unknown",
+      "is_official": false,
+      "search_snippet": "In fiscal year 2024, GiveDirectly reported total revenue of $206,811,067, with $201,022,303 in contributions and grants from individuals, foundations, and institutions.",
+      "search_provider": "duckduckgo_html",
+      "original_source_id": "SRC-004",
+      "discovered_by": "54_EVIDENCE_GAP_RESEARCH",
+      "targeted_gap_id": "GAP-REV-001",
+      "targeted_query": "GiveDirectly United States Can funding concentration be determined from additional public financial information public_financial_information audited statements annual report form 990",
+      "source_validation": {
+        "is_new_to_run": true,
+        "organization_relevant": true,
+        "gap_relevant": true,
+        "source_vs_evidence_note": "New source found; downstream extraction/evidence processing is required before treating the gap as resolved."
+      }
+    },
+    {
+      "source_id": "SRC-GAP-005",
+      "title": "Givedirectly Inc - Audit for period ending Dec 2024 - Nonprofit ...",
+      "url": "https://projects.propublica.org/nonprofits/display_audit/2024-12-GSAFAC-0000381190",
+      "source_type": "web_search_result",
+      "publisher": "projects.propublica.org",
+      "publication_date": null,
+      "retrieved_at": "2026-08-09T17:54:38Z",
+      "authority_level": "unknown",
+      "freshness": "unknown",
+      "is_official": false,
+      "search_snippet": "Since 2013, the IRS has released data culled from millions of nonprofit tax filings. Use this database to find organizations and see details like their executive compensation, revenue and expenses, as well as download tax filings going back as far as 2001.",
+      "search_provider": "duckduckgo_html",
+      "original_source_id": "SRC-005",
+      "discovered_by": "54_EVIDENCE_GAP_RESEARCH",
+      "targeted_gap_id": "GAP-REV-001",
+      "targeted_query": "GiveDirectly United States Can funding concentration be determined from additional public financial information public_financial_information audited statements annual report form 990",
+      "source_validation": {
+        "is_new_to_run": true,
+        "organization_relevant": true,
+        "gap_relevant": true,
+        "source_vs_evidence_note": "New source found; downstream extraction/evidence processing is required before treating the gap as resolved."
+      }
+    }
+  ],
+  "new_evidence": [],
+  "rejected_sources": [],
+  "unknown_marker": null,
+  "retry_count": 1,
+  "max_retries": 1,
+  "reason_for_retry": "Existing evidence does not show funding concentration.",
+  "research_attempted": true,
+  "rerun_required": true,
+  "rerun_domain": "revenue_resilience",
+  "requires_client_validation": false,
+  "source_evidence_boundary": "A new source is not treated as gap-resolving evidence until downstream extraction/evidence processing validates attributable facts.",
+  "errors": []
+}

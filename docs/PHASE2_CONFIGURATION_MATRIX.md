@@ -17,7 +17,7 @@ P0 = vertical slice. P1 = required expansion. P2 = hardening.
 | 51_REVENUE_RESILIENCE_AGENT | Paola | P0 | No | Future optional | Yes | No | 30,40 | n8n-native repo-ready deterministic P0 revenue finding |
 | 52_IMPACT_EVIDENCE_AGENT | Paola | P1 | No | Future optional | Yes | No | 30,40 | Repository-ready deterministic impact evidence agent; live n8n verification blocked pending n8n access |
 | 53_OPERATIONS_CX_AGENT | Gretel | P1 | No | Yes | Yes | No | 30,40 | Required expansion |
-| 54_EVIDENCE_GAP_RESEARCH | Paola | P2 | Yes | Optional | No | Optional | 30 | Hardening |
+| 54_EVIDENCE_GAP_RESEARCH | Paola | P2 | No | No | No | No | 30 | Repository-ready evidence-gap resolver; reuses 21_WEB_SEARCH and preserves unknowns/retry limits |
 | 60_TRANSFORMATION_ORCHESTRATOR | Gretel | P1 | No | No | No | No | 61,62,63,64,65,66 | Link child workflows |
 | 61_HYPOTHESIS_BUILDER | Gretel | P0 | No | Yes | Optional | No | Paola output fixture | P0 transformation |
 | 62_ROOT_CAUSE_DIAGNOSIS | Gretel | P0 | No | Yes | Optional | No | 61 | P0 transformation |
