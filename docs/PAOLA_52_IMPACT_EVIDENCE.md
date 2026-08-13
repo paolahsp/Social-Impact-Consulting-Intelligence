@@ -4,7 +4,7 @@
 
 Repository-ready on 2026-08-11.
 
-LIVE n8n verification is blocked in this Codex session because no n8n CLI, n8n API environment variables, or n8n connector tool are available. The repository exports are ready to import, but no live workflow URL, DEV workflow URL, or live execution IDs can be truthfully recorded yet.
+52 IMPACT & EVIDENCE — LIVE n8n VERIFIED
 
 ## Purpose
 
@@ -194,7 +194,7 @@ The insufficient-evidence output does not invent outcomes, impact, methodology, 
 1. GiveDirectly structured document evidence.
 2. Insufficient-evidence input.
 
-After import, each Execute Sub-workflow node must be linked to the stored `52_IMPACT_EVIDENCE_AGENT` workflow using the n8n database selector. The repository export intentionally contains no live workflow ID.
+Both DEV Execute Sub-workflow nodes were connected through the n8n database selector to stored workflow `TQEnm1kd7sB8SO8e`. The repository export intentionally contains no hardcoded live workflow ID.
 
 ## Validation
 
@@ -273,22 +273,52 @@ compileall passed for scripts after rerun with a 30-second timeout.
 
 ## Live n8n Verification
 
-Blocked as of 2026-08-11 in this Codex session.
+STATUS: 52 IMPACT & EVIDENCE — LIVE n8n VERIFIED
 
-Checks performed:
+Main workflow:
 
-- `Get-Command n8n` returned no installed CLI.
-- `Get-ChildItem Env:` found no `N8N`, `WEBHOOK`, or `WORKFLOW` environment variables.
-- Tool discovery did not surface an n8n connector.
+- `52_IMPACT_EVIDENCE_AGENT`
+- Workflow ID: `TQEnm1kd7sB8SO8e`
 
-Required next live steps:
+DEV workflow:
 
-1. Import or update `workflows/skeletons/52_IMPACT_EVIDENCE_AGENT.json`.
-2. Import or update `workflows/dev/DEV_PAOLA_52_IMPACT_EVIDENCE_TEST.json`.
-3. Link DEV Execute Sub-workflow nodes to the stored workflow 52 through the n8n database selector.
-4. Execute GiveDirectly and insufficient-evidence branches.
-5. Copy exact terminal-node outputs to `runs/paola_52_*.json`.
-6. Record live workflow IDs, URLs, and execution IDs here.
+- `DEV_PAOLA_52_IMPACT_EVIDENCE_TEST`
+- Workflow ID: `sCTZZ3bvTSw4i3EW`
+- DEV execution: `2066`
+
+GiveDirectly:
+
+- Execution: `2067`
+- `controlled_state`: `success`
+- impact evidence records: 4
+- classifications: `impact_claim`, `activity`, `output`
+- findings: 5
+- unknowns: 6
+- traceability source -> evidence -> finding verified
+- no output was converted into outcome or impact
+
+Insufficient evidence:
+
+- Execution: `2068`
+- `controlled_state`: `insufficient_evidence`
+- impact evidence: 0
+- findings: 1
+- unknowns: 1
+
+Confirmed:
+
+- no invented outcome
+- no invented impact
+- no invented methodology
+- no invented baseline
+- no negative conclusion from missing public evidence
+- absence of public evidence != evidence of absence
+
+Runtime:
+
+- No workflow logic or node-version correction was required.
+- Both DEV nodes were connected through the n8n database selector to stored workflow `TQEnm1kd7sB8SO8e`.
+- All validators and regressions pass.
 
 ## Limitations
 
