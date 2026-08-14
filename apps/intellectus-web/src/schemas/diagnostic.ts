@@ -2,7 +2,7 @@ import { z } from 'zod'
 
 const StableIdSchema = z
   .string()
-  .regex(/^[A-Z]+-[0-9]{3}$/, 'Use a stable ID such as ITEM-001')
+  .regex(/^[A-Z]+(?:-[A-Z0-9]+)+$/, 'Use a stable prefixed ID such as ITEM-001')
 
 export const EpistemicStatusSchema = z.enum([
   'PUBLIC_EVIDENCE',

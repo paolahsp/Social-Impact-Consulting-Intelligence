@@ -1,5 +1,6 @@
 import { useCallback, useMemo, useState, type ReactNode } from 'react'
 import { runStatusLabels, type DiagnosticRepository } from '../repositories/diagnosticRepository'
+import { EvidenceRequiredError, diagnosticMessages } from '../repositories/n8nDiagnosticRepository'
 import type { DiagnosticResult, DiagnosticRunStatus } from '../types/diagnostic'
 import { DiagnosticContext, type DiagnosticContextValue } from './diagnosticContext'
 import { createInitialIntake } from './initialIntake'
@@ -38,6 +39,7 @@ export function DiagnosticProvider({ children, repository }: { children: ReactNo
     runStatus,
     runStatusMessage: runStatusLabels[runStatus],
     runError,
+    isDemoMode: result?.diagnostic.isDemo ?? repository.deliveryMode !== 'live',
     intake,
     reviewed,
     nextStepAdded,
@@ -70,7 +72,7 @@ export function DiagnosticProvider({ children, repository }: { children: ReactNo
         return nextResult.run_status === 'completed'
       } catch (error: unknown) {
         setRunStatus('failed')
-        setRunError(error instanceof Error ? error.message : runStatusLabels.failed)
+        setRunError(error instanceof EvidenceRequiredError ? diagnosticMessages.evidenceRequired : diagnosticMessages.failed)
         return false
       }
     },

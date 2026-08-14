@@ -26,4 +26,5 @@ P0 = vertical slice. P1 = required expansion. P2 = hardening.
 | 65_CLIENT_VALIDATION_QUESTIONS | Gretel | P0 | No | Yes | No | No | 61,62 | Core MVP workflow |
 | 66_90_DAY_ROADMAP | Gretel | P0 | No | Yes | Optional | No | 63,64,65 | P0 transformation |
 | 70_REPORT_QA_DELIVERY | Gretel / Shared integration | P0 | No | Optional | No | Yes | Paola + Gretel outputs | Shared P0 after tracks work |
+| 71_INTELLECTUS_WEB_ADAPTER | Shared integration | P0 | Webhook | No | No | No | Paola handoff, 53 | Inactive repository-ready export; manual 53 selection and live security/e2e verification pending |
 | 99_GLOBAL_ERROR_HANDLER | Shared | P2 | No | No | No | Optional | All workflows | Hardening |

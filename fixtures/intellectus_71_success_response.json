@@ -1,0 +1,170 @@
+{
+  "contract_version": "1.0",
+  "status": "completed",
+  "correlation_id": "CORR-DEMO-001",
+  "run_id": "RUN-FICTIONAL-001",
+  "demo": true,
+  "message": "Diagnostic prepared for review.",
+  "completed_at": "2026-08-14T12:00:00.000Z",
+  "data": {
+    "intake": {
+      "organization_name": "Fictional River Learning Collective",
+      "website": "https://fictional-river-learning.example.org",
+      "country": "DE",
+      "current_challenge": "Preparing for a pre-engagement diagnostic workshop",
+      "research_window": {
+        "start_date": "2026-05-12",
+        "end_date": "2026-08-09"
+      },
+      "uploaded_document_refs": []
+    },
+    "sources": [
+      {
+        "source_id": "SRC-001",
+        "title": "Fictional River Learning Collective Volunteer Page",
+        "url": "https://fictional-river-learning.example.org/volunteer",
+        "source_type": "official_website",
+        "publisher": "Fictional River Learning Collective",
+        "publication_date": null,
+        "retrieved_at": "2026-08-09T09:10:00Z",
+        "authority_level": "official",
+        "freshness": "current",
+        "is_official": true
+      },
+      {
+        "source_id": "SRC-002",
+        "title": "Fictional River Learning Collective Annual Snapshot",
+        "url": "https://fictional-river-learning.example.org/annual-snapshot",
+        "source_type": "public_report",
+        "publisher": "Fictional River Learning Collective",
+        "publication_date": "2026-03-01",
+        "retrieved_at": "2026-08-09T09:14:00Z",
+        "authority_level": "official",
+        "freshness": "recent",
+        "is_official": true
+      }
+    ],
+    "evidence": [
+      {
+        "evidence_id": "EV-001",
+        "run_id": "RUN-FICTIONAL-001",
+        "claim": "Volunteer applications are collected through a public website form.",
+        "source_ids": [
+          "SRC-001"
+        ],
+        "domain": "operations_cx",
+        "evidence_type": "fact",
+        "confidence": 0.86,
+        "status": "supported",
+        "contradiction_ids": [],
+        "requires_validation": false
+      },
+      {
+        "evidence_id": "EV-002",
+        "run_id": "RUN-FICTIONAL-001",
+        "claim": "The organization describes grant funding and small donor support in its annual snapshot.",
+        "source_ids": [
+          "SRC-002"
+        ],
+        "domain": "revenue_resilience",
+        "evidence_type": "fact",
+        "confidence": 0.78,
+        "status": "supported",
+        "contradiction_ids": [],
+        "requires_validation": false
+      },
+      {
+        "evidence_id": "EV-003",
+        "run_id": "RUN-FICTIONAL-001",
+        "claim": "The internal volunteer follow-up process is not described in public sources.",
+        "source_ids": [
+          "SRC-001"
+        ],
+        "domain": "operations_cx",
+        "evidence_type": "unknown",
+        "confidence": 0.7,
+        "status": "unknown",
+        "contradiction_ids": [],
+        "requires_validation": true
+      }
+    ],
+    "findings": [
+      {
+        "finding_id": "F-OPS-001",
+        "domain": "operations_cx",
+        "finding": "The organization provides a publicly visible digital entry point for prospective volunteers.",
+        "evidence_ids": [
+          "EV-001"
+        ],
+        "finding_type": "observed",
+        "confidence": 0.86,
+        "requires_validation": false,
+        "validation_question": null,
+        "journey": "volunteer",
+        "journey_stage": "application",
+        "journey_stage_status": "observed"
+      },
+      {
+        "finding_id": "F-OPS-002",
+        "domain": "operations_cx",
+        "finding": "Public evidence does not establish the internal volunteer process at the follow_up stage.",
+        "evidence_ids": [
+          "EV-003"
+        ],
+        "finding_type": "unknown",
+        "confidence": 0.55,
+        "requires_validation": true,
+        "validation_question": "What happens internally after a volunteer application is submitted, including assignment, acknowledgement, and follow-up?",
+        "journey": "volunteer",
+        "journey_stage": "follow_up",
+        "journey_stage_status": "unknown"
+      },
+      {
+        "finding_id": "F-OPS-003",
+        "domain": "operations_cx",
+        "finding": "The handoffs between public volunteer application submission and first follow-up may involve internal coordination steps that are not visible in public evidence.",
+        "evidence_ids": [
+          "EV-001",
+          "EV-003"
+        ],
+        "finding_type": "hypothesis",
+        "confidence": 0.42,
+        "requires_validation": true,
+        "validation_question": "How are volunteer applications assigned, acknowledged, qualified, and followed up after submission?",
+        "journey": "volunteer",
+        "journey_stage": "application_to_follow_up",
+        "journey_stage_status": "hypothesis"
+      }
+    ],
+    "unknowns": [
+      {
+        "unknown_id": "UNK-001",
+        "domain": "operations_cx",
+        "description": "The internal follow-up process after volunteer form submission is not publicly visible.",
+        "evidence_ids": [
+          "EV-003"
+        ]
+      },
+      {
+        "unknown_id": "UNK-002",
+        "domain": "revenue_resilience",
+        "description": "Funding concentration cannot be determined from the public annual snapshot.",
+        "evidence_ids": [
+          "EV-002"
+        ]
+      }
+    ],
+    "contradictions": [],
+    "rag_metadata": {
+      "retrieval_run_id": "RAG-FICTIONAL-001",
+      "domains": [
+        "revenue_resilience",
+        "operations_cx"
+      ],
+      "retrieved_context_ids": [
+        "FRAMEWORK-REV-001",
+        "FRAMEWORK-OPS-001"
+      ]
+    }
+  }
+}

@@ -32,6 +32,7 @@ REQUIRED_WORKFLOWS = [
     "65_CLIENT_VALIDATION_QUESTIONS.json",
     "66_90_DAY_ROADMAP.json",
     "70_REPORT_QA_DELIVERY.json",
+    "71_INTELLECTUS_WEB_ADAPTER.json",
     "99_GLOBAL_ERROR_HANDLER.json",
 ]
 
@@ -64,6 +65,7 @@ REQUIRED_DOCS = [
     ROOT / "docs" / "GRETEL_P0_N8N_IMPORT.md",
     ROOT / "docs" / "GRETEL_53_N8N_IMPORT.md",
     ROOT / "docs" / "GRETEL_60_N8N_IMPORT.md",
+    ROOT / "docs" / "INTELLECTUS_71_N8N_IMPORT.md",
     ROOT / "tests" / "PHASE2_TEST_PLAN.md",
     ROOT / "stack_decision.md",
 ]
@@ -84,6 +86,9 @@ REQUIRED_FIXTURES = [
     ROOT / "fixtures" / "paola_track_insufficient_evidence.json",
     ROOT / "fixtures" / "gretel_track_output.json",
     ROOT / "fixtures" / "final_package_example.json",
+    ROOT / "fixtures" / "intellectus_71_live_request.json",
+    ROOT / "fixtures" / "intellectus_71_demo_request.json",
+    ROOT / "fixtures" / "intellectus_71_success_response.json",
 ]
 
 SECRET_PATTERNS = [
@@ -133,7 +138,8 @@ def has_terminal_output(workflow):
         name = node.get("name", "")
         js_code = node.get("parameters", {}).get("jsCode", "")
         if (
-            name.startswith("OUTPUT")
+            node.get("type") == "n8n-nodes-base.respondToWebhook"
+            or name.startswith("OUTPUT")
             or name.startswith("RETURN")
             or name.startswith("FINAL")
             or "TERMINAL_OUTPUT_NODE" in js_code

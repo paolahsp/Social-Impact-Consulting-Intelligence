@@ -5,7 +5,7 @@ import { getRouteByPath, routeRegistry } from '../../app/routeRegistry'
 import { Brand } from './Brand'
 
 function SharedHeader() {
-  const { briefExists, resetDiagnostic, result } = useDiagnostic()
+  const { briefExists, isDemoMode, resetDiagnostic, result } = useDiagnostic()
   const location = useLocation()
   const currentRoute = getRouteByPath(location.pathname) ?? routeRegistry[0]
 
@@ -15,7 +15,7 @@ function SharedHeader() {
         <div className="flex min-h-14 flex-wrap items-center justify-between gap-x-6 gap-y-2">
           <div className="flex min-w-0 items-center gap-3">
             <Brand compact />
-            <span
+            {isDemoMode && <><span
               aria-describedby="demo-description"
               className="rounded-control bg-blush px-2.5 py-1 text-xs font-semibold text-ink"
             >
@@ -23,7 +23,7 @@ function SharedHeader() {
             </span>
             <span className="sr-only" id="demo-description">
               Uses sample material. Nothing is sent or permanently saved.
-            </span>
+            </span></>}
           </div>
 
           <p className="text-sm font-semibold text-ink lg:hidden">

@@ -8,14 +8,12 @@ import {
   NextStepsPage,
   OverviewPage,
 } from '../pages/ProductPages'
-import {
-  FixtureDiagnosticRepository,
-  type DiagnosticRepository,
-} from '../repositories/diagnosticRepository'
+import type { DiagnosticRepository } from '../repositories/diagnosticRepository'
+import { createConfiguredDiagnosticRepository } from '../repositories/createDiagnosticRepository'
 import { DiagnosticProvider } from './DiagnosticProvider'
 import { useDiagnostic } from './diagnosticContext'
 
-const fixtureRepository = new FixtureDiagnosticRepository()
+const configuredRepository = createConfiguredDiagnosticRepository()
 
 function ProtectedStep({ children, brief = false }: { children: ReactNode; brief?: boolean }) {
   const { briefExists, result } = useDiagnostic()
@@ -27,7 +25,7 @@ function ProtectedStep({ children, brief = false }: { children: ReactNode; brief
 }
 
 export default function App({
-  repository = fixtureRepository,
+  repository = configuredRepository,
 }: {
   repository?: DiagnosticRepository
 }) {

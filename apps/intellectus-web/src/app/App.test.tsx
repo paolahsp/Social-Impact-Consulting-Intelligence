@@ -7,7 +7,8 @@ import { readFileSync } from 'node:fs'
 import { resolve } from 'node:path'
 import { countries } from '../data/countries'
 import { FixtureDiagnosticRepository, type DiagnosticRepository } from '../repositories/diagnosticRepository'
-import type { DiagnosticInput } from '../types/diagnostic'
+import { DiagnosticTransportError, EvidenceRequiredError } from '../repositories/n8nDiagnosticRepository'
+import type { DiagnosticInput, DiagnosticResult } from '../types/diagnostic'
 import App from './App'
 
 function renderAt(pathname = '/new-diagnostic', repository?: DiagnosticRepository) {
@@ -89,7 +90,7 @@ describe('setup validation, countries and documents', () => {
     const mapping = readFileSync(resolve(process.cwd(), 'docs/REPORT_MAPPING.md'), 'utf8')
     expect(mapping).toContain('`country` = `US`')
     expect(mapping).toContain('`United States`')
-    expect(mapping).toContain('Real adapter derives and sends both when required')
+    expect(mapping).toContain('The adapter preserves the ISO code; no country-name field is invented')
   })
 
   it('focuses the first invalid field and preserves associated errors', () => {
@@ -310,6 +311,19 @@ describe('workshop agenda, brief and calendar', () => {
 })
 
 describe('automated accessibility', () => {
+  it('announces the real pending state without invented progress', async () => {
+    const repository: DiagnosticRepository = {
+      deliveryMode: 'live',
+      prepareDiagnostic: vi.fn(() => new Promise<DiagnosticResult>(() => undefined)),
+    }
+    const { container } = renderAt('/new-diagnostic', repository)
+    fillDiagnostic()
+    fireEvent.click(screen.getByRole('button', { name: 'Prepare diagnostic' }))
+    expect(await screen.findByRole('status')).toHaveTextContent('Preparing diagnostic…')
+    expect(screen.getByRole('button', { name: 'Prepare diagnostic' })).toBeDisabled()
+    expect((await axe.run(container, { rules: { 'color-contrast': { enabled: false } } })).violations).toEqual([])
+  })
+
   it('has no axe violations across all five steps', async () => {
     const { container } = renderAt()
     expect((await axe.run(container, { rules: { 'color-contrast': { enabled: false } } })).violations).toEqual([])
@@ -321,6 +335,23 @@ describe('automated accessibility', () => {
     fireEvent.click(screen.getByRole('button', { name: 'Save questions and continue' }))
     expect((await axe.run(container, { rules: { 'color-contrast': { enabled: false } } })).violations).toEqual([])
     fireEvent.click(screen.getByRole('button', { name: 'Add to conversation brief' }))
+    expect((await axe.run(container, { rules: { 'color-contrast': { enabled: false } } })).violations).toEqual([])
+  })
+
+  it.each([
+    [new EvidenceRequiredError(), 'Evidence is required before this analysis can run.'],
+    [new DiagnosticTransportError(), 'We couldn’t prepare the diagnostic. Try again or continue with the local demo.'],
+  ])('keeps the new failure state accessible and free of internal jargon', async (error, message) => {
+    const repository: DiagnosticRepository = {
+      deliveryMode: 'live',
+      prepareDiagnostic: vi.fn(async () => { throw error }),
+    }
+    const { container } = renderAt('/new-diagnostic', repository)
+    fillDiagnostic()
+    fireEvent.click(screen.getByRole('button', { name: 'Prepare diagnostic' }))
+    expect(await screen.findByRole('alert')).toHaveTextContent(message)
+    expect(screen.getByRole('button', { name: 'Prepare diagnostic' })).toBeEnabled()
+    expect(container.textContent).not.toMatch(/\bn8n\b|workflow 53|schemas?|run_id|stack trace/i)
     expect((await axe.run(container, { rules: { 'color-contrast': { enabled: false } } })).violations).toEqual([])
   })
 })

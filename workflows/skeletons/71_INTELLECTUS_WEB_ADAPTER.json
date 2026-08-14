@@ -1,0 +1,434 @@
+{
+  "name": "71_INTELLECTUS_WEB_ADAPTER",
+  "nodes": [
+    {
+      "parameters": {
+        "content": "PURPOSE\nValidate the Intellectus transport envelope, require a Paola evidence handoff, adapt only compatible fields to 53, validate the leaf output, and return a stable HTTP response.\n\nSECURITY\nInactive by default. Configure authorization, CORS, proxy rate limits, payload limits, and retention before activation. No credential, endpoint, or live workflow ID is committed.\n\nDEMO\nUses only fixtures/paola_track_output.json, requires mode=demo, returns demo=true, and rejects uploaded document references or a supplied handoff.",
+        "height": 500,
+        "width": 660,
+        "color": 4
+      },
+      "id": "00_readme__intellectus_adapter_boundary",
+      "name": "00_README__INTELLECTUS_ADAPTER_BOUNDARY",
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [
+        -720,
+        -500
+      ]
+    },
+    {
+      "parameters": {
+        "httpMethod": "POST",
+        "path": "intellectus-diagnostic",
+        "responseMode": "responseNode",
+        "options": {}
+      },
+      "id": "webhook__post_intellectus_diagnostic",
+      "name": "WEBHOOK__POST_INTELLECTUS_DIAGNOSTIC",
+      "type": "n8n-nodes-base.webhook",
+      "typeVersion": 2,
+      "position": [
+        0,
+        0
+      ],
+      "webhookId": "",
+      "notes": "AFTER IMPORT: configure the production/test webhook URL in Intellectus. Keep inactive until authorization, CORS, proxy limits, and 53 selection are complete."
+    },
+    {
+      "parameters": {
+        "jsCode": "const webhookItem = items[0]?.json;\nconst raw = webhookItem && typeof webhookItem === 'object' && !Array.isArray(webhookItem)\n  ? (webhookItem.body ?? webhookItem)\n  : null;\nconst CONTRACT_VERSION = '1.0';\nconst MAX_BYTES = 256 * 1024;\nconst demoFixture = {\"run_context\":{\"run_id\":\"RUN-FICTIONAL-001\",\"organization\":{\"name\":\"Fictional River Learning Collective\",\"website\":\"https://fictional-river-learning.example.org\",\"country\":\"Germany\",\"mission_area\":\"youth education\"},\"current_challenge\":\"Preparing for a pre-engagement diagnostic workshop\",\"uploaded_document_refs\":[],\"status\":\"analyzing\",\"started_at\":\"2026-08-09T09:00:00Z\",\"errors\":[]},\"sources\":[{\"source_id\":\"SRC-001\",\"title\":\"Fictional River Learning Collective Volunteer Page\",\"url\":\"https://fictional-river-learning.example.org/volunteer\",\"source_type\":\"official_website\",\"publisher\":\"Fictional River Learning Collective\",\"publication_date\":null,\"retrieved_at\":\"2026-08-09T09:10:00Z\",\"authority_level\":\"official\",\"freshness\":\"current\",\"is_official\":true},{\"source_id\":\"SRC-002\",\"title\":\"Fictional River Learning Collective Annual Snapshot\",\"url\":\"https://fictional-river-learning.example.org/annual-snapshot\",\"source_type\":\"public_report\",\"publisher\":\"Fictional River Learning Collective\",\"publication_date\":\"2026-03-01\",\"retrieved_at\":\"2026-08-09T09:14:00Z\",\"authority_level\":\"official\",\"freshness\":\"recent\",\"is_official\":true}],\"evidence\":[{\"evidence_id\":\"EV-001\",\"run_id\":\"RUN-FICTIONAL-001\",\"claim\":\"Volunteer applications are collected through a public website form.\",\"source_ids\":[\"SRC-001\"],\"domain\":\"operations_cx\",\"evidence_type\":\"fact\",\"confidence\":0.86,\"status\":\"supported\",\"contradiction_ids\":[],\"requires_validation\":false},{\"evidence_id\":\"EV-002\",\"run_id\":\"RUN-FICTIONAL-001\",\"claim\":\"The organization describes grant funding and small donor support in its annual snapshot.\",\"source_ids\":[\"SRC-002\"],\"domain\":\"revenue_resilience\",\"evidence_type\":\"fact\",\"confidence\":0.78,\"status\":\"supported\",\"contradiction_ids\":[],\"requires_validation\":false},{\"evidence_id\":\"EV-003\",\"run_id\":\"RUN-FICTIONAL-001\",\"claim\":\"The internal volunteer follow-up process is not described in public sources.\",\"source_ids\":[\"SRC-001\"],\"domain\":\"operations_cx\",\"evidence_type\":\"unknown\",\"confidence\":0.7,\"status\":\"unknown\",\"contradiction_ids\":[],\"requires_validation\":true}],\"findings\":[{\"finding_id\":\"F-001\",\"domain\":\"operations_cx\",\"finding\":\"The public volunteer journey includes an online application form.\",\"evidence_ids\":[\"EV-001\"],\"finding_type\":\"observed\",\"confidence\":0.82,\"requires_validation\":false,\"validation_question\":null},{\"finding_id\":\"F-002\",\"domain\":\"revenue_resilience\",\"finding\":\"Public reporting indicates more than one revenue signal, but the concentration of funding is not publicly visible.\",\"evidence_ids\":[\"EV-002\"],\"finding_type\":\"inferred\",\"confidence\":0.58,\"requires_validation\":true,\"validation_question\":\"What share of annual income comes from the largest funding source?\"}],\"unknowns\":[{\"unknown_id\":\"UNK-001\",\"domain\":\"operations_cx\",\"description\":\"The internal follow-up process after volunteer form submission is not publicly visible.\",\"evidence_ids\":[\"EV-003\"]},{\"unknown_id\":\"UNK-002\",\"domain\":\"revenue_resilience\",\"description\":\"Funding concentration cannot be determined from the public annual snapshot.\",\"evidence_ids\":[\"EV-002\"]}],\"contradictions\":[],\"rag_metadata\":{\"retrieval_run_id\":\"RAG-FICTIONAL-001\",\"domains\":[\"revenue_resilience\",\"operations_cx\"],\"retrieved_context_ids\":[\"FRAMEWORK-REV-001\",\"FRAMEWORK-OPS-001\"]}};\nconst publicMessage = {\n  invalid: 'We couldn\\'t prepare the diagnostic. Try again or continue with the local demo.',\n  evidence: 'Evidence is required before this analysis can run.'\n};\n\nfunction envelope(status, correlationId, runId, demo, extra = {}) {\n  return { contract_version: CONTRACT_VERSION, status, correlation_id: correlationId, run_id: runId, demo, ...extra };\n}\nfunction own(value, key) { return Object.prototype.hasOwnProperty.call(value, key); }\nfunction isObject(value) { return Boolean(value) && typeof value === 'object' && !Array.isArray(value); }\nfunction nonEmpty(value) { return typeof value === 'string' && value.trim().length > 0; }\nfunction unique(values) { return new Set(values).size === values.length; }\nfunction httpUrl(value) {\n  try { return ['http:', 'https:'].includes(new URL(value).protocol); } catch { return false; }\n}\nfunction canonical(value) {\n  if (Array.isArray(value)) return `[${value.map(canonical).join(',')}]`;\n  if (isObject(value)) return `{${Object.keys(value).sort().map(key => `${JSON.stringify(key)}:${canonical(value[key])}`).join(',')}}`;\n  return JSON.stringify(value);\n}\nfunction generatedId(prefix) {\n  const executionId = typeof $execution !== 'undefined' && $execution?.id ? String($execution.id) : crypto.randomUUID();\n  return `${prefix}-${executionId}`;\n}\nfunction sameOrganization(intake, handoff) {\n  const organization = handoff?.run_context?.organization;\n  if (!isObject(organization)) return false;\n  const normalizeName = value => String(value || '').trim().toLowerCase().replace(/\\s+/g, ' ');\n  if (normalizeName(intake.organization_name) !== normalizeName(organization.name)) return false;\n  try {\n    return new URL(intake.website).hostname.toLowerCase() === new URL(organization.website).hostname.toLowerCase();\n  } catch { return false; }\n}\nfunction validateIntake(intake) {\n  if (!isObject(intake)) return false;\n  if (!nonEmpty(intake.organization_name) || !nonEmpty(intake.current_challenge)) return false;\n  if (!/^[A-Z]{2}$/.test(intake.country || '')) return false;\n  if (!isObject(intake.research_window) || !/^\\d{4}-\\d{2}-\\d{2}$/.test(intake.research_window.start_date || '') || !/^\\d{4}-\\d{2}-\\d{2}$/.test(intake.research_window.end_date || '')) return false;\n  if (!Array.isArray(intake.uploaded_document_refs) || !intake.uploaded_document_refs.every(nonEmpty)) return false;\n  try { if (!['http:', 'https:'].includes(new URL(intake.website).protocol)) return false; } catch { return false; }\n  return true;\n}\nfunction validateHandoff(handoff) {\n  if (!isObject(handoff) || !isObject(handoff.run_context) || !nonEmpty(handoff.run_context.run_id)) return false;\n  if (!isObject(handoff.run_context.organization) || !nonEmpty(handoff.run_context.organization.name) || !httpUrl(handoff.run_context.organization.website) || !nonEmpty(handoff.run_context.organization.country)) return false;\n  if (!['created','researching','analyzing','qa','completed','failed'].includes(handoff.run_context.status) || !nonEmpty(handoff.run_context.started_at) || !Array.isArray(handoff.run_context.errors)) return false;\n  if (!isObject(handoff.rag_metadata)) return false;\n  for (const key of ['sources', 'evidence', 'findings', 'unknowns', 'contradictions']) if (!Array.isArray(handoff[key])) return false;\n  const sourceIds = handoff.sources.map(source => source?.source_id);\n  const evidenceIds = handoff.evidence.map(evidence => evidence?.evidence_id);\n  const findingIds = handoff.findings.map(finding => finding?.finding_id);\n  if (!unique(sourceIds) || !unique(evidenceIds) || !unique(findingIds)) return false;\n  if (handoff.sources.some(source => !isObject(source) || !/^SRC-/.test(source.source_id || '') || !nonEmpty(source.title) || !httpUrl(source.url) || !nonEmpty(source.source_type) || !nonEmpty(source.retrieved_at) || typeof source.is_official !== 'boolean')) return false;\n  const sourceSet = new Set(sourceIds);\n  if (handoff.evidence.some(evidence => !isObject(evidence) || !/^EV-/.test(evidence.evidence_id || '') || !nonEmpty(evidence.run_id) || !nonEmpty(evidence.claim) || !Array.isArray(evidence.source_ids) || evidence.source_ids.some(id => !sourceSet.has(id)) || !nonEmpty(evidence.domain) || !['fact','inference','hypothesis','unknown'].includes(evidence.evidence_type) || !Number.isFinite(evidence.confidence) || evidence.confidence < 0 || evidence.confidence > 1 || !['supported','partially_supported','contradicted','insufficient_evidence','unknown'].includes(evidence.status) || !Array.isArray(evidence.contradiction_ids) || typeof evidence.requires_validation !== 'boolean')) return false;\n  const evidenceSet = new Set(evidenceIds);\n  if (handoff.evidence.some(evidence => evidence.contradiction_ids.some(id => !evidenceSet.has(id)))) return false;\n  if (handoff.findings.some(finding => !isObject(finding) || !/^F-/.test(finding.finding_id || '') || !nonEmpty(finding.domain) || !nonEmpty(finding.finding) || !Array.isArray(finding.evidence_ids) || finding.evidence_ids.some(id => !evidenceSet.has(id)) || !['observed','inferred','hypothesis','unknown'].includes(finding.finding_type) || !Number.isFinite(finding.confidence) || finding.confidence < 0 || finding.confidence > 1 || typeof finding.requires_validation !== 'boolean' || !(finding.validation_question === null || nonEmpty(finding.validation_question)))) return false;\n  return true;\n}\n\nlet correlationId = generatedId('CORR');\nlet runId = generatedId('RUN');\nlet mode = 'live';\ntry {\n  if (!isObject(raw)) throw new Error('invalid');\n  const size = new TextEncoder().encode(JSON.stringify(raw)).length;\n  if (size > MAX_BYTES) throw new Error('invalid');\n  if (raw.contract_version !== CONTRACT_VERSION || !['live', 'demo'].includes(raw.mode)) throw new Error('invalid');\n  if (!validateIntake(raw.intake)) throw new Error('invalid');\n  mode = raw.mode;\n  correlationId = nonEmpty(raw.correlation_id) ? raw.correlation_id : (nonEmpty(raw.run_id) ? raw.run_id : correlationId);\n  let handoff;\n  if (mode === 'demo') {\n    if (own(raw, 'evidence_handoff') || raw.intake.uploaded_document_refs.length > 0) throw new Error('invalid');\n    handoff = demoFixture;\n  } else {\n    handoff = raw.evidence_handoff;\n  }\n  if (mode === 'live' && handoff == null) {\n    return [{ json: {\n      request_valid: true,\n      evidence_ready: false,\n      correlation_id: correlationId,\n      run_id: nonEmpty(raw.run_id) ? raw.run_id : runId,\n      demo: false,\n      response: envelope('needs_evidence', correlationId, nonEmpty(raw.run_id) ? raw.run_id : runId, false, {\n        message: publicMessage.evidence,\n        error: { code: 'evidence_required' }\n      })\n    } }];\n  }\n  if (!validateHandoff(handoff)) throw new Error('invalid');\n  if (mode === 'live' && canonical(handoff) === canonical(demoFixture)) throw new Error('invalid');\n  runId = handoff.run_context.run_id;\n  if (nonEmpty(raw.run_id) && raw.run_id !== runId) throw new Error('invalid');\n  if (!sameOrganization(raw.intake, handoff)) throw new Error('invalid');\n  const operationsEvidence = handoff.evidence.filter(evidence => evidence.domain === 'operations_cx');\n  const sufficient = operationsEvidence.length > 0 && operationsEvidence.every(evidence => evidence.source_ids.length > 0);\n  if (!sufficient) {\n    return [{ json: {\n      request_valid: true,\n      evidence_ready: false,\n      correlation_id: correlationId,\n      run_id: runId,\n      demo: mode === 'demo',\n      response: envelope('needs_evidence', correlationId, runId, mode === 'demo', {\n        message: publicMessage.evidence,\n        error: { code: 'evidence_required' }\n      })\n    } }];\n  }\n  return [{ json: {\n    request_valid: true,\n    evidence_ready: true,\n    correlation_id: correlationId,\n    run_id: runId,\n    demo: mode === 'demo',\n    intake: raw.intake,\n    evidence_handoff: handoff\n  } }];\n} catch {\n  return [{ json: {\n    request_valid: false,\n    evidence_ready: false,\n    correlation_id: correlationId,\n    run_id: runId,\n    demo: mode === 'demo',\n    response: envelope('error', correlationId, runId, mode === 'demo', {\n      message: publicMessage.invalid,\n      error: { code: 'invalid_request' }\n    })\n  } }];\n}\n"
+      },
+      "id": "normalize_and_validate_request",
+      "name": "NORMALIZE_AND_VALIDATE_REQUEST",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        280,
+        0
+      ]
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 2
+          },
+          "conditions": [
+            {
+              "id": "decision__request_valid_condition",
+              "leftValue": "={{ $json.request_valid }}",
+              "operator": {
+                "type": "boolean",
+                "operation": "true",
+                "singleValue": true
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "id": "decision__request_valid",
+      "name": "DECISION__REQUEST_VALID",
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.2,
+      "position": [
+        580,
+        0
+      ]
+    },
+    {
+      "parameters": {
+        "respondWith": "json",
+        "responseBody": "={{ $json.response }}",
+        "options": {
+          "responseCode": 400
+        }
+      },
+      "id": "respond__invalid_request_400",
+      "name": "RESPOND__INVALID_REQUEST_400",
+      "type": "n8n-nodes-base.respondToWebhook",
+      "typeVersion": 1.4,
+      "position": [
+        880,
+        240
+      ]
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 2
+          },
+          "conditions": [
+            {
+              "id": "decision__evidence_ready_condition",
+              "leftValue": "={{ $json.evidence_ready }}",
+              "operator": {
+                "type": "boolean",
+                "operation": "true",
+                "singleValue": true
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "id": "decision__evidence_ready",
+      "name": "DECISION__EVIDENCE_READY",
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.2,
+      "position": [
+        880,
+        -80
+      ]
+    },
+    {
+      "parameters": {
+        "respondWith": "json",
+        "responseBody": "={{ $json.response }}",
+        "options": {
+          "responseCode": 422
+        }
+      },
+      "id": "respond__needs_evidence_422",
+      "name": "RESPOND__NEEDS_EVIDENCE_422",
+      "type": "n8n-nodes-base.respondToWebhook",
+      "typeVersion": 1.4,
+      "position": [
+        1180,
+        120
+      ]
+    },
+    {
+      "parameters": {
+        "jsCode": "const normalized = items[0]?.json;\nif (!normalized?.request_valid || !normalized?.evidence_ready || !normalized.evidence_handoff) {\n  throw new Error('Adapter gate did not provide a validated evidence handoff');\n}\nconst handoff = normalized.evidence_handoff;\nreturn [{ json: {\n  run_context: handoff.run_context,\n  sources: handoff.sources,\n  evidence: handoff.evidence,\n  findings: handoff.findings,\n  unknowns: handoff.unknowns,\n  contradictions: handoff.contradictions,\n  rag_metadata: handoff.rag_metadata\n} }];\n"
+      },
+      "id": "adapt__paola_handoff_to_53_input",
+      "name": "ADAPT__PAOLA_HANDOFF_TO_53_INPUT",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        1180,
+        -180
+      ]
+    },
+    {
+      "parameters": {
+        "source": "database",
+        "workflowId": {
+          "__rl": true,
+          "value": "",
+          "mode": "list",
+          "cachedResultName": ""
+        },
+        "mode": "once",
+        "options": {
+          "waitForSubWorkflow": true
+        }
+      },
+      "id": "todo_link_subworkflow__53_operations_cx",
+      "name": "TODO_LINK_SUBWORKFLOW__53_OPERATIONS_CX",
+      "type": "n8n-nodes-base.executeWorkflow",
+      "typeVersion": 1.3,
+      "position": [
+        1480,
+        -180
+      ],
+      "notes": "BLOCKING AFTER IMPORT: select 53_OPERATIONS_CX_AGENT from the Workflow list. No live workflow ID is committed.",
+      "onError": "continueErrorOutput"
+    },
+    {
+      "parameters": {
+        "jsCode": "const leaf = items[0]?.json;\nconst normalized = $('NORMALIZE_AND_VALIDATE_REQUEST').first().json;\nconst handoff = normalized.evidence_handoff;\nconst responseBase = {\n  contract_version: '1.0', correlation_id: normalized.correlation_id,\n  run_id: normalized.run_id, demo: normalized.demo\n};\ntry {\n  if (!leaf || typeof leaf !== 'object' || Array.isArray(leaf) || !Array.isArray(leaf.findings) || Object.keys(leaf).some(key => key !== 'findings')) throw new Error('invalid');\n  const evidenceById = new Map(handoff.evidence.map(evidence => [evidence.evidence_id, evidence]));\n  const ids = new Set();\n  for (const finding of leaf.findings) {\n    if (!finding || typeof finding !== 'object' || !/^F-OPS-/.test(finding.finding_id || '') || ids.has(finding.finding_id)) throw new Error('invalid');\n    ids.add(finding.finding_id);\n    if (finding.domain !== 'operations_cx' || !['observed','inferred','hypothesis','unknown'].includes(finding.finding_type)) throw new Error('invalid');\n    if (typeof finding.finding !== 'string' || !finding.finding.trim() || !Array.isArray(finding.evidence_ids) || !finding.evidence_ids.length) throw new Error('invalid');\n    if (!Number.isFinite(finding.confidence) || finding.confidence < 0 || finding.confidence > 1 || typeof finding.requires_validation !== 'boolean') throw new Error('invalid');\n    for (const evidenceId of finding.evidence_ids) if (evidenceById.get(evidenceId)?.domain !== 'operations_cx') throw new Error('invalid');\n    if (finding.finding_type === 'observed' && (finding.requires_validation || finding.validation_question !== null)) throw new Error('invalid');\n    if (finding.finding_type !== 'observed' && (!finding.requires_validation || typeof finding.validation_question !== 'string' || !finding.validation_question.trim())) throw new Error('invalid');\n  }\n  return [{ json: { output_valid: true, response: {\n    ...responseBase,\n    status: 'completed',\n    message: 'Diagnostic prepared for review.',\n    completed_at: new Date().toISOString(),\n    data: {\n      intake: normalized.intake,\n      sources: handoff.sources,\n      evidence: handoff.evidence,\n      findings: leaf.findings,\n      unknowns: handoff.unknowns,\n      contradictions: handoff.contradictions,\n      rag_metadata: handoff.rag_metadata\n    }\n  } } }];\n} catch {\n  return [{ json: { output_valid: false, response: {\n    ...responseBase,\n    status: 'error',\n    message: 'We couldn\\'t prepare the diagnostic. Try again or continue with the local demo.',\n    error: { code: 'invalid_upstream_response' }\n  } } }];\n}\n"
+      },
+      "id": "validate_and_normalize_53_output",
+      "name": "VALIDATE_AND_NORMALIZE_53_OUTPUT",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        1780,
+        -260
+      ]
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 2
+          },
+          "conditions": [
+            {
+              "id": "decision__output_valid_condition",
+              "leftValue": "={{ $json.output_valid }}",
+              "operator": {
+                "type": "boolean",
+                "operation": "true",
+                "singleValue": true
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "id": "decision__output_valid",
+      "name": "DECISION__OUTPUT_VALID",
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.2,
+      "position": [
+        2080,
+        -260
+      ]
+    },
+    {
+      "parameters": {
+        "respondWith": "json",
+        "responseBody": "={{ $json.response }}",
+        "options": {
+          "responseCode": 200
+        }
+      },
+      "id": "respond__success_200",
+      "name": "RESPOND__SUCCESS_200",
+      "type": "n8n-nodes-base.respondToWebhook",
+      "typeVersion": 1.4,
+      "position": [
+        2380,
+        -360
+      ]
+    },
+    {
+      "parameters": {
+        "respondWith": "json",
+        "responseBody": "={{ $json.response }}",
+        "options": {
+          "responseCode": 502
+        }
+      },
+      "id": "respond__upstream_output_error_502",
+      "name": "RESPOND__UPSTREAM_OUTPUT_ERROR_502",
+      "type": "n8n-nodes-base.respondToWebhook",
+      "typeVersion": 1.4,
+      "position": [
+        2380,
+        -140
+      ]
+    },
+    {
+      "parameters": {
+        "jsCode": "const normalized = $('NORMALIZE_AND_VALIDATE_REQUEST').first().json;\nreturn [{ json: { response: {\n  contract_version: '1.0',\n  status: 'error',\n  correlation_id: normalized.correlation_id,\n  run_id: normalized.run_id,\n  demo: normalized.demo,\n  message: 'We couldn\\'t prepare the diagnostic. Try again or continue with the local demo.',\n  error: { code: 'upstream_failure' }\n} } }];\n"
+      },
+      "id": "map__subworkflow_error",
+      "name": "MAP__SUBWORKFLOW_ERROR",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        1780,
+        0
+      ]
+    },
+    {
+      "parameters": {
+        "respondWith": "json",
+        "responseBody": "={{ $json.response }}",
+        "options": {
+          "responseCode": 502
+        }
+      },
+      "id": "respond__subworkflow_error_502",
+      "name": "RESPOND__SUBWORKFLOW_ERROR_502",
+      "type": "n8n-nodes-base.respondToWebhook",
+      "typeVersion": 1.4,
+      "position": [
+        2080,
+        0
+      ]
+    }
+  ],
+  "connections": {
+    "WEBHOOK__POST_INTELLECTUS_DIAGNOSTIC": {
+      "main": [
+        [
+          {
+            "node": "NORMALIZE_AND_VALIDATE_REQUEST",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "NORMALIZE_AND_VALIDATE_REQUEST": {
+      "main": [
+        [
+          {
+            "node": "DECISION__REQUEST_VALID",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "DECISION__REQUEST_VALID": {
+      "main": [
+        [
+          {
+            "node": "DECISION__EVIDENCE_READY",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "RESPOND__INVALID_REQUEST_400",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "DECISION__EVIDENCE_READY": {
+      "main": [
+        [
+          {
+            "node": "ADAPT__PAOLA_HANDOFF_TO_53_INPUT",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "RESPOND__NEEDS_EVIDENCE_422",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "ADAPT__PAOLA_HANDOFF_TO_53_INPUT": {
+      "main": [
+        [
+          {
+            "node": "TODO_LINK_SUBWORKFLOW__53_OPERATIONS_CX",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "TODO_LINK_SUBWORKFLOW__53_OPERATIONS_CX": {
+      "main": [
+        [
+          {
+            "node": "VALIDATE_AND_NORMALIZE_53_OUTPUT",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "MAP__SUBWORKFLOW_ERROR",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "VALIDATE_AND_NORMALIZE_53_OUTPUT": {
+      "main": [
+        [
+          {
+            "node": "DECISION__OUTPUT_VALID",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "DECISION__OUTPUT_VALID": {
+      "main": [
+        [
+          {
+            "node": "RESPOND__SUCCESS_200",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "RESPOND__UPSTREAM_OUTPUT_ERROR_502",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "MAP__SUBWORKFLOW_ERROR": {
+      "main": [
+        [
+          {
+            "node": "RESPOND__SUBWORKFLOW_ERROR_502",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": false,
+  "settings": {
+    "executionOrder": "v1"
+  },
+  "pinData": {}
+}

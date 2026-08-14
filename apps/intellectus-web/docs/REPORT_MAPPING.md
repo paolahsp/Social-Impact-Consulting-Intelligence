@@ -9,7 +9,7 @@ shared repository**.
 | Organization | `organization_name` | Context only | Context only | `run_context.input.organization_name` | Metadata | Current form value | Always show |
 | Website | `website` | Research input | Context only | `run_context.input.website` | Not repeated | Current form value | Keep available to adapter |
 | Country code | `country` = `US` | Research context | Context | `run_context.input.country` | Metadata lookup input | `US` | Preserve ISO alpha-2 |
-| Country name | Derived centrally = `United States` | **To verify against shared repository** | **To verify against shared repository** | No separate field currently | `United States` | Central `getCountryName` lookup | Real adapter derives and sends both when required |
+| Country name | Derived centrally = `United States` | **To verify against shared research contract** | **To verify against shared research contract** | No separate field currently | `United States` | Central `getCountryName` lookup | The adapter preserves the ISO code; no country-name field is invented |
 | Research window | `research_window` | **To verify against shared repository** | Context | `run_context.input.research_window` | Metadata | Current dates | Limits recent external context; does not exclude relevant official reports; current workflows are not claimed to consume it |
 | Document references | `uploaded_document_refs` | Research input | Context | `run_context.input.uploaded_document_refs` | Sources and limitations when real | Empty array | Browser Files remain separate and are not sources |
 | Sources | — | Sources | Context | `public_evidence_map`, `evidence_ledger` | Sources and limitations | None reviewed | Show only reviewed sources |
@@ -34,3 +34,22 @@ overwrite consultant notes or the human Draft/Ready decision.
 Consultant notes remain human-controlled session state. The workflow must never
 overwrite their text or inclusion choice. Private notes are excluded from the
 brief, print output and Calendar description.
+
+## Current workflow 71 mapping
+
+Workflow 71 passes the flat Paola handoff to 53 without renaming its seven
+top-level fields. The response returns 53's Operations/CX `findings` alongside
+the unchanged source/evidence context required for traceability. The web maps:
+
+- 53 observed findings to source-linked public-evidence items;
+- inferred, hypothesis and unknown findings to items requiring human review;
+- each non-null `validation_question` to the workshop-question list;
+- finding text to overview/brief summaries;
+- the original Paola sources and evidence to the hidden typed ledger.
+
+The review action shown by Intellectus is a UI control, not a recommendation
+produced by 53. Workflow 53 does not produce diagnoses, recommendations, KPIs
+or a roadmap, so those analytical outputs remain absent. A complete shared
+final-package mapping is **To verify against shared research contract** and the
+transformation orchestrator contract; no values are synthesized to fill that
+gap.

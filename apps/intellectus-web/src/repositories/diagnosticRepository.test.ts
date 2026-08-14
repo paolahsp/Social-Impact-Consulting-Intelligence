@@ -46,6 +46,6 @@ describe('FixtureDiagnosticRepository contract', () => {
   })
 
   it('defines plain-language copy for every frozen run state', () => {
-    expect(runStatusLabels).toEqual({ created: 'Preparing your diagnostic', researching: 'Reviewing public sources', analyzing: 'Organizing the evidence', qa: 'Preparing your brief', completed: 'Ready for review', failed: 'We couldn’t complete the diagnostic' })
+    expect(runStatusLabels).toEqual({ created: 'Preparing diagnostic…', researching: 'Preparing diagnostic…', analyzing: 'Preparing diagnostic…', qa: 'Preparing diagnostic…', completed: 'Diagnostic prepared for review.', failed: 'We couldn’t prepare the diagnostic. Try again or continue with the local demo.' })
   })
 })

@@ -8,6 +8,7 @@ export interface DiagnosticContextValue {
   runStatus: DiagnosticRunStatus
   runStatusMessage: string
   runError: string
+  isDemoMode: boolean
   intake: IntakeData
   reviewed: boolean
   nextStepAdded: boolean

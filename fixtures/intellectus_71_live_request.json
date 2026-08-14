@@ -1,0 +1,230 @@
+{
+  "contract_version": "1.0",
+  "mode": "live",
+  "correlation_id": "CORR-PAOLA-P0-001",
+  "run_id": "RUN-PAOLA-P0-001",
+  "intake": {
+    "organization_name": "GiveDirectly",
+    "website": "https://www.givedirectly.org",
+    "country": "US",
+    "current_challenge": "Preparing for a pre-engagement diagnostic workshop",
+    "research_window": {
+      "start_date": "2026-05-12",
+      "end_date": "2026-08-09"
+    },
+    "uploaded_document_refs": []
+  },
+  "evidence_handoff": {
+    "run_context": {
+      "run_id": "RUN-PAOLA-P0-001",
+      "organization": {
+        "name": "GiveDirectly",
+        "website": "https://www.givedirectly.org",
+        "country": "United States",
+        "mission_area": "youth education"
+      },
+      "current_challenge": "Preparing for a pre-engagement diagnostic workshop",
+      "uploaded_document_refs": [],
+      "status": "created",
+      "started_at": "2026-08-09T09:00:00Z",
+      "errors": []
+    },
+    "sources": [
+      {
+        "source_id": "SRC-001",
+        "title": "All Financials by Year - GiveDirectly",
+        "url": "https://www.givedirectly.org/financials-by-year",
+        "source_type": "registry",
+        "publisher": "GiveDirectly",
+        "publication_date": null,
+        "retrieved_at": "2026-08-09T17:54:38Z",
+        "authority_level": "official",
+        "freshness": "unknown",
+        "is_official": true,
+        "search_snippet": "2018 GiveDirectly Policy Plan 2018 - RSIN: 8257 94 948 IRS Form 990 Financial Statements",
+        "search_provider": "duckduckgo_html"
+      },
+      {
+        "source_id": "SRC-002",
+        "title": "Financials | GiveDirectly",
+        "url": "https://www.givedirectly.org/financials",
+        "source_type": "registry",
+        "publisher": "GiveDirectly",
+        "publication_date": null,
+        "retrieved_at": "2026-08-09T17:54:38Z",
+        "authority_level": "official",
+        "freshness": "unknown",
+        "is_official": true,
+        "search_snippet": "Non-profit finances are often opaque and complex. We aim to be transparent and straightforward. We update this page when we release the prior year's financial statements and 990 tax filing here \u2192\u2026",
+        "search_provider": "duckduckgo_html"
+      },
+      {
+        "source_id": "SRC-003",
+        "title": "Givedirectly Inc - Nonprofit Explorer - ProPublica",
+        "url": "https://projects.propublica.org/nonprofits/organizations/271661997",
+        "source_type": "web_search_result",
+        "publisher": "projects.propublica.org",
+        "publication_date": null,
+        "retrieved_at": "2026-08-09T17:54:38Z",
+        "authority_level": "unknown",
+        "freshness": "unknown",
+        "is_official": false,
+        "search_snippet": "Since 2013, the IRS has released data culled from millions of nonprofit tax filings. Use this database to find organizations and see details like their executive compensation, revenue and expenses, as well as download tax filings going back as far as 2001.",
+        "search_provider": "duckduckgo_html"
+      },
+      {
+        "source_id": "SRC-004",
+        "title": "Givedirectly \u2014 Financials & Trends (990)",
+        "url": "https://www.roundpaper.com/nonprofits/org/givedirectly-inc-271661997",
+        "source_type": "registry",
+        "publisher": "roundpaper.com",
+        "publication_date": null,
+        "retrieved_at": "2026-08-09T17:54:38Z",
+        "authority_level": "unknown",
+        "freshness": "unknown",
+        "is_official": false,
+        "search_snippet": "In fiscal year 2024, GiveDirectly reported total revenue of $206,811,067, with $201,022,303 in contributions and grants from individuals, foundations, and institutions.",
+        "search_provider": "duckduckgo_html"
+      },
+      {
+        "source_id": "SRC-005",
+        "title": "Givedirectly Inc - Audit for period ending Dec 2024 - Nonprofit ...",
+        "url": "https://projects.propublica.org/nonprofits/display_audit/2024-12-GSAFAC-0000381190",
+        "source_type": "web_search_result",
+        "publisher": "projects.propublica.org",
+        "publication_date": null,
+        "retrieved_at": "2026-08-09T17:54:38Z",
+        "authority_level": "unknown",
+        "freshness": "unknown",
+        "is_official": false,
+        "search_snippet": "Since 2013, the IRS has released data culled from millions of nonprofit tax filings. Use this database to find organizations and see details like their executive compensation, revenue and expenses, as well as download tax filings going back as far as 2001.",
+        "search_provider": "duckduckgo_html"
+      }
+    ],
+    "evidence": [
+      {
+        "evidence_id": "EV-001",
+        "run_id": "RUN-PAOLA-P0-001",
+        "claim": "Public source \"All Financials by Year - GiveDirectly\" contains revenue-resilience search signals: 990, financial.",
+        "source_ids": [
+          "SRC-001"
+        ],
+        "domain": "revenue_resilience",
+        "evidence_type": "fact",
+        "confidence": 0.68,
+        "status": "supported",
+        "contradiction_ids": [],
+        "requires_validation": false
+      },
+      {
+        "evidence_id": "EV-002",
+        "run_id": "RUN-PAOLA-P0-001",
+        "claim": "Public source \"Financials | GiveDirectly\" contains revenue-resilience search signals: 990, finance, financial.",
+        "source_ids": [
+          "SRC-002"
+        ],
+        "domain": "revenue_resilience",
+        "evidence_type": "fact",
+        "confidence": 0.68,
+        "status": "supported",
+        "contradiction_ids": [],
+        "requires_validation": false
+      },
+      {
+        "evidence_id": "EV-003",
+        "run_id": "RUN-PAOLA-P0-001",
+        "claim": "Public source \"Givedirectly Inc - Nonprofit Explorer - ProPublica\" contains revenue-resilience search signals: revenue.",
+        "source_ids": [
+          "SRC-003"
+        ],
+        "domain": "revenue_resilience",
+        "evidence_type": "fact",
+        "confidence": 0.52,
+        "status": "supported",
+        "contradiction_ids": [],
+        "requires_validation": false
+      },
+      {
+        "evidence_id": "EV-004",
+        "run_id": "RUN-PAOLA-P0-001",
+        "claim": "Public source \"Givedirectly \u2014 Financials & Trends (990)\" contains revenue-resilience search signals: 990, financial, grant, grants, report.",
+        "source_ids": [
+          "SRC-004"
+        ],
+        "domain": "revenue_resilience",
+        "evidence_type": "fact",
+        "confidence": 0.52,
+        "status": "supported",
+        "contradiction_ids": [],
+        "requires_validation": false
+      },
+      {
+        "evidence_id": "EV-005",
+        "run_id": "RUN-PAOLA-P0-001",
+        "claim": "Public source \"Givedirectly Inc - Audit for period ending Dec 2024 - Nonprofit ...\" contains revenue-resilience search signals: revenue.",
+        "source_ids": [
+          "SRC-005"
+        ],
+        "domain": "revenue_resilience",
+        "evidence_type": "fact",
+        "confidence": 0.52,
+        "status": "supported",
+        "contradiction_ids": [],
+        "requires_validation": false
+      }
+    ],
+    "findings": [
+      {
+        "finding_id": "F-001",
+        "domain": "revenue_resilience",
+        "finding": "Public search results surfaced revenue-resilience signals that should be reviewed before drawing conclusions about funding mix or concentration.",
+        "evidence_ids": [
+          "EV-001",
+          "EV-002",
+          "EV-003",
+          "EV-004",
+          "EV-005"
+        ],
+        "finding_type": "observed",
+        "confidence": 0.58,
+        "requires_validation": true,
+        "validation_question": "Which revenue sources are material, recurring, or concentrated in the current financial year?",
+        "rag_context_ids": [
+          "FRAMEWORK-REV-001",
+          "FRAMEWORK-REV-004",
+          "FRAMEWORK-REV-002"
+        ],
+        "limitations": [
+          "No revenue numbers are inferred from search metadata.",
+          "Missing financial evidence remains unknown rather than negative."
+        ]
+      }
+    ],
+    "unknowns": [
+      {
+        "unknown_id": "UNK-001",
+        "domain": "revenue_resilience",
+        "description": "Revenue concentration and recurrence cannot be determined from the P0 public search slice alone.",
+        "evidence_ids": [
+          "EV-001",
+          "EV-002",
+          "EV-003",
+          "EV-004",
+          "EV-005"
+        ]
+      }
+    ],
+    "contradictions": [],
+    "rag_metadata": {
+      "retrieval_run_id": "RAG-P0-001",
+      "domains": [
+        "revenue_resilience"
+      ],
+      "retrieved_context_ids": [
+        "FRAMEWORK-REV-001",
+        "FRAMEWORK-REV-004",
+        "FRAMEWORK-REV-002"
+      ]
+    }
+  }
+}

@@ -1,0 +1,16 @@
+{
+  "contract_version": "1.0",
+  "mode": "demo",
+  "correlation_id": "CORR-DEMO-001",
+  "intake": {
+    "organization_name": "Fictional River Learning Collective",
+    "website": "https://fictional-river-learning.example.org",
+    "country": "DE",
+    "current_challenge": "Preparing for a pre-engagement diagnostic workshop",
+    "research_window": {
+      "start_date": "2026-05-12",
+      "end_date": "2026-08-09"
+    },
+    "uploaded_document_refs": []
+  }
+}

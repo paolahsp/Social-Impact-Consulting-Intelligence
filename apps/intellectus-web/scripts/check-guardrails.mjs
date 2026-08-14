@@ -12,7 +12,6 @@ const forbiddenPatterns = [
   { label: 'placeholder link', pattern: /href\s*=\s*["']#["']/ },
   { label: 'legacy brand name', pattern: /Intellectus AI/ },
   { label: 'promotional AI claim', pattern: /AI-powered/i },
-  { label: 'network fetch', pattern: /\bfetch\s*\(/ },
   { label: 'direct service endpoint', pattern: /\/(?:api|webhooks?)\//i },
   { label: 'local persistence', pattern: /\b(?:localStorage|sessionStorage|indexedDB)\b/i },
   { label: 'TypeScript suppression', pattern: /@ts-ignore/ },
@@ -89,6 +88,9 @@ if (/min-w-\[(?!0)/.test(await readFile(join(sourceRoot, 'pages', 'ProductPages.
 
 for (const file of files) {
   const contents = await readFile(file, 'utf8')
+  if (/\bfetch\b/.test(contents) && relative(projectRoot, file) !== 'src/repositories/n8nDiagnosticRepository.ts') {
+    violations.push(`${relative(projectRoot, file)}: network transport must remain inside the n8n infrastructure adapter`)
+  }
   for (const { label, pattern } of forbiddenPatterns) {
     if (pattern.test(contents)) {
       violations.push(`${relative(projectRoot, file)}: ${label}`)

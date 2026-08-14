@@ -266,6 +266,21 @@ Use this checklist per workflow during n8n setup.
 - [ ] Connected to parent workflow
 - [ ] Integration test passed
 
+## 71_INTELLECTUS_WEB_ADAPTER
+
+- [ ] Imported after `53_OPERATIONS_CX_AGENT`
+- [ ] `TODO_LINK_SUBWORKFLOW__53_OPERATIONS_CX` selected manually
+- [ ] No workflow ID or credential exported to the repository
+- [ ] Authorization boundary configured
+- [ ] Exact-origin CORS configured
+- [ ] Proxy/BFF rate and 256 KiB body limits configured
+- [ ] Input, evidence handoff and output contracts validated
+- [ ] HTTP 400, 422, 502 and 200 demo branches tested
+- [ ] Demo result contains `demo: true`
+- [ ] Live fixture without Operations/CX evidence returns `needs_evidence`
+- [ ] Retention, redacted logging, cancellation and idempotency controls agreed
+- [ ] Live web -> 71 -> 53 -> web run recorded before any active claim
+
 ## 99_GLOBAL_ERROR_HANDLER
 
 - [ ] Imported

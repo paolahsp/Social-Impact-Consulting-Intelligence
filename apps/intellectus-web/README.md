@@ -36,12 +36,20 @@ npm run preview
 `npm run verify` runs lint, strict type checking, tests, runtime guardrails and
 the production build.
 
+## Workflow adapter
+
+Set `VITE_DIAGNOSTIC_WEBHOOK_URL` to activate the validated workflow adapter.
+Leave it unset to use the explicit local demo. Never put tokens in `VITE_*`
+variables. See [the integration contract](docs/N8N_INTEGRATION_CONTRACT.md) for
+the request/response boundary and production limitations.
+
 ## Current limits
 
-- The workflow adapter is not connected; the repository returns validated local
-  sample data.
-- There are no remote requests, endpoints, secrets, authentication, export or
-  persistence.
+- No environment-specific webhook, workflow ID or credential is committed.
+- A live web request cannot complete until the shared research track supplies a
+  validated Operations/CX evidence handoff.
+- Direct browser-to-workflow deployment cannot protect a secret; production
+  requires an authenticated backend/BFF or equivalent gateway.
 - KPI baselines and targets are not established.
 - Automated accessibility checks do not establish WCAG conformance. Browser,
   assistive-technology, zoom and reflow checks remain manual QA work.

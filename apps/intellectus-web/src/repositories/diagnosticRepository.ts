@@ -11,15 +11,16 @@ import type {
 } from '../types/diagnostic'
 
 export const runStatusLabels: Record<DiagnosticRunStatus, string> = {
-  created: 'Preparing your diagnostic',
-  researching: 'Reviewing public sources',
-  analyzing: 'Organizing the evidence',
-  qa: 'Preparing your brief',
-  completed: 'Ready for review',
-  failed: 'We couldn’t complete the diagnostic',
+  created: 'Preparing diagnostic…',
+  researching: 'Preparing diagnostic…',
+  analyzing: 'Preparing diagnostic…',
+  qa: 'Preparing diagnostic…',
+  completed: 'Diagnostic prepared for review.',
+  failed: 'We couldn’t prepare the diagnostic. Try again or continue with the local demo.',
 }
 
 export interface DiagnosticRepository {
+  readonly deliveryMode?: 'demo' | 'live'
   prepareDiagnostic(input: DiagnosticInput): Promise<DiagnosticResult>
 }
 
@@ -48,6 +49,8 @@ export function classifyChallenge(value: string): DiagnosticScenario {
 }
 
 export class FixtureDiagnosticRepository implements DiagnosticRepository {
+  readonly deliveryMode = 'demo' as const
+
   async prepareDiagnostic(input: DiagnosticInput): Promise<DiagnosticResult> {
     const validatedInput = DiagnosticInputSchema.parse(input)
     const scenario = classifyChallenge(validatedInput.current_challenge)
