@@ -58,5 +58,5 @@ A secure consultant workspace with authentication, saved diagnostics, document
 storage and history belongs to a future persistence phase.
 
 See [Information Architecture](docs/INFORMATION_ARCHITECTURE.md), the
-[UX QA Checklist](docs/UX_QA_CHECKLIST.md), and the future
+[UX QA Checklist](docs/UX_QA_CHECKLIST.md), and the
 [n8n Integration Contract](docs/N8N_INTEGRATION_CONTRACT.md).
