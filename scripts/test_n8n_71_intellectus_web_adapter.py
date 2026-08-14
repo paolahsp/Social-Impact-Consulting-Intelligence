@@ -30,13 +30,20 @@ def node(workflow, name):
 
 def run_code(workflow, name, items, contexts=None):
     code = node(workflow, name)["parameters"]["jsCode"]
+    # A fresh VM context intentionally omits Node/browser Web API globals such
+    # as URL and TextEncoder, matching the isolation boundary of n8n Code nodes.
     harness = r"""
 const fs = require('fs');
+const vm = require('node:vm');
 const input = JSON.parse(fs.readFileSync(0, 'utf8'));
-const $execution = { id: 'offline-test-execution' };
-const $ = name => ({ first: () => ({ json: input.contexts[name] }) });
+const context = vm.createContext({
+  items: input.items,
+  $execution: { id: 'offline-test-execution' },
+  __contexts: input.contexts,
+});
+context.$ = name => ({ first: () => ({ json: context.__contexts[name] }) });
 try {
-  const result = new Function('items', '$execution', '$', input.code)(input.items, $execution, $);
+  const result = new vm.Script(`(() => {${input.code}\n})()`).runInContext(context);
   process.stdout.write(JSON.stringify(result));
 } catch (error) {
   console.error(error && error.stack ? error.stack : String(error));
@@ -56,7 +63,15 @@ try {
 
 
 def normalize(workflow, request):
-    return run_code(workflow, "NORMALIZE_AND_VALIDATE_REQUEST", [{"json": {"body": request}}])[0]["json"]
+    webhook_item = {
+        "headers": {"content-type": "application/json"},
+        "params": {},
+        "query": {},
+        "body": request,
+        "webhookUrl": "https://n8n.example/webhook-test/intellectus-diagnostic",
+        "executionMode": "test",
+    }
+    return run_code(workflow, "NORMALIZE_AND_VALIDATE_REQUEST", [{"json": webhook_item}])[0]["json"]
 
 
 def run_53(workflow, payload):
@@ -119,6 +134,9 @@ def main():
     live = load(LIVE_REQUEST)
     demo = load(DEMO_REQUEST)
     validate_export(workflow_71)
+    normalize_code = node(workflow_71, "NORMALIZE_AND_VALIDATE_REQUEST")["parameters"]["jsCode"]
+    assert "TextEncoder" not in normalize_code
+    assert "new URL(" not in normalize_code
 
     normalized = normalize(workflow_71, live)
     assert normalized["request_valid"] is True and normalized["evidence_ready"] is False
@@ -145,6 +163,11 @@ def main():
     demo_result = normalize(workflow_71, demo)
     assert demo_result["request_valid"] is True and demo_result["evidence_ready"] is True
     assert demo_result["demo"] is True
+    assert demo_result["correlation_id"] == "CORR-DEMO-001"
+
+    unicode_oversize = copy.deepcopy(demo)
+    unicode_oversize["intake"]["current_challenge"] = "é" * 131_000
+    assert normalize(workflow_71, unicode_oversize)["request_valid"] is False
 
     mixed_demo = copy.deepcopy(demo)
     mixed_demo["evidence_handoff"] = live["evidence_handoff"]

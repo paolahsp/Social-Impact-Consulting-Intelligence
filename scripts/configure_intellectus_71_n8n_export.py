@@ -115,8 +115,32 @@ function own(value, key) { return Object.prototype.hasOwnProperty.call(value, ke
 function isObject(value) { return Boolean(value) && typeof value === 'object' && !Array.isArray(value); }
 function nonEmpty(value) { return typeof value === 'string' && value.trim().length > 0; }
 function unique(values) { return new Set(values).size === values.length; }
+function utf8ByteLength(value) {
+  let bytes = 0;
+  for (let index = 0; index < value.length; index += 1) {
+    const code = value.charCodeAt(index);
+    if (code <= 0x7f) bytes += 1;
+    else if (code <= 0x7ff) bytes += 2;
+    else if (code >= 0xd800 && code <= 0xdbff && index + 1 < value.length && value.charCodeAt(index + 1) >= 0xdc00 && value.charCodeAt(index + 1) <= 0xdfff) {
+      bytes += 4;
+      index += 1;
+    } else bytes += 3;
+  }
+  return bytes;
+}
+function httpUrlParts(value) {
+  if (!nonEmpty(value) || /[\s\\]/.test(value)) return null;
+  const match = /^(https?):\/\/([^/?#]+)(?:[/?#].*)?$/i.exec(value.trim());
+  if (!match) return null;
+  let authority = match[2];
+  const userInfoEnd = authority.lastIndexOf('@');
+  if (userInfoEnd >= 0) authority = authority.slice(userInfoEnd + 1);
+  const hostMatch = /^(\[[0-9a-f:.]+\]|[^:]+)(?::(\d{1,5}))?$/i.exec(authority);
+  if (!hostMatch || !hostMatch[1] || (hostMatch[2] && Number(hostMatch[2]) > 65535)) return null;
+  return { protocol: `${match[1].toLowerCase()}:`, hostname: hostMatch[1].toLowerCase() };
+}
 function httpUrl(value) {
-  try { return ['http:', 'https:'].includes(new URL(value).protocol); } catch { return false; }
+  return httpUrlParts(value) !== null;
 }
 function canonical(value) {
   if (Array.isArray(value)) return `[${value.map(canonical).join(',')}]`;
@@ -132,9 +156,9 @@ function sameOrganization(intake, handoff) {
   if (!isObject(organization)) return false;
   const normalizeName = value => String(value || '').trim().toLowerCase().replace(/\s+/g, ' ');
   if (normalizeName(intake.organization_name) !== normalizeName(organization.name)) return false;
-  try {
-    return new URL(intake.website).hostname.toLowerCase() === new URL(organization.website).hostname.toLowerCase();
-  } catch { return false; }
+  const intakeUrl = httpUrlParts(intake.website);
+  const organizationUrl = httpUrlParts(organization.website);
+  return Boolean(intakeUrl && organizationUrl && intakeUrl.hostname === organizationUrl.hostname);
 }
 function validateIntake(intake) {
   if (!isObject(intake)) return false;
@@ -142,7 +166,7 @@ function validateIntake(intake) {
   if (!/^[A-Z]{2}$/.test(intake.country || '')) return false;
   if (!isObject(intake.research_window) || !/^\d{4}-\d{2}-\d{2}$/.test(intake.research_window.start_date || '') || !/^\d{4}-\d{2}-\d{2}$/.test(intake.research_window.end_date || '')) return false;
   if (!Array.isArray(intake.uploaded_document_refs) || !intake.uploaded_document_refs.every(nonEmpty)) return false;
-  try { if (!['http:', 'https:'].includes(new URL(intake.website).protocol)) return false; } catch { return false; }
+  if (!httpUrl(intake.website)) return false;
   return true;
 }
 function validateHandoff(handoff) {
@@ -169,7 +193,7 @@ let runId = generatedId('RUN');
 let mode = 'live';
 try {
   if (!isObject(raw)) throw new Error('invalid');
-  const size = new TextEncoder().encode(JSON.stringify(raw)).length;
+  const size = utf8ByteLength(JSON.stringify(raw));
   if (size > MAX_BYTES) throw new Error('invalid');
   if (raw.contract_version !== CONTRACT_VERSION || !['live', 'demo'].includes(raw.mode)) throw new Error('invalid');
   if (!validateIntake(raw.intake)) throw new Error('invalid');
