@@ -148,15 +148,17 @@ Use this checklist per workflow during n8n setup.
 
 ## 53_OPERATIONS_CX_AGENT
 
-- [ ] Imported
-- [ ] Trigger works
-- [ ] Input contract validated
-- [ ] API configured
-- [ ] Agent configured
-- [ ] Output matches contract
-- [ ] Error path tested
-- [ ] Connected to parent workflow
-- [ ] Integration test passed
+- [ ] Retained evidence that workflow 53 was imported into n8n; execution through
+  71 is reported in PR #1 but is not independently auditable
+- [ ] Retained n8n trigger execution evidence
+- [x] Input contract validated offline
+- [x] No API or credential required by the committed deterministic workflow
+- [x] Repository workflow logic configured
+- [x] Output contract validated offline
+- [x] Error and rejection paths validated offline
+- [x] Offline 71 -> 53 composition harness passed
+- [ ] Retained evidence of a configured n8n parent link
+- [ ] Retained n8n integration execution artifact
 
 ## 54_EVIDENCE_GAP_RESEARCH
 
@@ -268,18 +270,26 @@ Use this checklist per workflow during n8n setup.
 
 ## 71_INTELLECTUS_WEB_ADAPTER
 
-- [ ] Imported after `53_OPERATIONS_CX_AGENT`
-- [ ] `TODO_LINK_SUBWORKFLOW__53_OPERATIONS_CX` selected manually
-- [ ] No workflow ID or credential exported to the repository
+- [ ] Retained evidence that 71 was imported after `53_OPERATIONS_CX_AGENT`;
+  controlled execution is reported in PR #1 but is not independently auditable
+- [ ] Retained evidence that `TODO_LINK_SUBWORKFLOW__53_OPERATIONS_CX` was
+  selected in n8n; the repository export intentionally remains unlinked
+- [x] No workflow ID or credential exported to the repository
 - [ ] Authorization boundary configured
 - [ ] Exact-origin CORS configured
 - [ ] Proxy/BFF rate and 256 KiB body limits configured
-- [ ] Input, evidence handoff and output contracts validated
-- [ ] HTTP 400, 422, 502 and 200 demo branches tested
-- [ ] Demo result contains `demo: true`
-- [ ] Live fixture without Operations/CX evidence returns `needs_evidence`
+- [x] Input, evidence handoff and output contracts validated offline
+- [x] Offline 400, 422, 502 and 200 demo branch logic and response-code
+  configuration validated
+- [ ] Retained n8n HTTP captures for 400, 422, 502 and 200 demo responses
+- [x] Offline demo result contains `demo: true`
+- [x] Offline live fixture without Operations/CX evidence returns
+  `needs_evidence`
+- [ ] Retained workflow 71 Test Webhook execution artifact; execution is
+  reported in PR #1 but is not independently auditable
 - [ ] Retention, redacted logging, cancellation and idempotency controls agreed
-- [ ] Live web -> 71 -> 53 -> web run recorded before any active claim
+- [ ] Live browser -> public research -> validated handoff -> 71 -> 53 -> web
+  run artifact retained before any active claim
 
 ## 99_GLOBAL_ERROR_HANDLER
 
