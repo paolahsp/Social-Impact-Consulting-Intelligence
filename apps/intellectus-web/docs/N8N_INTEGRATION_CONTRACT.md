@@ -1,6 +1,6 @@
 # Intellectus web adapter contract
 
-Status: repository-ready and offline-tested; not live end-to-end verified.
+Status: repository-ready and offline-tested. The 71 -> 53 composition is reproducibly validated offline using fictional evidence. PR #1 reports a controlled n8n Test Webhook execution of the same path, but no corresponding workflow 71 execution artifact is retained in the repository. Live public-research end-to-end integration remains unverified.
 
 Contract version: `1.0`.
 
@@ -139,13 +139,14 @@ automatic; the consultant can retry from the form.
 
 ## Fixtures
 
-- `fixtures/intellectus_71_demo_request.json`: successful offline/demo path;
-  must return `demo: true`.
+- `fixtures/intellectus_71_demo_request.json`: fictional demo request exercised
+  by the offline composition harness; must return `demo: true`.
 - `fixtures/intellectus_71_live_request.json`: real Paola P0 GiveDirectly
   handoff. It is a valid live envelope but has no Operations/CX evidence, so it
   correctly returns `422 needs_evidence`.
-- `fixtures/intellectus_71_success_response.json`: demo success envelope based
-  only on the validated repository fixture.
+- `fixtures/intellectus_71_success_response.json`: static demo success envelope
+  based only on validated repository fixtures; it is not a workflow execution
+  artifact.
 
 An actual `200 demo: false` fixture does not exist because the repository has
 no validated live Operations/CX handoff. Creating one would invent evidence.
