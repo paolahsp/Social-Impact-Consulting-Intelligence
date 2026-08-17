@@ -1338,6 +1338,28 @@ def main():
         from configure_gretel_60_n8n_exports import configure_gretel_60_workflows
 
         configure_gretel_60_workflows(ROOT)
+
+        from configure_paola_22_website_extraction import configure_paola_22_workflows
+
+        configure_paola_22_workflows(ROOT)
+    except ImportError:
+        pass
+    try:
+        from configure_paola_23_document_research import configure_paola_23_workflows
+
+        configure_paola_23_workflows(ROOT)
+    except ImportError:
+        pass
+    try:
+        from configure_paola_52_impact_evidence import configure_paola_52_workflows
+
+        configure_paola_52_workflows(ROOT)
+    except ImportError:
+        pass
+    try:
+        from configure_paola_54_evidence_gap_research import configure_paola_54_workflows
+
+        configure_paola_54_workflows(ROOT)
     except ImportError:
         pass
     print(f"Generated {len(WORKFLOWS)} workflows and {len(SCHEMAS)} schemas.")

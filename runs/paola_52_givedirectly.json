@@ -1,0 +1,383 @@
+{
+  "repository_execution_evidence": {
+    "verified_at": "2026-08-11T00:00:00Z",
+    "runner": "scripts/paola_52_impact_evidence_test.py",
+    "note": "Repository-local deterministic mirror of the n8n Code-node logic."
+  },
+  "run_context": {
+    "run_id": "RUN-N8N-23-GIVEDIRECTLY",
+    "organization": {
+      "name": "GiveDirectly",
+      "website": "https://www.givedirectly.org",
+      "country": "United States",
+      "mission_area": null
+    },
+    "current_challenge": null,
+    "uploaded_document_refs": [],
+    "status": "created",
+    "started_at": "2026-08-10T15:39:17.433Z",
+    "errors": []
+  },
+  "controlled_state": "success",
+  "impact_taxonomy": [
+    "activity",
+    "output",
+    "outcome",
+    "impact",
+    "indicator",
+    "unknown",
+    "impact_claim",
+    "impact_evidence"
+  ],
+  "sources": [
+    {
+      "source_id": "SRC-DOC-001",
+      "title": "PFS - 201597 GiveDirectly AUD 1223 - Published FS (GiveDirectly - Audit - 2023 10768333 [12/31/2023] (In Process))",
+      "url": "https://www.givedirectly.org/wp-content/uploads/2024/11/FY2023-GiveDirectly-Audit-Final-FS-Public-Disclosure.pdf",
+      "source_type": "public_document_audited_financial_statement",
+      "publisher": "GiveDirectly",
+      "publication_date": null,
+      "retrieved_at": "2026-08-10T15:39:18.244Z",
+      "authority_level": "official",
+      "freshness": "unknown",
+      "is_official": true,
+      "document_id": "DOC-001",
+      "document_type": "audited_financial_statement",
+      "file_type": "pdf",
+      "discovered_by": "website_extraction",
+      "extraction_provider": "jina_reader",
+      "useful_sections": [
+        {
+          "section_type": "financial",
+          "text": "Independent Auditors\u2019 Report ............................................................................................................. 1-2 Financial Statements Statements of Financial Position ........................................................................................................ 3 Statements of Activities ...................................................................................................................... 4 Statements of Functional Expenses ................................................................................................ 5-6 Statements of Cash Flows .................................................................................................................. 7 Notes to Financial Statements ....................................................................................................... 8-22 Marcum llp / 1899 L Street, NW / Suite 850 / Washington, DC 20036 / Phone 202.227.4000 / marcumllp.com - 1 -INDEPENDENT AUDITORS\u2019 REPORT"
+        },
+        {
+          "section_type": "financial",
+          "text": "We have audited the financial statements of GiveDirectly, Inc. (GiveDirectly), which comprise the statements of financial position as of December 31, 2023 and 2022, and the related statements of activities, functional expenses and cash flows for the years then ended, and the related notes to the financial statements. In our opinion, the accompanying financial statements present fairly, in all material respects, the financial position of GiveDirectly as of December 31, 2023 and 2022, and the changes in their net assets and their cash flows for the years then ended in accordance with accounting principles generally accepted in the United States of America."
+        },
+        {
+          "section_type": "impact",
+          "text": "GiveDirectly, Inc. (GiveDirectly) is a not-for-profit organization incorporated on September 1, 2009, in the State of Massachusetts. GiveDirectly\u2019s mission is to reduce poverty by providing financial assistance directly to those in need. GiveDirectly offers a service that enables others to send cash transfers directly to people in need. GiveDirectly operates in the United States of America (U.S.), Kenya, Uganda, Rwanda, Liberia, Malawi, Mozambique, the Democratic Republic of the Congo (DRC), Nigeria, Yemen, Bangladesh, Morocco, and the United Kingdom (UK). With a focus on efficiency and using the latest available technology, GiveDirectly identifies households and informs them that they are eligible for a transfer, helps them register for a digital payments system, sends funds, and follows up with recipients\u2019 post-transfer. Transfer sizes vary by project. GiveDirectly exclusively focuses on unconditional cash transfers; therefore, recipients are free to spend on what they need without restriction. Many of GiveDirectly\u2019s transfers are made as part of research projects designed to better understand how to optimize the use of cash transfers and answer questions posed by the policy worl"
+        },
+        {
+          "section_type": "impact",
+          "text": "The preparation of financial statements in conformity with GAAP requires management to make estimates and assumptions that affect the reported amounts and disclosures. Accordingly, actual results could differ from those estimates. 2. Inventory GiveDirectly provides cell phones to some recipients to facilitate their enrollment in a payments platform. Phones that have not yet been distributed to recipients are GiveDirectly\u2019s only inventory item. Inventory on hand was $933,518 and $1,249,133 at December 31, 2023 and 2022, respectively. Inventory is reported at net realizable value on a first-in, first-out basis. 3. Grants and Contributions Receivable GiveDirectly has received promises to give from donors as of December 31, 2023 and 2022, that will be received over the course of the next several years. The table below breaks down the grants and contributions receivable by the timeframe in which they will be received. Grants and contributions to be received in over 12 months have been discounted to reflect net present value. Grants and contributions receivable, net at December 31, 2023 and 2022, are deemed fully collectible and due as follows: 2023 2022 Due within one year $ 25,222,623 "
+        },
+        {
+          "section_type": "programs",
+          "text": "GiveDirectly uses the allowance method to record potentially uncollectible receivables. Unconditional promises to give that are expected to be collected within one year are recorded at their net realizable value. Unconditional promises to give that are expected to be collected in future years are recorded at the present value of their estimated future cash flows if significant. The discounts on those amounts are computed using risk-adjusted interest rates appropriate for the expected term of the promise to give. Amortization of the discount is included in grants and contributions in the accompanying statements of activities. GIVEDIRECTLY, INC."
+        },
+        {
+          "section_type": "programs",
+          "text": "GiveDirectly invests in a professionally managed portfolio. Investments are reported at fair value. Investments in marketable equity securities, fixed income securities and mutual funds are stated at quoted market values. Investments in private equity funds are reported at fair value based on the net asset value (NAV) as determined by the external partnership or fund manager. Fair value is the price that would be received to sell an asset, or paid to transfer a liability through an orderly transaction between market participants at the measurement date. Purchases and sales are reflected on a trade date basis. Interest, dividends and realized gains or losses are recorded when earned. Changes in the fair value of the portfolio are recorded as unrealized gains or losses. Donated investments are recorded as contributions based on their fair value at the date of donation. The investment objective for marketable equity securities, fixed income securities and mutual funds is to preserve capital while generating a modest return to support GiveDirectly\u2019s activities. During 2020, GiveDirectly\u2019s investment in Segovia Technology was exchanged for holdings in two newly created companies, Tap-Ta"
+        },
+        {
+          "section_type": "governance",
+          "text": "Management is responsible for the preparation and fair presentation of the financial statements in accordance with accounting principles generally accepted in the United States of America, and for the design, implementation, and maintenance of internal control relevant to the preparation and fair presentation of financial statements that are free from material misstatement, whether due to fraud or error. In preparing the financial statements, management is required to evaluate whether there are conditions or events, considered in the aggregate, that raise substantial doubt about GiveDirectly\u2019s ability to continue as a going concern within one year after the date that the financial statements are available to be issued."
+        },
+        {
+          "section_type": "governance",
+          "text": "\uf0b7 evaluate the appropriateness of accounting policies used and the reasonableness of significant accounting estimates made by management, as well as evaluate the overall presentation of the financial statements."
+        }
+      ]
+    }
+  ],
+  "evidence": [],
+  "impact_evidence": [
+    {
+      "evidence_id": "EV-IMP-001",
+      "run_id": "RUN-N8N-23-GIVEDIRECTLY",
+      "claim": "GiveDirectly\u2019s mission is to reduce poverty by providing financial assistance directly to those in need.",
+      "source_ids": [
+        "SRC-DOC-001"
+      ],
+      "domain": "impact_evidence",
+      "evidence_type": "fact",
+      "confidence": 0.72,
+      "status": "supported",
+      "contradiction_ids": [],
+      "requires_validation": false,
+      "impact_signal_source": "document_section",
+      "document_id": "DOC-001",
+      "document_type": "audited_financial_statement",
+      "section_type": "impact",
+      "impact_classification": {
+        "level": "impact_claim",
+        "signal_nature": "claim",
+        "taxonomy_version": "impact-taxonomy-v1"
+      }
+    },
+    {
+      "evidence_id": "EV-IMP-002",
+      "run_id": "RUN-N8N-23-GIVEDIRECTLY",
+      "claim": "GiveDirectly offers a service that enables others to send cash transfers directly to people in need.",
+      "source_ids": [
+        "SRC-DOC-001"
+      ],
+      "domain": "impact_evidence",
+      "evidence_type": "fact",
+      "confidence": 0.72,
+      "status": "supported",
+      "contradiction_ids": [],
+      "requires_validation": false,
+      "impact_signal_source": "document_section",
+      "document_id": "DOC-001",
+      "document_type": "audited_financial_statement",
+      "section_type": "impact",
+      "impact_classification": {
+        "level": "activity",
+        "signal_nature": "evidence_signal",
+        "taxonomy_version": "impact-taxonomy-v1"
+      }
+    },
+    {
+      "evidence_id": "EV-IMP-003",
+      "run_id": "RUN-N8N-23-GIVEDIRECTLY",
+      "claim": "With a focus on efficiency and using the latest available technology, GiveDirectly identifies households and informs them that they are eligible for a transfer, helps them register for a digital payments system, sends funds, and follows up with recipients\u2019 post-transfer.",
+      "source_ids": [
+        "SRC-DOC-001"
+      ],
+      "domain": "impact_evidence",
+      "evidence_type": "fact",
+      "confidence": 0.72,
+      "status": "supported",
+      "contradiction_ids": [],
+      "requires_validation": false,
+      "impact_signal_source": "document_section",
+      "document_id": "DOC-001",
+      "document_type": "audited_financial_statement",
+      "section_type": "impact",
+      "impact_classification": {
+        "level": "output",
+        "signal_nature": "evidence_signal",
+        "taxonomy_version": "impact-taxonomy-v1"
+      }
+    },
+    {
+      "evidence_id": "EV-IMP-004",
+      "run_id": "RUN-N8N-23-GIVEDIRECTLY",
+      "claim": "Transfer sizes vary by project.",
+      "source_ids": [
+        "SRC-DOC-001"
+      ],
+      "domain": "impact_evidence",
+      "evidence_type": "fact",
+      "confidence": 0.72,
+      "status": "supported",
+      "contradiction_ids": [],
+      "requires_validation": false,
+      "impact_signal_source": "document_section",
+      "document_id": "DOC-001",
+      "document_type": "audited_financial_statement",
+      "section_type": "impact",
+      "impact_classification": {
+        "level": "output",
+        "signal_nature": "evidence_signal",
+        "taxonomy_version": "impact-taxonomy-v1"
+      }
+    }
+  ],
+  "evidence_characteristics": [
+    {
+      "evidence_id": "EV-IMP-001",
+      "impact_level": "impact_claim",
+      "source_authority": "official",
+      "specificity": "low",
+      "measurement_presence": false,
+      "timeframe_visibility": false,
+      "methodology_visibility": false,
+      "denominator_sample_visibility": false,
+      "baseline_visibility": false,
+      "target_visibility": false,
+      "attribution_limitations": null
+    },
+    {
+      "evidence_id": "EV-IMP-002",
+      "impact_level": "activity",
+      "source_authority": "official",
+      "specificity": "low",
+      "measurement_presence": false,
+      "timeframe_visibility": false,
+      "methodology_visibility": false,
+      "denominator_sample_visibility": false,
+      "baseline_visibility": false,
+      "target_visibility": false,
+      "attribution_limitations": null
+    },
+    {
+      "evidence_id": "EV-IMP-003",
+      "impact_level": "output",
+      "source_authority": "official",
+      "specificity": "medium",
+      "measurement_presence": false,
+      "timeframe_visibility": false,
+      "methodology_visibility": false,
+      "denominator_sample_visibility": false,
+      "baseline_visibility": false,
+      "target_visibility": false,
+      "attribution_limitations": null
+    },
+    {
+      "evidence_id": "EV-IMP-004",
+      "impact_level": "output",
+      "source_authority": "official",
+      "specificity": "low",
+      "measurement_presence": false,
+      "timeframe_visibility": false,
+      "methodology_visibility": false,
+      "denominator_sample_visibility": false,
+      "baseline_visibility": false,
+      "target_visibility": false,
+      "attribution_limitations": null
+    }
+  ],
+  "findings": [
+    {
+      "finding_id": "F-IMP-001",
+      "domain": "impact_evidence",
+      "finding": "Program activities or service delivery steps are publicly described in the reviewed sources.",
+      "evidence_ids": [
+        "EV-IMP-002"
+      ],
+      "finding_type": "observed",
+      "confidence": 0.72,
+      "requires_validation": false,
+      "validation_question": null
+    },
+    {
+      "finding_id": "F-IMP-002",
+      "domain": "impact_evidence",
+      "finding": "Public reporting reviewed contains output or reach signals.",
+      "evidence_ids": [
+        "EV-IMP-003",
+        "EV-IMP-004"
+      ],
+      "finding_type": "observed",
+      "confidence": 0.72,
+      "requires_validation": false,
+      "validation_question": null
+    },
+    {
+      "finding_id": "F-IMP-003",
+      "domain": "impact_evidence",
+      "finding": "An impact-oriented claim or mission statement is publicly stated, but it is not treated as proof that long-term impact occurred.",
+      "evidence_ids": [
+        "EV-IMP-001"
+      ],
+      "finding_type": "observed",
+      "confidence": 0.72,
+      "requires_validation": true,
+      "validation_question": "What outcome or longitudinal evidence supports this public impact claim?"
+    },
+    {
+      "finding_id": "F-IMP-004",
+      "domain": "impact_evidence",
+      "finding": "Public reporting reviewed emphasizes activities, outputs, or claims more clearly than measured outcomes or long-term impact evidence.",
+      "evidence_ids": [
+        "EV-IMP-001",
+        "EV-IMP-002",
+        "EV-IMP-003",
+        "EV-IMP-004"
+      ],
+      "finding_type": "inferred",
+      "confidence": 0.56,
+      "requires_validation": true,
+      "validation_question": "Are measured outcomes or long-term follow-up results available outside the public sources reviewed?"
+    },
+    {
+      "finding_id": "F-IMP-005",
+      "domain": "impact_evidence",
+      "finding": "Some impact evidence characteristics remain unknown from the public sources reviewed.",
+      "evidence_ids": [
+        "EV-IMP-001",
+        "EV-IMP-002",
+        "EV-IMP-003",
+        "EV-IMP-004"
+      ],
+      "finding_type": "unknown",
+      "confidence": 0.5,
+      "requires_validation": true,
+      "validation_question": "Which measurement details, if any, can the organization validate directly?"
+    }
+  ],
+  "unknowns": [
+    {
+      "unknown_id": "UNK-IMP-001",
+      "domain": "impact_evidence",
+      "description": "Outcome evidence was not identified in the public sources reviewed.",
+      "evidence_ids": [
+        "EV-IMP-001",
+        "EV-IMP-002",
+        "EV-IMP-003",
+        "EV-IMP-004"
+      ]
+    },
+    {
+      "unknown_id": "UNK-IMP-002",
+      "domain": "impact_evidence",
+      "description": "Long-term impact evidence was not identified in the public sources reviewed.",
+      "evidence_ids": [
+        "EV-IMP-001",
+        "EV-IMP-002",
+        "EV-IMP-003",
+        "EV-IMP-004"
+      ]
+    },
+    {
+      "unknown_id": "UNK-IMP-003",
+      "domain": "impact_evidence",
+      "description": "Methodology visibility could not be determined from the public evidence reviewed.",
+      "evidence_ids": [
+        "EV-IMP-001",
+        "EV-IMP-002",
+        "EV-IMP-003",
+        "EV-IMP-004"
+      ]
+    },
+    {
+      "unknown_id": "UNK-IMP-004",
+      "domain": "impact_evidence",
+      "description": "Baseline visibility could not be determined from the public evidence reviewed.",
+      "evidence_ids": [
+        "EV-IMP-001",
+        "EV-IMP-002",
+        "EV-IMP-003",
+        "EV-IMP-004"
+      ]
+    },
+    {
+      "unknown_id": "UNK-IMP-005",
+      "domain": "impact_evidence",
+      "description": "Denominator or sample visibility could not be determined from the public evidence reviewed.",
+      "evidence_ids": [
+        "EV-IMP-001",
+        "EV-IMP-002",
+        "EV-IMP-003",
+        "EV-IMP-004"
+      ]
+    },
+    {
+      "unknown_id": "UNK-IMP-006",
+      "domain": "impact_evidence",
+      "description": "Target visibility could not be determined from the public evidence reviewed.",
+      "evidence_ids": [
+        "EV-IMP-001",
+        "EV-IMP-002",
+        "EV-IMP-003",
+        "EV-IMP-004"
+      ]
+    }
+  ],
+  "contradictions": [],
+  "rag_metadata": {
+    "retrieval_run_id": null,
+    "domains": [],
+    "retrieved_context_ids": []
+  },
+  "guardrails": [
+    "Activity, output, outcome, impact, indicator, and unknown are not interchangeable.",
+    "Absence of public evidence is not treated as evidence of organizational absence.",
+    "RAG context cannot add organization-specific facts."
+  ],
+  "errors": []
+}

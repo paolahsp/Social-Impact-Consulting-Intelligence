@@ -34,6 +34,12 @@ Paola returns one object with these fields:
 - `contradictions`: array of contradiction summaries linked to evidence IDs
 - `rag_metadata`: retrieval metadata needed by downstream analysis
 
+### Workflow 23 document handoff
+
+`23_DOCUMENT_PUBLIC_DATA_RESEARCH` reuses the existing source contract. It adds document metadata through permitted additional source properties rather than creating a competing shared schema. Its direct sub-workflow output contains `run_context`, `sources`, `documents`, `controlled_state`, and `errors`.
+
+Each `documents[]` entry references exactly one `sources[].source_id`. The downstream `30_EVIDENCE_PIPELINE` must convert only attributable document statements into evidence; workflow 23 does not create consulting conclusions. `partial_success` preserves successful sources and documents while exposing failed candidates in `errors`.
+
 ## Gretel Track Input
 
 Gretel receives the exact Paola output shape. This lets Gretel configure transformation workflows from fixtures while Paola is still connecting live research APIs.
@@ -207,4 +213,3 @@ The shared final output is `final_package.schema.json`.
   }
 }
 ```
-

@@ -1,0 +1,44 @@
+{
+  "live_n8n_evidence": {
+    "verified_at": "2026-08-10T15:39:20Z",
+    "dev_execution_id": "1396",
+    "subworkflow_execution_id": "1400",
+    "workflow_id": "bNt57WU9v9dewoUY",
+    "dev_workflow_id": "57ipCHY4PPPvZYiP",
+    "snapshot_note": "Exact single-item output copied from the live n8n aggregate node."
+  },
+  "run_context": {
+    "run_id": "RUN-N8N-23-UNSUPPORTED",
+    "organization": {
+      "name": "GiveDirectly",
+      "website": "https://www.givedirectly.org",
+      "country": "United States",
+      "mission_area": null
+    },
+    "current_challenge": null,
+    "uploaded_document_refs": [],
+    "status": "created",
+    "started_at": "2026-08-10T15:39:19.878Z",
+    "errors": []
+  },
+  "controlled_state": "unsupported_document",
+  "extraction_provider": "jina_reader",
+  "provider": {
+    "name": "Jina Reader",
+    "credential_required": false,
+    "integration": "n8n HTTP Request",
+    "endpoint_pattern": "https://r.jina.ai/{public_document_url}"
+  },
+  "candidates_attempted": 1,
+  "documents": [],
+  "sources": [],
+  "useful_sections_count": 0,
+  "errors": [
+    {
+      "stage": "DOCUMENT_RELEVANCE_FILTER",
+      "error_type": "unsupported_document",
+      "url": "https://www.givedirectly.org/about",
+      "message": "Candidate is not a supported or recognizable public document"
+    }
+  ]
+}

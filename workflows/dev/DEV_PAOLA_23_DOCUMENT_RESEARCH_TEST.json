@@ -1,0 +1,381 @@
+{
+  "name": "DEV_PAOLA_23_DOCUMENT_RESEARCH_TEST",
+  "nodes": [
+    {
+      "parameters": {
+        "content": "DEV_PAOLA_23_DOCUMENT_RESEARCH_TEST\nRuns four visible branches against the stored 23 sub-workflow:\n1) GiveDirectly audited financial statement\n2) MSF financial report\n3) valid + missing GiveDirectly documents (partial success)\n4) unsupported non-document URL\n\nAfter import, link every Execute Sub-workflow node to the real stored workflow 23.",
+        "height": 420,
+        "width": 680,
+        "color": 4
+      },
+      "id": "00_readme__dev_workflow",
+      "name": "00_README__DEV_WORKFLOW",
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [
+        -520,
+        -620
+      ]
+    },
+    {
+      "parameters": {},
+      "id": "start__manual_test_trigger",
+      "name": "START__MANUAL_TEST_TRIGGER",
+      "type": "n8n-nodes-base.manualTrigger",
+      "typeVersion": 1,
+      "position": [
+        0,
+        80
+      ]
+    },
+    {
+      "parameters": {
+        "jsCode": "return [{ json: {\n  run_id: 'RUN-N8N-23-GIVEDIRECTLY',\n  organization: { name: 'GiveDirectly', website: 'https://www.givedirectly.org', country: 'United States' },\n  document_candidates: [{\n    url: 'https://www.givedirectly.org/wp-content/uploads/2024/11/FY2023-GiveDirectly-Audit-Final-FS-Public-Disclosure.pdf',\n    title: 'GiveDirectly FY2023 audited financial statements',\n    discovered_by: 'website_extraction'\n  }]\n} }];\n"
+      },
+      "id": "dev_input__givedirectly",
+      "name": "DEV_INPUT__GIVEDIRECTLY",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        300,
+        -360
+      ]
+    },
+    {
+      "parameters": {
+        "source": "database",
+        "workflowId": {
+          "__rl": true,
+          "value": "",
+          "mode": "list",
+          "cachedResultName": "23_DOCUMENT_PUBLIC_DATA_RESEARCH"
+        },
+        "workflowInputs": {
+          "mappingMode": "passThrough",
+          "value": {},
+          "matchingColumns": [],
+          "schema": [],
+          "attemptToConvertTypes": false,
+          "convertFieldsToString": true
+        },
+        "options": {
+          "waitForSubWorkflow": true
+        }
+      },
+      "id": "execute_subworkflow__23_givedirectly",
+      "name": "EXECUTE_SUBWORKFLOW__23_GIVEDIRECTLY",
+      "type": "n8n-nodes-base.executeWorkflow",
+      "typeVersion": 1.3,
+      "position": [
+        640,
+        -360
+      ],
+      "notes": "AFTER IMPORT: select the stored n8n workflow 23_DOCUMENT_PUBLIC_DATA_RESEARCH. Never invent an ID."
+    },
+    {
+      "parameters": {
+        "jsCode": "return items;\n"
+      },
+      "id": "final_givedirectly_success",
+      "name": "FINAL_GIVEDIRECTLY_SUCCESS",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        980,
+        -360
+      ]
+    },
+    {
+      "parameters": {
+        "jsCode": "return [{ json: {\n  run_id: 'RUN-N8N-23-MSF',\n  organization: { name: 'M\u00e9decins Sans Fronti\u00e8res', website: 'https://www.msf.org', country: 'Switzerland' },\n  document_candidates: [{\n    url: 'https://www.msf.org/sites/default/files/2024-07/MSF_Financial_Report_2023_FINAL_APPROVED_030724.pdf',\n    title: 'MSF International Financial Report 2023',\n    discovered_by: 'web_search'\n  }]\n} }];\n"
+      },
+      "id": "dev_input__msf",
+      "name": "DEV_INPUT__MSF",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        300,
+        -80
+      ]
+    },
+    {
+      "parameters": {
+        "source": "database",
+        "workflowId": {
+          "__rl": true,
+          "value": "",
+          "mode": "list",
+          "cachedResultName": "23_DOCUMENT_PUBLIC_DATA_RESEARCH"
+        },
+        "workflowInputs": {
+          "mappingMode": "passThrough",
+          "value": {},
+          "matchingColumns": [],
+          "schema": [],
+          "attemptToConvertTypes": false,
+          "convertFieldsToString": true
+        },
+        "options": {
+          "waitForSubWorkflow": true
+        }
+      },
+      "id": "execute_subworkflow__23_msf",
+      "name": "EXECUTE_SUBWORKFLOW__23_MSF",
+      "type": "n8n-nodes-base.executeWorkflow",
+      "typeVersion": 1.3,
+      "position": [
+        640,
+        -80
+      ],
+      "notes": "AFTER IMPORT: select the stored n8n workflow 23_DOCUMENT_PUBLIC_DATA_RESEARCH. Never invent an ID."
+    },
+    {
+      "parameters": {
+        "jsCode": "return items;\n"
+      },
+      "id": "final_msf_success",
+      "name": "FINAL_MSF_SUCCESS",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        980,
+        -80
+      ]
+    },
+    {
+      "parameters": {
+        "jsCode": "return [{ json: {\n  run_id: 'RUN-N8N-23-PARTIAL',\n  organization: { name: 'GiveDirectly', website: 'https://www.givedirectly.org', country: 'United States' },\n  document_candidates: [\n    {\n      url: 'https://www.givedirectly.org/wp-content/uploads/2024/11/FY2023-GiveDirectly-Audit-Final-FS-Public-Disclosure.pdf',\n      title: 'GiveDirectly FY2023 audited financial statements',\n      discovered_by: 'website_extraction'\n    },\n    {\n      url: 'https://www.givedirectly.org/wp-content/uploads/2099/12/missing-document.pdf',\n      title: 'Missing GiveDirectly report test',\n      discovered_by: 'public_data'\n    }\n  ]\n} }];\n"
+      },
+      "id": "dev_input__partial_success",
+      "name": "DEV_INPUT__PARTIAL_SUCCESS",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        300,
+        200
+      ]
+    },
+    {
+      "parameters": {
+        "source": "database",
+        "workflowId": {
+          "__rl": true,
+          "value": "",
+          "mode": "list",
+          "cachedResultName": "23_DOCUMENT_PUBLIC_DATA_RESEARCH"
+        },
+        "workflowInputs": {
+          "mappingMode": "passThrough",
+          "value": {},
+          "matchingColumns": [],
+          "schema": [],
+          "attemptToConvertTypes": false,
+          "convertFieldsToString": true
+        },
+        "options": {
+          "waitForSubWorkflow": true
+        }
+      },
+      "id": "execute_subworkflow__23_partial_success",
+      "name": "EXECUTE_SUBWORKFLOW__23_PARTIAL_SUCCESS",
+      "type": "n8n-nodes-base.executeWorkflow",
+      "typeVersion": 1.3,
+      "position": [
+        640,
+        200
+      ],
+      "notes": "AFTER IMPORT: select the stored n8n workflow 23_DOCUMENT_PUBLIC_DATA_RESEARCH. Never invent an ID."
+    },
+    {
+      "parameters": {
+        "jsCode": "return items;\n"
+      },
+      "id": "final_partial_success",
+      "name": "FINAL_PARTIAL_SUCCESS",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        980,
+        200
+      ]
+    },
+    {
+      "parameters": {
+        "jsCode": "return [{ json: {\n  run_id: 'RUN-N8N-23-UNSUPPORTED',\n  organization: { name: 'GiveDirectly', website: 'https://www.givedirectly.org', country: 'United States' },\n  document_candidates: [{\n    url: 'https://www.givedirectly.org/about',\n    title: 'About GiveDirectly',\n    discovered_by: 'website_extraction'\n  }]\n} }];\n"
+      },
+      "id": "dev_input__unsupported",
+      "name": "DEV_INPUT__UNSUPPORTED",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        300,
+        480
+      ]
+    },
+    {
+      "parameters": {
+        "source": "database",
+        "workflowId": {
+          "__rl": true,
+          "value": "",
+          "mode": "list",
+          "cachedResultName": "23_DOCUMENT_PUBLIC_DATA_RESEARCH"
+        },
+        "workflowInputs": {
+          "mappingMode": "passThrough",
+          "value": {},
+          "matchingColumns": [],
+          "schema": [],
+          "attemptToConvertTypes": false,
+          "convertFieldsToString": true
+        },
+        "options": {
+          "waitForSubWorkflow": true
+        }
+      },
+      "id": "execute_subworkflow__23_unsupported",
+      "name": "EXECUTE_SUBWORKFLOW__23_UNSUPPORTED",
+      "type": "n8n-nodes-base.executeWorkflow",
+      "typeVersion": 1.3,
+      "position": [
+        640,
+        480
+      ],
+      "notes": "AFTER IMPORT: select the stored n8n workflow 23_DOCUMENT_PUBLIC_DATA_RESEARCH. Never invent an ID."
+    },
+    {
+      "parameters": {
+        "jsCode": "return items;\n"
+      },
+      "id": "final_unsupported_document",
+      "name": "FINAL_UNSUPPORTED_DOCUMENT",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        980,
+        480
+      ]
+    }
+  ],
+  "connections": {
+    "START__MANUAL_TEST_TRIGGER": {
+      "main": [
+        [
+          {
+            "node": "DEV_INPUT__GIVEDIRECTLY",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "DEV_INPUT__MSF",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "DEV_INPUT__PARTIAL_SUCCESS",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "DEV_INPUT__UNSUPPORTED",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "DEV_INPUT__GIVEDIRECTLY": {
+      "main": [
+        [
+          {
+            "node": "EXECUTE_SUBWORKFLOW__23_GIVEDIRECTLY",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "EXECUTE_SUBWORKFLOW__23_GIVEDIRECTLY": {
+      "main": [
+        [
+          {
+            "node": "FINAL_GIVEDIRECTLY_SUCCESS",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "DEV_INPUT__MSF": {
+      "main": [
+        [
+          {
+            "node": "EXECUTE_SUBWORKFLOW__23_MSF",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "EXECUTE_SUBWORKFLOW__23_MSF": {
+      "main": [
+        [
+          {
+            "node": "FINAL_MSF_SUCCESS",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "DEV_INPUT__PARTIAL_SUCCESS": {
+      "main": [
+        [
+          {
+            "node": "EXECUTE_SUBWORKFLOW__23_PARTIAL_SUCCESS",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "EXECUTE_SUBWORKFLOW__23_PARTIAL_SUCCESS": {
+      "main": [
+        [
+          {
+            "node": "FINAL_PARTIAL_SUCCESS",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "DEV_INPUT__UNSUPPORTED": {
+      "main": [
+        [
+          {
+            "node": "EXECUTE_SUBWORKFLOW__23_UNSUPPORTED",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "EXECUTE_SUBWORKFLOW__23_UNSUPPORTED": {
+      "main": [
+        [
+          {
+            "node": "FINAL_UNSUPPORTED_DOCUMENT",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": false,
+  "settings": {
+    "executionOrder": "v1"
+  },
+  "pinData": {}
+}

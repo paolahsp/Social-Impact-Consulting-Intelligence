@@ -3,9 +3,9 @@
   "nodes": [
     {
       "parameters": {
-        "content": "PURPOSE\nExtract useful information from official organization pages.\n\nOWNER\nPAOLA TRACK A\n\nINPUT CONTRACT\nofficial_url plus run_context\n\nOUTPUT CONTRACT\nsource.schema.json[] plus extracted useful_content\n\nSTATUS\nSkeleton only. Inactive by default. No credentials. Configure TODO nodes after import.",
-        "height": 340,
-        "width": 520,
+        "content": "PURPOSE\nExtract useful public evidence from official organization pages.\n\nOWNER\nPAOLA TRACK A\n\nINPUT CONTRACT\nofficial_url or website plus run_context/organization fields\n\nOUTPUT CONTRACT\nsource.schema.json[] plus controlled_state and website_context\n\nSTATUS\nRepository-ready Jina Reader development implementation. Inactive by default. No credentials. Public evidence only; no consulting conclusions.",
+        "height": 400,
+        "width": 600,
         "color": 4
       },
       "id": "00_readme__purpose_owner_contracts_status",
@@ -13,8 +13,24 @@
       "type": "n8n-nodes-base.stickyNote",
       "typeVersion": 1,
       "position": [
-        -420,
-        -320
+        -520,
+        -420
+      ]
+    },
+    {
+      "parameters": {
+        "content": "FACT \u2260 INFERENCE \u2260 HYPOTHESIS \u2260 UNKNOWN\nThis workflow collects and normalizes public page evidence. Missing content remains unknown. It must never infer organizational inefficiency, performance, or need from missing website information.",
+        "height": 260,
+        "width": 600,
+        "color": 6
+      },
+      "id": "note__fact_boundaries",
+      "name": "NOTE__FACT_BOUNDARIES",
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [
+        -520,
+        20
       ]
     },
     {
@@ -30,23 +46,23 @@
     },
     {
       "parameters": {
-        "jsCode": "// SKELETON_PLACEHOLDER: INPUT_CONTRACT__OFFICIAL_URL\n// Accept official URL and extraction scope.\n// TODO: Replace this placeholder with configured production logic.\n// Contract discipline: preserve FACT / INFERENCE / HYPOTHESIS / UNKNOWN boundaries.\nreturn items;\n"
+        "jsCode": "function normalizeWebsite(value) {\n  const raw = String(value || '').trim();\n  if (!raw) return null;\n  const candidate = /^https?:\\/\\//i.test(raw) ? raw : `https://${raw}`;\n  const match = candidate.match(/^(https?):\\/\\/([^\\/?#]+)(?:[\\/?#]|$)/i);\n  if (!match || !match[2] || !match[2].includes('.')) return null;\n  return `${match[1].toLowerCase()}://${match[2].toLowerCase()}`;\n}\n\nreturn items.map(item => {\n  const payload = item.json || {};\n  const organization = payload.run_context?.organization || payload.organization || {};\n  const organizationName = payload.organization_name || organization.name;\n  const country = payload.country || organization.country;\n  const website = normalizeWebsite(payload.official_url || payload.website || organization.website);\n  const runContext = payload.run_context || {\n    run_id: payload.run_id || `RUN-22-${Date.now()}`,\n    organization: {\n      name: organizationName,\n      website,\n      country,\n      mission_area: payload.mission_area || organization.mission_area || null\n    },\n    current_challenge: payload.current_challenge || null,\n    uploaded_document_refs: payload.uploaded_document_refs || [],\n    status: 'created',\n    started_at: payload.started_at || new Date().toISOString(),\n    errors: []\n  };\n  runContext.organization = {\n    ...(runContext.organization || {}),\n    name: organizationName,\n    website,\n    country,\n    mission_area: payload.mission_area || organization.mission_area || runContext.organization?.mission_area || null\n  };\n  const errors = [...(payload.errors || [])];\n  if (!organizationName || !country || !website) {\n    errors.push({\n      stage: 'INPUT_VALIDATION',\n      error_type: 'invalid_input',\n      message: 'organization_name, website/official_url, and country are required and website must be an HTTP(S) URL'\n    });\n  }\n  return {\n    json: {\n      ...payload,\n      run_context: runContext,\n      official_url: website,\n      controlled_state: errors.length ? 'request_failure' : 'ready',\n      errors\n    }\n  };\n});\n"
       },
-      "id": "input_contract__official_url",
-      "name": "INPUT_CONTRACT__OFFICIAL_URL",
+      "id": "input_validation",
+      "name": "INPUT_VALIDATION",
       "type": "n8n-nodes-base.code",
       "typeVersion": 2,
       "position": [
-        260,
+        280,
         0
       ]
     },
     {
       "parameters": {
-        "jsCode": "// SKELETON_PLACEHOLDER: TODO_API__WEBSITE_EXTRACTION\n// Placeholder for Firecrawl, Jina, or direct extraction.\n// TODO: Replace this placeholder with configured production logic.\n// Contract discipline: preserve FACT / INFERENCE / HYPOTHESIS / UNKNOWN boundaries.\nreturn items;\n"
+        "jsCode": "return items.map(item => {\n  if (item.json.controlled_state === 'request_failure') return item;\n  const officialDomain = String(item.json.official_url).replace(/^https?:\\/\\//i, '').split('/')[0].replace(/^www\\./, '').toLowerCase();\n  return {\n    json: {\n      ...item.json,\n      official_domain: officialDomain,\n      extraction_provider: 'jina_reader',\n      provider_endpoint_pattern: 'https://r.jina.ai/http://{host}{path}'\n    }\n  };\n});\n"
       },
-      "id": "todo_api__website_extraction",
-      "name": "TODO_API__WEBSITE_EXTRACTION",
+      "id": "official_url",
+      "name": "OFFICIAL_URL",
       "type": "n8n-nodes-base.code",
       "typeVersion": 2,
       "position": [
@@ -56,54 +72,233 @@
     },
     {
       "parameters": {
-        "jsCode": "// SKELETON_PLACEHOLDER: PAGE_RESULT_VALIDATION\n// Validate page fetch/extraction status and URL match.\n// TODO: Replace this placeholder with configured production logic.\n// Contract discipline: preserve FACT / INFERENCE / HYPOTHESIS / UNKNOWN boundaries.\nreturn items;\n"
+        "jsCode": "const output = [];\nconst pathCandidates = [\n  { path: '/', page_type: 'home' },\n  { path: '/about', page_type: 'about' },\n  { path: '/our-work', page_type: 'programs' },\n  { path: '/impact', page_type: 'impact' },\n  { path: '/financials', page_type: 'financials' },\n  { path: '/annual-reports', page_type: 'reports' },\n  { path: '/donate', page_type: 'fundraising' },\n  { path: '/contact', page_type: 'contact' }\n];\n\nfor (const item of items) {\n  if (item.json.controlled_state === 'request_failure') {\n    output.push({ json: { ...item.json, page_index: 0, page_type: 'invalid_input', page_url: null, extraction_url: null } });\n    continue;\n  }\n  const root = String(item.json.official_url).replace(/\\/+$/, '');\n  const host = root.replace(/^https?:\\/\\//i, '').split('/')[0];\n  for (let index = 0; index < pathCandidates.length; index++) {\n    const candidate = pathCandidates[index];\n    const pageUrl = candidate.path === '/' ? `${root}/` : `${root}${candidate.path}`;\n    const extractionUrl = `https://r.jina.ai/http://${host}${candidate.path}`;\n    output.push({\n      json: {\n        ...item.json,\n        page_index: index,\n        page_type: candidate.page_type,\n        page_url: pageUrl,\n        extraction_url: extractionUrl,\n        relevance_reason: `official_${candidate.page_type}_candidate`\n      }\n    });\n  }\n}\nreturn output;\n"
       },
-      "id": "page_result_validation",
-      "name": "PAGE_RESULT_VALIDATION",
+      "id": "page_discovery",
+      "name": "PAGE_DISCOVERY",
       "type": "n8n-nodes-base.code",
       "typeVersion": 2,
       "position": [
-        860,
+        840,
         0
       ]
     },
     {
       "parameters": {
-        "jsCode": "// SKELETON_PLACEHOLDER: USEFUL_CONTENT\n// Keep useful text, headings, and page signals.\n// TODO: Replace this placeholder with configured production logic.\n// Contract discipline: preserve FACT / INFERENCE / HYPOTHESIS / UNKNOWN boundaries.\nreturn items;\n"
+        "jsCode": "const allowedTypes = new Set(['home', 'about', 'programs', 'impact', 'financials', 'reports', 'fundraising', 'contact']);\nreturn items.filter(item => item.json.controlled_state === 'request_failure' || (item.json.page_url && allowedTypes.has(item.json.page_type)));\n"
+      },
+      "id": "relevance_filter",
+      "name": "RELEVANCE_FILTER",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        1120,
+        0
+      ]
+    },
+    {
+      "parameters": {
+        "method": "GET",
+        "url": "={{ $json.extraction_url }}",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "Accept",
+              "value": "text/plain"
+            },
+            {
+              "name": "User-Agent",
+              "value": "Mozilla/5.0 SocialImpactConsultingIntelligence/1.0"
+            }
+          ]
+        },
+        "options": {
+          "timeout": 30000,
+          "response": {
+            "response": {
+              "responseFormat": "text",
+              "outputPropertyName": "reader_text"
+            }
+          }
+        }
+      },
+      "id": "extraction_request__jina_reader",
+      "name": "EXTRACTION_REQUEST__JINA_READER",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        1400,
+        0
+      ],
+      "continueOnFail": true
+    },
+    {
+      "parameters": {
+        "jsCode": "function responseText(value) {\n  if (typeof value === 'string') return value;\n  if (value === null || value === undefined) return '';\n  try { return JSON.stringify(value); } catch { return String(value); }\n}\n\nreturn items.map((item, index) => {\n  const bases = $items('RELEVANCE_FILTER');\n  const base = bases[index]?.json || item.json;\n  if (base.controlled_state === 'request_failure' && !base.extraction_url) {\n    return { json: { ...base, fetch_state: 'request_failure' } };\n  }\n  const text = responseText(item.json.reader_text || item.json.data || item.json.body || item.json.response || '');\n  const errorMessage = item.json.error?.message || item.json.message || '';\n  const statusCode = Number(item.json.statusCode || item.json.status || 0);\n  const titleMatch = text.match(/^Title:\\s*(.+)$/mi);\n  const title = titleMatch ? titleMatch[1].trim() : '';\n  const looksLikeProviderError = /Target URL returned error|Domain .* could not be resolved|Failed to fetch|Access Denied|\\b404 Not Found\\b|\\b502 Bad Gateway\\b|cannot find the page/i.test(text) || /page not found/i.test(title);\n  const failed = Boolean(item.json.error || errorMessage || statusCode >= 400 || looksLikeProviderError || text.trim().length < 80);\n  if (failed) {\n    return {\n      json: {\n        ...base,\n        fetch_state: 'request_failure',\n        reader_text: '',\n        fetch_error: errorMessage || (statusCode ? `HTTP ${statusCode}` : 'Jina Reader returned no usable page content')\n      }\n    };\n  }\n  const sourceMatch = text.match(/^URL Source:\\s*(.+)$/mi);\n  return {\n    json: {\n      ...base,\n      fetch_state: 'success',\n      reader_text: text,\n      reader_title: title,\n      reader_source_url: sourceMatch ? sourceMatch[1].trim() : base.page_url\n    }\n  };\n});\n"
+      },
+      "id": "response_validation",
+      "name": "RESPONSE_VALIDATION",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        1680,
+        0
+      ]
+    },
+    {
+      "parameters": {
+        "jsCode": "function host(value) {\n  const match = String(value || '').match(/^https?:\\/\\/([^\\/?#]+)/i);\n  return match ? match[1].replace(/^www\\./, '').toLowerCase() : '';\n}\n\nreturn items.map(item => {\n  if (item.json.fetch_state !== 'success') return item;\n  const expectedDomain = item.json.official_domain;\n  const actualDomain = host(item.json.reader_source_url || item.json.page_url);\n  const officialDomainMatch = Boolean(expectedDomain && actualDomain && (actualDomain === expectedDomain || actualDomain.endsWith(`.${expectedDomain}`)));\n  const nameTokens = String(item.json.run_context?.organization?.name || '').toLowerCase().match(/[a-z0-9]+/g) || [];\n  const content = `${item.json.reader_title || ''} ${item.json.reader_text || ''}`.toLowerCase();\n  const nameMatch = nameTokens.filter(token => token.length > 3).some(token => content.includes(token));\n  return {\n    json: {\n      ...item.json,\n      organization_match: officialDomainMatch || nameMatch,\n      is_official: officialDomainMatch\n    }\n  };\n});\n"
+      },
+      "id": "organization_match_check",
+      "name": "ORGANIZATION_MATCH_CHECK",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        1960,
+        0
+      ]
+    },
+    {
+      "parameters": {
+        "jsCode": "function clean(value) {\n  return String(value || '')\n    .replace(/^Title:.*$/gmi, '')\n    .replace(/^URL Source:.*$/gmi, '')\n    .replace(/^Published Time:.*$/gmi, '')\n    .replace(/^Markdown Content:\\s*$/gmi, '')\n    .replace(/\\n{3,}/g, '\\n\\n')\n    .trim();\n}\n\nreturn items.map(item => {\n  if (item.json.fetch_state !== 'success' || !item.json.organization_match) {\n    return { json: { ...item.json, useful_content: '' } };\n  }\n  const content = clean(item.json.reader_text).slice(0, 16000);\n  const title = item.json.reader_title || content.match(/^#\\s+(.+)$/m)?.[1]?.trim() || `${item.json.run_context.organization.name} \u2014 ${item.json.page_type}`;\n  return {\n    json: {\n      ...item.json,\n      source_title: title,\n      useful_content: content,\n      content_length: content.length\n    }\n  };\n});\n"
       },
       "id": "useful_content",
       "name": "USEFUL_CONTENT",
       "type": "n8n-nodes-base.code",
       "typeVersion": 2,
       "position": [
-        1160,
+        2240,
         0
       ]
     },
     {
       "parameters": {
-        "jsCode": "// SKELETON_PLACEHOLDER: SOURCE_METADATA\n// Attach source metadata and retrieval timestamp.\n// TODO: Replace this placeholder with configured production logic.\n// Contract discipline: preserve FACT / INFERENCE / HYPOTHESIS / UNKNOWN boundaries.\nreturn items;\n"
+        "jsCode": "return items.map(item => {\n  if (item.json.fetch_state !== 'success' || !item.json.organization_match || !item.json.useful_content) {\n    return {\n      json: {\n        run_context: item.json.run_context,\n        page_index: item.json.page_index,\n        page_type: item.json.page_type,\n        page_url: item.json.page_url,\n        result_type: 'error',\n        error: {\n          stage: item.json.fetch_state === 'success' ? 'ORGANIZATION_MATCH_CHECK' : 'EXTRACTION_REQUEST__JINA_READER',\n          error_type: item.json.fetch_state === 'success' ? 'organization_mismatch' : 'request_failure',\n          page_url: item.json.page_url,\n          message: item.json.fetch_error || 'The page did not yield usable organization-matched content'\n        }\n      }\n    };\n  }\n  const normalizedPageType = /jobs?|openings?|careers?/i.test(item.json.source_title || '')\n    ? 'careers'\n    : item.json.page_type;\n  return {\n    json: {\n      run_context: item.json.run_context,\n      result_type: 'source',\n      source: {\n        source_id: `SRC-WEB-${String(item.json.page_index + 1).padStart(3, '0')}`,\n        title: item.json.source_title,\n        url: item.json.page_url,\n        source_type: `official_website_${normalizedPageType}`,\n        publisher: item.json.run_context.organization.name,\n        publication_date: null,\n        retrieved_at: new Date().toISOString(),\n        authority_level: 'official',\n        freshness: 'unknown',\n        is_official: true,\n        extraction_provider: 'jina_reader',\n        page_type: normalizedPageType,\n        useful_content: item.json.useful_content\n      }\n    }\n  };\n});\n"
       },
-      "id": "source_metadata",
-      "name": "SOURCE_METADATA",
+      "id": "source_normalization",
+      "name": "SOURCE_NORMALIZATION",
       "type": "n8n-nodes-base.code",
       "typeVersion": 2,
       "position": [
-        1460,
+        2520,
         0
       ]
     },
     {
       "parameters": {
-        "jsCode": "// TERMINAL_OUTPUT_NODE: RETURN_SOURCES\n// Return official website source records.\n// TODO: Replace this placeholder with configured production logic.\n// Contract discipline: preserve FACT / INFERENCE / HYPOTHESIS / UNKNOWN boundaries.\nreturn items;\n"
+        "jsCode": "function sentences(text) {\n  return String(text || '').replace(/\\s+/g, ' ').split(/(?<=[.!?])\\s+/).map(value => value.trim()).filter(value => value.length >= 40 && value.length <= 360);\n}\nfunction selectSignals(allSentences, terms, limit = 5) {\n  const selected = [];\n  const seen = new Set();\n  for (const sentence of allSentences) {\n    const lower = sentence.toLowerCase();\n    if (!terms.some(term => lower.includes(term))) continue;\n    const key = lower.slice(0, 180);\n    if (seen.has(key)) continue;\n    seen.add(key);\n    selected.push(sentence);\n    if (selected.length >= limit) break;\n  }\n  return selected;\n}\n\nconst rows = items.map(item => item.json);\nconst sourceRows = rows.filter(row => row.result_type === 'source');\nconst sources = sourceRows.map(row => row.source);\nconst errors = rows.filter(row => row.result_type === 'error').map(row => row.error);\nconst runContext = rows[0]?.run_context || null;\nconst allSentences = sourceRows.flatMap(row => sentences(row.source.useful_content));\nconst stakeholderEntryPoints = sources\n  .filter(source => ['fundraising', 'contact', 'programs'].includes(source.page_type))\n  .map(source => ({ page_type: source.page_type, title: source.title, url: source.url }));\nconst reportLinks = sources\n  .filter(source => ['financials', 'reports'].includes(source.page_type) || /report|financial|research/i.test(`${source.title} ${source.url}`))\n  .map(source => ({ title: source.title, url: source.url, page_type: source.page_type }));\nconst websiteContext = {\n  mission_signals: selectSignals(allSentences, ['mission', 'purpose', 'we exist', 'our goal', 'our vision', 'people in poverty', 'living in poverty', 'help someone']),\n  program_signals: selectSignals(allSentences, ['program', 'how it works', 'what we do', 'service', 'cash transfer', 'initiative']),\n  impact_signals: selectSignals(allSentences, ['impact', 'evidence', 'research', 'results', 'outcomes']),\n  fundraising_signals: selectSignals(allSentences, ['donate', 'donor', 'fundraising', 'contribution', 'give now', 'support our']),\n  stakeholder_entry_points: stakeholderEntryPoints,\n  report_links: reportLinks\n};\nlet controlledState = 'success';\nif (!sources.length && errors.length) controlledState = 'request_failure';\nelse if (!sources.length) controlledState = 'no_relevant_content';\nreturn [{\n  json: {\n    run_context: runContext,\n    controlled_state: controlledState,\n    extraction_provider: 'jina_reader',\n    pages_attempted: rows.length,\n    sources,\n    website_context: websiteContext,\n    errors\n  }\n}];\n"
       },
-      "id": "return_sources",
-      "name": "RETURN_SOURCES",
+      "id": "aggregate_website_context",
+      "name": "AGGREGATE_WEBSITE_CONTEXT",
       "type": "n8n-nodes-base.code",
       "typeVersion": 2,
       "position": [
-        1760,
+        2800,
         0
+      ]
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict"
+          },
+          "conditions": [
+            {
+              "id": "decision__request_failure_request_failure",
+              "leftValue": "={{ $json.controlled_state }}",
+              "rightValue": "request_failure",
+              "operator": {
+                "type": "string",
+                "operation": "equals"
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "id": "decision__request_failure",
+      "name": "DECISION__REQUEST_FAILURE",
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2,
+      "position": [
+        3080,
+        0
+      ]
+    },
+    {
+      "parameters": {
+        "jsCode": "return items.map(item => ({\n  json: {\n    run_context: item.json.run_context,\n    controlled_state: item.json.controlled_state,\n    extraction_provider: item.json.extraction_provider,\n    pages_attempted: item.json.pages_attempted,\n    sources: item.json.sources || [],\n    website_context: item.json.website_context || {\n      mission_signals: [],\n      program_signals: [],\n      impact_signals: [],\n      fundraising_signals: [],\n      stakeholder_entry_points: [],\n      report_links: []\n    },\n    errors: item.json.errors || []\n  }\n}));\n"
+      },
+      "id": "output_request_failure",
+      "name": "OUTPUT_REQUEST_FAILURE",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        3360,
+        -240
+      ]
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict"
+          },
+          "conditions": [
+            {
+              "id": "decision__no_relevant_content_no_relevant_content",
+              "leftValue": "={{ $json.controlled_state }}",
+              "rightValue": "no_relevant_content",
+              "operator": {
+                "type": "string",
+                "operation": "equals"
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "id": "decision__no_relevant_content",
+      "name": "DECISION__NO_RELEVANT_CONTENT",
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2,
+      "position": [
+        3360,
+        80
+      ]
+    },
+    {
+      "parameters": {
+        "jsCode": "return items.map(item => ({\n  json: {\n    run_context: item.json.run_context,\n    controlled_state: item.json.controlled_state,\n    extraction_provider: item.json.extraction_provider,\n    pages_attempted: item.json.pages_attempted,\n    sources: item.json.sources || [],\n    website_context: item.json.website_context || {\n      mission_signals: [],\n      program_signals: [],\n      impact_signals: [],\n      fundraising_signals: [],\n      stakeholder_entry_points: [],\n      report_links: []\n    },\n    errors: item.json.errors || []\n  }\n}));\n"
+      },
+      "id": "output_no_relevant_content",
+      "name": "OUTPUT_NO_RELEVANT_CONTENT",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        3640,
+        -40
+      ]
+    },
+    {
+      "parameters": {
+        "jsCode": "return items.map(item => ({\n  json: {\n    run_context: item.json.run_context,\n    controlled_state: item.json.controlled_state,\n    extraction_provider: item.json.extraction_provider,\n    pages_attempted: item.json.pages_attempted,\n    sources: item.json.sources || [],\n    website_context: item.json.website_context || {\n      mission_signals: [],\n      program_signals: [],\n      impact_signals: [],\n      fundraising_signals: [],\n      stakeholder_entry_points: [],\n      report_links: []\n    },\n    errors: item.json.errors || []\n  }\n}));\n"
+      },
+      "id": "output_success",
+      "name": "OUTPUT_SUCCESS",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        3640,
+        180
       ]
     }
   ],
@@ -112,36 +307,80 @@
       "main": [
         [
           {
-            "node": "INPUT_CONTRACT__OFFICIAL_URL",
+            "node": "INPUT_VALIDATION",
             "type": "main",
             "index": 0
           }
         ]
       ]
     },
-    "INPUT_CONTRACT__OFFICIAL_URL": {
+    "INPUT_VALIDATION": {
       "main": [
         [
           {
-            "node": "TODO_API__WEBSITE_EXTRACTION",
+            "node": "OFFICIAL_URL",
             "type": "main",
             "index": 0
           }
         ]
       ]
     },
-    "TODO_API__WEBSITE_EXTRACTION": {
+    "OFFICIAL_URL": {
       "main": [
         [
           {
-            "node": "PAGE_RESULT_VALIDATION",
+            "node": "PAGE_DISCOVERY",
             "type": "main",
             "index": 0
           }
         ]
       ]
     },
-    "PAGE_RESULT_VALIDATION": {
+    "PAGE_DISCOVERY": {
+      "main": [
+        [
+          {
+            "node": "RELEVANCE_FILTER",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "RELEVANCE_FILTER": {
+      "main": [
+        [
+          {
+            "node": "EXTRACTION_REQUEST__JINA_READER",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "EXTRACTION_REQUEST__JINA_READER": {
+      "main": [
+        [
+          {
+            "node": "RESPONSE_VALIDATION",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "RESPONSE_VALIDATION": {
+      "main": [
+        [
+          {
+            "node": "ORGANIZATION_MATCH_CHECK",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "ORGANIZATION_MATCH_CHECK": {
       "main": [
         [
           {
@@ -156,18 +395,65 @@
       "main": [
         [
           {
-            "node": "SOURCE_METADATA",
+            "node": "SOURCE_NORMALIZATION",
             "type": "main",
             "index": 0
           }
         ]
       ]
     },
-    "SOURCE_METADATA": {
+    "SOURCE_NORMALIZATION": {
       "main": [
         [
           {
-            "node": "RETURN_SOURCES",
+            "node": "AGGREGATE_WEBSITE_CONTEXT",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "AGGREGATE_WEBSITE_CONTEXT": {
+      "main": [
+        [
+          {
+            "node": "DECISION__REQUEST_FAILURE",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "DECISION__REQUEST_FAILURE": {
+      "main": [
+        [
+          {
+            "node": "OUTPUT_REQUEST_FAILURE",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "DECISION__NO_RELEVANT_CONTENT",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "DECISION__NO_RELEVANT_CONTENT": {
+      "main": [
+        [
+          {
+            "node": "OUTPUT_NO_RELEVANT_CONTENT",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "OUTPUT_SUCCESS",
             "type": "main",
             "index": 0
           }

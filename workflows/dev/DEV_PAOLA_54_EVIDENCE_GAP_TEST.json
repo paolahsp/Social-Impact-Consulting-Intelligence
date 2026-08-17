@@ -1,0 +1,297 @@
+{
+  "name": "DEV_PAOLA_54_EVIDENCE_GAP_TEST",
+  "nodes": [
+    {
+      "parameters": {
+        "content": "DEV_PAOLA_54_EVIDENCE_GAP_TEST\nRuns three visible branches against stored workflow 54:\nA) GiveDirectly public-answerable financial gap\nB) internal/non-public gap\nC) retry exhausted\n\nAfter import, link each Execute Sub-workflow node to the real stored workflow 54. Workflow 54 itself links to stored workflow 21.",
+        "height": 420,
+        "width": 720,
+        "color": 4
+      },
+      "id": "00_readme__dev_workflow",
+      "name": "00_README__DEV_WORKFLOW",
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [
+        -560,
+        -560
+      ]
+    },
+    {
+      "parameters": {},
+      "id": "start__manual_test_trigger",
+      "name": "START__MANUAL_TEST_TRIGGER",
+      "type": "n8n-nodes-base.manualTrigger",
+      "typeVersion": 1,
+      "position": [
+        0,
+        120
+      ]
+    },
+    {
+      "parameters": {
+        "jsCode": "return [{ json: {\n  run_context: {\n    run_id: 'RUN-N8N-54-GIVEDIRECTLY-ANSWERABLE',\n    organization: { name: 'GiveDirectly', website: 'https://www.givedirectly.org', country: 'United States', mission_area: null },\n    current_challenge: 'Resolve a public financial evidence gap',\n    uploaded_document_refs: [],\n    status: 'created',\n    started_at: new Date().toISOString(),\n    errors: []\n  },\n  sources: [{\n    source_id: 'SRC-WEB-001',\n    title: 'GiveDirectly home page',\n    url: 'https://www.givedirectly.org/',\n    source_type: 'official_website_home',\n    publisher: 'GiveDirectly',\n    publication_date: null,\n    retrieved_at: new Date().toISOString(),\n    authority_level: 'official',\n    freshness: 'unknown',\n    is_official: true\n  }],\n  evidence: [],\n  missing_evidence_request: {\n    gap_id: 'GAP-REV-001',\n    domain: 'revenue_resilience',\n    question: 'Can funding concentration be determined from additional public financial information?',\n    gap_type: 'public_financial_information',\n    current_evidence_ids: [],\n    retry_count: 0,\n    max_retries: 1,\n    reason_for_retry: 'Existing evidence does not show funding concentration.'\n  }\n} }];\n"
+      },
+      "id": "dev_input__answerable_givedirectly",
+      "name": "DEV_INPUT__ANSWERABLE_GIVEDIRECTLY",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        300,
+        -180
+      ]
+    },
+    {
+      "parameters": {
+        "source": "database",
+        "workflowId": {
+          "__rl": true,
+          "value": "",
+          "mode": "list",
+          "cachedResultName": "54_EVIDENCE_GAP_RESEARCH"
+        },
+        "workflowInputs": {
+          "mappingMode": "passThrough",
+          "value": {},
+          "matchingColumns": [],
+          "schema": [],
+          "attemptToConvertTypes": false,
+          "convertFieldsToString": true
+        },
+        "options": {
+          "waitForSubWorkflow": true
+        }
+      },
+      "id": "execute_subworkflow__54_answerable_givedirectly",
+      "name": "EXECUTE_SUBWORKFLOW__54_ANSWERABLE_GIVEDIRECTLY",
+      "type": "n8n-nodes-base.executeWorkflow",
+      "typeVersion": 1.3,
+      "position": [
+        640,
+        -180
+      ],
+      "notes": "AFTER IMPORT: select the stored n8n workflow 54_EVIDENCE_GAP_RESEARCH. Never invent an ID."
+    },
+    {
+      "parameters": {
+        "jsCode": "return items;\n"
+      },
+      "id": "final_answerable_gap",
+      "name": "FINAL_ANSWERABLE_GAP",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        980,
+        -180
+      ]
+    },
+    {
+      "parameters": {
+        "jsCode": "return [{ json: {\n  run_context: {\n    run_id: 'RUN-N8N-54-INTERNAL-GAP',\n    organization: { name: 'GiveDirectly', website: 'https://www.givedirectly.org', country: 'United States', mission_area: null },\n    current_challenge: 'Preserve an internal process unknown',\n    uploaded_document_refs: [],\n    status: 'created',\n    started_at: new Date().toISOString(),\n    errors: []\n  },\n  sources: [],\n  evidence: [],\n  missing_evidence_request: {\n    gap_id: 'GAP-OPS-001',\n    domain: 'operations_cx',\n    question: 'What happens internally after a stakeholder submits an application form?',\n    gap_type: 'internal_handoff',\n    current_evidence_ids: [],\n    retry_count: 0,\n    max_retries: 1,\n    reason_for_retry: 'Public sources do not describe the internal follow-up process.'\n  }\n} }];\n"
+      },
+      "id": "dev_input__non_public_internal",
+      "name": "DEV_INPUT__NON_PUBLIC_INTERNAL",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        300,
+        200
+      ]
+    },
+    {
+      "parameters": {
+        "source": "database",
+        "workflowId": {
+          "__rl": true,
+          "value": "",
+          "mode": "list",
+          "cachedResultName": "54_EVIDENCE_GAP_RESEARCH"
+        },
+        "workflowInputs": {
+          "mappingMode": "passThrough",
+          "value": {},
+          "matchingColumns": [],
+          "schema": [],
+          "attemptToConvertTypes": false,
+          "convertFieldsToString": true
+        },
+        "options": {
+          "waitForSubWorkflow": true
+        }
+      },
+      "id": "execute_subworkflow__54_non_public_internal",
+      "name": "EXECUTE_SUBWORKFLOW__54_NON_PUBLIC_INTERNAL",
+      "type": "n8n-nodes-base.executeWorkflow",
+      "typeVersion": 1.3,
+      "position": [
+        640,
+        200
+      ],
+      "notes": "AFTER IMPORT: select the stored n8n workflow 54_EVIDENCE_GAP_RESEARCH. Never invent an ID."
+    },
+    {
+      "parameters": {
+        "jsCode": "return items;\n"
+      },
+      "id": "final_non_public_gap",
+      "name": "FINAL_NON_PUBLIC_GAP",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        980,
+        200
+      ]
+    },
+    {
+      "parameters": {
+        "jsCode": "return [{ json: {\n  run_context: {\n    run_id: 'RUN-N8N-54-RETRY-EXHAUSTED',\n    organization: { name: 'GiveDirectly', website: 'https://www.givedirectly.org', country: 'United States', mission_area: null },\n    current_challenge: 'Stop after retry limit',\n    uploaded_document_refs: [],\n    status: 'created',\n    started_at: new Date().toISOString(),\n    errors: []\n  },\n  sources: [],\n  evidence: [],\n  missing_evidence_request: {\n    gap_id: 'GAP-REV-RETRY',\n    domain: 'revenue_resilience',\n    question: 'Can funding concentration be determined from additional public financial information?',\n    gap_type: 'public_financial_information',\n    current_evidence_ids: [],\n    retry_count: 1,\n    max_retries: 1,\n    reason_for_retry: 'Existing evidence does not show funding concentration.'\n  }\n} }];\n"
+      },
+      "id": "dev_input__retry_exhausted",
+      "name": "DEV_INPUT__RETRY_EXHAUSTED",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        300,
+        580
+      ]
+    },
+    {
+      "parameters": {
+        "source": "database",
+        "workflowId": {
+          "__rl": true,
+          "value": "",
+          "mode": "list",
+          "cachedResultName": "54_EVIDENCE_GAP_RESEARCH"
+        },
+        "workflowInputs": {
+          "mappingMode": "passThrough",
+          "value": {},
+          "matchingColumns": [],
+          "schema": [],
+          "attemptToConvertTypes": false,
+          "convertFieldsToString": true
+        },
+        "options": {
+          "waitForSubWorkflow": true
+        }
+      },
+      "id": "execute_subworkflow__54_retry_exhausted",
+      "name": "EXECUTE_SUBWORKFLOW__54_RETRY_EXHAUSTED",
+      "type": "n8n-nodes-base.executeWorkflow",
+      "typeVersion": 1.3,
+      "position": [
+        640,
+        580
+      ],
+      "notes": "AFTER IMPORT: select the stored n8n workflow 54_EVIDENCE_GAP_RESEARCH. Never invent an ID."
+    },
+    {
+      "parameters": {
+        "jsCode": "return items;\n"
+      },
+      "id": "final_retry_exhausted",
+      "name": "FINAL_RETRY_EXHAUSTED",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        980,
+        580
+      ]
+    }
+  ],
+  "connections": {
+    "START__MANUAL_TEST_TRIGGER": {
+      "main": [
+        [
+          {
+            "node": "DEV_INPUT__ANSWERABLE_GIVEDIRECTLY",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "DEV_INPUT__NON_PUBLIC_INTERNAL",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "DEV_INPUT__RETRY_EXHAUSTED",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "DEV_INPUT__ANSWERABLE_GIVEDIRECTLY": {
+      "main": [
+        [
+          {
+            "node": "EXECUTE_SUBWORKFLOW__54_ANSWERABLE_GIVEDIRECTLY",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "EXECUTE_SUBWORKFLOW__54_ANSWERABLE_GIVEDIRECTLY": {
+      "main": [
+        [
+          {
+            "node": "FINAL_ANSWERABLE_GAP",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "DEV_INPUT__NON_PUBLIC_INTERNAL": {
+      "main": [
+        [
+          {
+            "node": "EXECUTE_SUBWORKFLOW__54_NON_PUBLIC_INTERNAL",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "EXECUTE_SUBWORKFLOW__54_NON_PUBLIC_INTERNAL": {
+      "main": [
+        [
+          {
+            "node": "FINAL_NON_PUBLIC_GAP",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "DEV_INPUT__RETRY_EXHAUSTED": {
+      "main": [
+        [
+          {
+            "node": "EXECUTE_SUBWORKFLOW__54_RETRY_EXHAUSTED",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "EXECUTE_SUBWORKFLOW__54_RETRY_EXHAUSTED": {
+      "main": [
+        [
+          {
+            "node": "FINAL_RETRY_EXHAUSTED",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": false,
+  "settings": {
+    "executionOrder": "v1"
+  },
+  "pinData": {}
+}

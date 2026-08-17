@@ -8,16 +8,16 @@ P0 = vertical slice. P1 = required expansion. P2 = hardening.
 | 10_INTAKE_AND_ORG_RESOLVER | Shared | P1 | No | No | No | Optional | None | Ready for input validation |
 | 20_CONTEXT_RESEARCH_ORCHESTRATOR | Paola | P1 | No | Optional | No | No | 21,22,23,24 | Ready for channel linking |
 | 21_WEB_SEARCH | Paola | P0 | Yes | No | No | Optional | 10 | n8n-native repo-ready with HTTP Request and branch paths |
-| 22_WEBSITE_EXTRACTION | Paola | P1 | Yes | Optional | No | Optional | 10 | Placeholder only |
-| 23_DOCUMENT_PUBLIC_DATA_RESEARCH | Paola | P1 | Yes | Optional | No | Optional | 10 | Placeholder only |
+| 22_WEBSITE_EXTRACTION | Paola | P1 | Yes | Optional | No | Optional | 10 | LIVE n8n VERIFIED with GiveDirectly success and controlled invalid-domain failure |
+| 23_DOCUMENT_PUBLIC_DATA_RESEARCH | Paola | P1 | Yes | No | No | No | 10,21,22 | LIVE n8n VERIFIED: official GiveDirectly/MSF documents, partial success, and unsupported-document branch |
 | 24_NEWS_EXTERNAL_CONTEXT | Paola | P2 | Yes | No | No | Optional | 10 | Placeholder only |
 | 30_EVIDENCE_PIPELINE | Paola | P0 | No | Future optional | No | Optional | 20 or fixtures | n8n-native repo-ready deterministic P0 evidence extraction |
 | 40_RAG_RETRIEVAL_PIPELINE | Paola | P0 | No | No | Local corpus | No | 30 | n8n-native repo-ready transparent Revenue Resilience retrieval |
 | 50_ANALYSIS_ORCHESTRATOR | Shared | P1 | No | No | No | No | 51,52,53 | Link specialists after track work |
 | 51_REVENUE_RESILIENCE_AGENT | Paola | P0 | No | Future optional | Yes | No | 30,40 | n8n-native repo-ready deterministic P0 revenue finding |
-| 52_IMPACT_EVIDENCE_AGENT | Paola | P1 | No | Yes | Yes | No | 30,40 | Required expansion |
+| 52_IMPACT_EVIDENCE_AGENT | Paola | P1 | No | Future optional | Yes | No | 30,40 | Repository-ready deterministic impact evidence agent; live n8n verification blocked pending n8n access |
 | 53_OPERATIONS_CX_AGENT | Gretel | P1 | No | No | Upstream handoff only | No | Validated Paola handoff | Phase 2C repository-configured and reproducibly tested offline; n8n execution reported in PR #1 but no retained run provenance independently verifies it |
-| 54_EVIDENCE_GAP_RESEARCH | Paola | P2 | Yes | Optional | No | Optional | 30 | Hardening |
+| 54_EVIDENCE_GAP_RESEARCH | Paola | P2 | No | No | No | No | 30 | Repository-ready evidence-gap resolver; reuses 21_WEB_SEARCH and preserves unknowns/retry limits |
 | 60_TRANSFORMATION_ORCHESTRATOR | Gretel | P1 | No | No | No | No | 53,61,62,63,64,65,66 | Phase 2D current-n8n export repository-ready with cumulative runtime state guards; manual child selections and live tests pending |
 | 61_HYPOTHESIS_BUILDER | Gretel | P0 | No | Yes | Optional | No | Paola output fixture | P0 transformation |
 | 62_ROOT_CAUSE_DIAGNOSIS | Gretel | P0 | No | Yes | Optional | No | 61 | P0 transformation |

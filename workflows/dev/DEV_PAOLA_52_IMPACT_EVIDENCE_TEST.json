@@ -1,0 +1,213 @@
+{
+  "name": "DEV_PAOLA_52_IMPACT_EVIDENCE_TEST",
+  "nodes": [
+    {
+      "parameters": {
+        "content": "DEV_PAOLA_52_IMPACT_EVIDENCE_TEST\nRuns two visible branches against stored workflow 52:\n1) GiveDirectly structured document evidence path\n2) insufficient-evidence path\n\nAfter import, link every Execute Sub-workflow node to the real stored workflow 52 using the n8n database selector.",
+        "height": 360,
+        "width": 680,
+        "color": 4
+      },
+      "id": "00_readme__dev_workflow",
+      "name": "00_README__DEV_WORKFLOW",
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [
+        -520,
+        -460
+      ]
+    },
+    {
+      "parameters": {},
+      "id": "start__manual_test_trigger",
+      "name": "START__MANUAL_TEST_TRIGGER",
+      "type": "n8n-nodes-base.manualTrigger",
+      "typeVersion": 1,
+      "position": [
+        0,
+        80
+      ]
+    },
+    {
+      "parameters": {
+        "jsCode": "return [{ json: {\n  run_context: {\n    run_id: 'RUN-N8N-52-GIVEDIRECTLY',\n    organization: { name: 'GiveDirectly', website: 'https://www.givedirectly.org', country: 'United States', mission_area: null },\n    current_challenge: null,\n    uploaded_document_refs: [],\n    status: 'created',\n    started_at: new Date().toISOString(),\n    errors: []\n  },\n  sources: [{\n    source_id: 'SRC-DOC-001',\n    title: 'GiveDirectly FY2023 audited financial statements',\n    url: 'https://www.givedirectly.org/wp-content/uploads/2024/11/FY2023-GiveDirectly-Audit-Final-FS-Public-Disclosure.pdf',\n    source_type: 'public_document_audited_financial_statement',\n    publisher: 'GiveDirectly',\n    publication_date: null,\n    retrieved_at: new Date().toISOString(),\n    authority_level: 'official',\n    freshness: 'unknown',\n    is_official: true\n  }],\n  documents: [{\n    document_id: 'DOC-001',\n    source_id: 'SRC-DOC-001',\n    document_type: 'audited_financial_statement',\n    is_official: true,\n    sections: [{\n      section_type: 'impact',\n      text: 'GiveDirectly mission is to reduce poverty by providing financial assistance directly to those in need. GiveDirectly offers a service that enables others to send cash transfers directly to people in need. GiveDirectly operates in the United States, Kenya, Uganda, Rwanda, Liberia, Malawi, Mozambique, the Democratic Republic of the Congo, Nigeria, Yemen, Bangladesh, Morocco, and the United Kingdom. GiveDirectly identifies households, informs them that they are eligible for a transfer, helps them register for a digital payments system, sends funds, and follows up with recipients post-transfer.'\n    }]\n  }],\n  evidence: [],\n  rag_context: {\n    retrieval_run_id: 'RAG-52-FRAMEWORK-001',\n    domain: 'impact_evidence',\n    contexts: [{\n      context_id: 'FRAMEWORK-IMPACT-001',\n      domain: 'impact_evidence',\n      title: 'Impact evidence taxonomy',\n      content: 'Activities, outputs, outcomes, and impact are distinct. Public claims are not proof of long-term impact.'\n    }]\n  }\n} }];\n"
+      },
+      "id": "dev_input__givedirectly",
+      "name": "DEV_INPUT__GIVEDIRECTLY",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        300,
+        -120
+      ]
+    },
+    {
+      "parameters": {
+        "source": "database",
+        "workflowId": {
+          "__rl": true,
+          "value": "",
+          "mode": "list",
+          "cachedResultName": "52_IMPACT_EVIDENCE_AGENT"
+        },
+        "workflowInputs": {
+          "mappingMode": "passThrough",
+          "value": {},
+          "matchingColumns": [],
+          "schema": [],
+          "attemptToConvertTypes": false,
+          "convertFieldsToString": true
+        },
+        "options": {
+          "waitForSubWorkflow": true
+        }
+      },
+      "id": "execute_subworkflow__52_givedirectly",
+      "name": "EXECUTE_SUBWORKFLOW__52_GIVEDIRECTLY",
+      "type": "n8n-nodes-base.executeWorkflow",
+      "typeVersion": 1.3,
+      "position": [
+        640,
+        -120
+      ],
+      "notes": "AFTER IMPORT: select the stored n8n workflow 52_IMPACT_EVIDENCE_AGENT. Never invent an ID."
+    },
+    {
+      "parameters": {
+        "jsCode": "return items;\n"
+      },
+      "id": "final_givedirectly_impact_evidence",
+      "name": "FINAL_GIVEDIRECTLY_IMPACT_EVIDENCE",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        980,
+        -120
+      ]
+    },
+    {
+      "parameters": {
+        "jsCode": "return [{ json: {\n  run_context: {\n    run_id: 'RUN-N8N-52-INSUFFICIENT',\n    organization: { name: 'GiveDirectly', website: 'https://www.givedirectly.org', country: 'United States', mission_area: null },\n    current_challenge: null,\n    uploaded_document_refs: [],\n    status: 'created',\n    started_at: new Date().toISOString(),\n    errors: []\n  },\n  sources: [{\n    source_id: 'SRC-001',\n    title: 'Financials page search result',\n    url: 'https://www.givedirectly.org/financials',\n    source_type: 'registry',\n    publisher: 'GiveDirectly',\n    publication_date: null,\n    retrieved_at: new Date().toISOString(),\n    authority_level: 'official',\n    freshness: 'unknown',\n    is_official: true\n  }],\n  evidence: [{\n    evidence_id: 'EV-001',\n    run_id: 'RUN-N8N-52-INSUFFICIENT',\n    claim: 'Public source contains revenue-resilience search signals: financial.',\n    source_ids: ['SRC-001'],\n    domain: 'revenue_resilience',\n    evidence_type: 'fact',\n    confidence: 0.68,\n    status: 'supported',\n    contradiction_ids: [],\n    requires_validation: false\n  }],\n  documents: [],\n  rag_context: { retrieval_run_id: 'RAG-52-FRAMEWORK-001', domain: 'impact_evidence', contexts: [] }\n} }];\n"
+      },
+      "id": "dev_input__insufficient",
+      "name": "DEV_INPUT__INSUFFICIENT",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        300,
+        220
+      ]
+    },
+    {
+      "parameters": {
+        "source": "database",
+        "workflowId": {
+          "__rl": true,
+          "value": "",
+          "mode": "list",
+          "cachedResultName": "52_IMPACT_EVIDENCE_AGENT"
+        },
+        "workflowInputs": {
+          "mappingMode": "passThrough",
+          "value": {},
+          "matchingColumns": [],
+          "schema": [],
+          "attemptToConvertTypes": false,
+          "convertFieldsToString": true
+        },
+        "options": {
+          "waitForSubWorkflow": true
+        }
+      },
+      "id": "execute_subworkflow__52_insufficient",
+      "name": "EXECUTE_SUBWORKFLOW__52_INSUFFICIENT",
+      "type": "n8n-nodes-base.executeWorkflow",
+      "typeVersion": 1.3,
+      "position": [
+        640,
+        220
+      ],
+      "notes": "AFTER IMPORT: select the stored n8n workflow 52_IMPACT_EVIDENCE_AGENT. Never invent an ID."
+    },
+    {
+      "parameters": {
+        "jsCode": "return items;\n"
+      },
+      "id": "final_insufficient_evidence",
+      "name": "FINAL_INSUFFICIENT_EVIDENCE",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        980,
+        220
+      ]
+    }
+  ],
+  "connections": {
+    "START__MANUAL_TEST_TRIGGER": {
+      "main": [
+        [
+          {
+            "node": "DEV_INPUT__GIVEDIRECTLY",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "DEV_INPUT__INSUFFICIENT",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "DEV_INPUT__GIVEDIRECTLY": {
+      "main": [
+        [
+          {
+            "node": "EXECUTE_SUBWORKFLOW__52_GIVEDIRECTLY",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "EXECUTE_SUBWORKFLOW__52_GIVEDIRECTLY": {
+      "main": [
+        [
+          {
+            "node": "FINAL_GIVEDIRECTLY_IMPACT_EVIDENCE",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "DEV_INPUT__INSUFFICIENT": {
+      "main": [
+        [
+          {
+            "node": "EXECUTE_SUBWORKFLOW__52_INSUFFICIENT",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "EXECUTE_SUBWORKFLOW__52_INSUFFICIENT": {
+      "main": [
+        [
+          {
+            "node": "FINAL_INSUFFICIENT_EVIDENCE",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": false,
+  "settings": {
+    "executionOrder": "v1"
+  },
+  "pinData": {}
+}

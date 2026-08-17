@@ -21,3 +21,5 @@ New product ideas go to `docs/FUTURE_BACKLOG.md`, not into the current workflow 
 Branch-scoped integration exception: `71_INTELLECTUS_WEB_ADAPTER` adds an
 inactive HTTP boundary around the unchanged 53 leaf. It does not redesign 53,
 replace Paola's research workflows or change a shared JSON schema.
+
+Configured implementations may replace TODO logic inside their frozen workflow boundary, add a DEV test export, and document provider/runtime evidence. `23_DOCUMENT_PUBLIC_DATA_RESEARCH` follows this rule: it keeps the existing trigger and source/evidence handoff, reuses upstream candidates from workflows 21/22, and does not add a competing shared contract or new orchestrator.
