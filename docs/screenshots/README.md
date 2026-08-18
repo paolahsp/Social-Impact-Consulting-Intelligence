@@ -1,33 +1,24 @@
-# Required n8n Screenshot Evidence
+# Verified n8n Screenshot Evidence
 
-The Project 3 submission requires screenshots of the live n8n workflow. These
-images must be captured from the actual n8n instance; diagrams or recreated
-mockups are not substitutes.
+These PNG files were captured from the published n8n instance on 18 August
+2026. They correspond to the exact workflow exports in
+`workflows/exports/`.
 
-Add the following PNG files to this directory before submission:
+1. [INTELLECTUS_LIVE_WEBHOOK canvas](01-intellectus-live-webhook-workflow.png)
+   - Published parent workflow `tBC3Pb82V2g5epzC`.
+   - Shows the HTTP trigger, request validation, child-workflow call, response
+     mapping, and controlled error path.
+2. [Parent execution 3015](02-parent-execution-3015-success.png)
+   - `INTELLECTUS_LIVE_WEBHOOK` completed successfully in 16.38 seconds.
+   - The selected response shows HTTP 200 and status `completed`.
+3. [Child execution 3016](03-child-execution-3016-success.png)
+   - `DEV_PROJECT3_END_TO_END` completed successfully in 14.986 seconds.
+   - Shows the live research-to-structured-diagnostic orchestration.
 
-1. `01-intellectus-live-webhook-workflow.png`
-   - Show the complete `INTELLECTUS_LIVE_WEBHOOK` canvas.
-   - Node names and connections must be readable.
-   - Hide the production/test webhook URL and all credential details.
-2. `02-parent-execution-3015-success.png`
-   - Show execution `3015`, its successful terminal status, and the workflow
-     name.
-   - Keep request/response bodies collapsed if they could expose sensitive
-     data.
-3. `03-child-execution-3016-success.png`
-   - Show execution `3016`, successful status, and
-     `DEV_PROJECT3_END_TO_END`.
+The captures do not show credentials, authorization headers, webhook tokens,
+personal data, or private client inputs. GiveDirectly information visible in
+the successful run is public demonstration data.
 
-If newer executions are used, update the filenames and
-`docs/INTELLECTUS_AUDIT_GUIDE.md` so the IDs remain consistent.
-
-## Capture quality
-
-- Use PNG, not a phone photograph.
-- Capture at normal browser zoom with readable node and status labels.
-- Crop unrelated browser chrome where practical.
-- Do not show credentials, authorization headers, webhook tokens, personal
-  data, or private client inputs.
-- Confirm the screenshot matches the workflow export committed in GitHub.
-
+Execution `3163` is intentionally not used as the happy-path evidence. It
+submitted the unreachable placeholder `https://example.test` and correctly
+returned HTTP 422 with `needs_evidence`; the system did not fabricate a report.
