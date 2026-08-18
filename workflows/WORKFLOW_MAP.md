@@ -7,6 +7,10 @@ contains the validated `INTELLECTUS_LIVE_WEBHOOK` boundary and the confirmed
 child workflow ID, while remaining inactive in the repository export to avoid
 unsafe automatic activation after import.
 
+Exact exports of the published parent and child workflows are retained in
+`workflows/exports/`. Those files preserve `active: true` as runtime evidence;
+they must be reviewed and deactivated before import into another environment.
+
 | Workflow | Owner | Purpose | Input | Output | Dependencies | Future configuration |
 | --- | --- | --- | --- | --- | --- | --- |
 | 00_MAIN_ORCHESTRATOR | SHARED | Coordinates full run | Initial run request | Final package | 10,20,30,40,50,60,70 | Sub-workflow links |
