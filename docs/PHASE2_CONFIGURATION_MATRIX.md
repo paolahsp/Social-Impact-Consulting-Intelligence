@@ -16,9 +16,9 @@ P0 = vertical slice. P1 = required expansion. P2 = hardening.
 | 50_ANALYSIS_ORCHESTRATOR | Shared | P1 | No | No | No | No | 51,52,53 | Link specialists after track work |
 | 51_REVENUE_RESILIENCE_AGENT | Paola | P0 | No | Future optional | Yes | No | 30,40 | n8n-native repo-ready deterministic P0 revenue finding |
 | 52_IMPACT_EVIDENCE_AGENT | Paola | P1 | No | Yes | Yes | No | 30,40 | Required expansion |
-| 53_OPERATIONS_CX_AGENT | Gretel | P1 | No | Yes | Yes | No | 30,40 | Required expansion |
+| 53_OPERATIONS_CX_AGENT | Gretel | P1 | No | No | Upstream handoff only | No | Validated Paola handoff | Phase 2C repository-configured and reproducibly tested offline; n8n execution reported in PR #1 but no retained run provenance independently verifies it |
 | 54_EVIDENCE_GAP_RESEARCH | Paola | P2 | Yes | Optional | No | Optional | 30 | Hardening |
-| 60_TRANSFORMATION_ORCHESTRATOR | Gretel | P1 | No | No | No | No | 61,62,63,64,65,66 | Link child workflows |
+| 60_TRANSFORMATION_ORCHESTRATOR | Gretel | P1 | No | No | No | No | 53,61,62,63,64,65,66 | Phase 2D current-n8n export repository-ready with cumulative runtime state guards; manual child selections and live tests pending |
 | 61_HYPOTHESIS_BUILDER | Gretel | P0 | No | Yes | Optional | No | Paola output fixture | P0 transformation |
 | 62_ROOT_CAUSE_DIAGNOSIS | Gretel | P0 | No | Yes | Optional | No | 61 | P0 transformation |
 | 63_ACTION_DESIGN | Gretel | P0 | No | Yes | Optional | No | 62 | P0 transformation |
@@ -26,4 +26,5 @@ P0 = vertical slice. P1 = required expansion. P2 = hardening.
 | 65_CLIENT_VALIDATION_QUESTIONS | Gretel | P0 | No | Yes | No | No | 61,62 | Core MVP workflow |
 | 66_90_DAY_ROADMAP | Gretel | P0 | No | Yes | Optional | No | 63,64,65 | P0 transformation |
 | 70_REPORT_QA_DELIVERY | Gretel / Shared integration | P0 | No | Optional | No | Yes | Paola + Gretel outputs | Shared P0 after tracks work |
+| 71_INTELLECTUS_WEB_ADAPTER / INTELLECTUS_LIVE_WEBHOOK | Shared integration | P0 | Webhook | No | No | No | DEV_PROJECT3_END_TO_END | Final live architecture recorded with workflow IDs `tBC3Pb82V2g5epzC` and `62QlFvCwJ8b3weif`; execution 3015 completed with HTTP 200, `status: completed`, `demo: false` in 16.38 s; child execution 3016 successful; production gateway hardening remains required |
 | 99_GLOBAL_ERROR_HANDLER | Shared | P2 | No | No | No | Optional | All workflows | Hardening |

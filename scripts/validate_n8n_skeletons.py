@@ -32,6 +32,7 @@ REQUIRED_WORKFLOWS = [
     "65_CLIENT_VALIDATION_QUESTIONS.json",
     "66_90_DAY_ROADMAP.json",
     "70_REPORT_QA_DELIVERY.json",
+    "71_INTELLECTUS_WEB_ADAPTER.json",
     "99_GLOBAL_ERROR_HANDLER.json",
 ]
 
@@ -61,12 +62,20 @@ REQUIRED_DOCS = [
     ROOT / "docs" / "GIT_PARALLEL_WORK.md",
     ROOT / "docs" / "PAOLA_P0_VERTICAL_SLICE.md",
     ROOT / "docs" / "PAOLA_P0_N8N_IMPORT.md",
+    ROOT / "docs" / "GRETEL_P0_N8N_IMPORT.md",
+    ROOT / "docs" / "GRETEL_53_N8N_IMPORT.md",
+    ROOT / "docs" / "GRETEL_60_N8N_IMPORT.md",
+    ROOT / "docs" / "INTELLECTUS_71_N8N_IMPORT.md",
+    ROOT / "docs" / "INTELLECTUS_AUDIT_GUIDE.md",
     ROOT / "tests" / "PHASE2_TEST_PLAN.md",
     ROOT / "stack_decision.md",
 ]
 
 REQUIRED_DEV_WORKFLOWS = [
     ROOT / "workflows" / "dev" / "DEV_PAOLA_P0_LIVE_TEST.json",
+    ROOT / "workflows" / "dev" / "DEV_GRETEL_P0_LIVE_TEST.json",
+    ROOT / "workflows" / "dev" / "DEV_GRETEL_53_OPERATIONS_CX_TEST.json",
+    ROOT / "workflows" / "dev" / "DEV_GRETEL_60_TRANSFORMATION_TEST.json",
 ]
 
 REQUIRED_FIXTURES = [
@@ -75,8 +84,12 @@ REQUIRED_FIXTURES = [
     ROOT / "fixtures" / "evidence_example.json",
     ROOT / "fixtures" / "finding_example.json",
     ROOT / "fixtures" / "paola_track_output.json",
+    ROOT / "fixtures" / "paola_track_insufficient_evidence.json",
     ROOT / "fixtures" / "gretel_track_output.json",
     ROOT / "fixtures" / "final_package_example.json",
+    ROOT / "fixtures" / "intellectus_71_live_request.json",
+    ROOT / "fixtures" / "intellectus_71_demo_request.json",
+    ROOT / "fixtures" / "intellectus_71_success_response.json",
 ]
 
 SECRET_PATTERNS = [
@@ -126,13 +139,53 @@ def has_terminal_output(workflow):
         name = node.get("name", "")
         js_code = node.get("parameters", {}).get("jsCode", "")
         if (
-            name.startswith("OUTPUT")
+            node.get("type") == "n8n-nodes-base.respondToWebhook"
+            or name.startswith("OUTPUT")
             or name.startswith("RETURN")
             or name.startswith("FINAL")
             or "TERMINAL_OUTPUT_NODE" in js_code
         ):
             return True
     return False
+
+
+def validate_gretel_60_execute_nodes(path, workflow, errors):
+    expected_counts = {
+        "60_TRANSFORMATION_ORCHESTRATOR.json": 7,
+        "DEV_GRETEL_60_TRANSFORMATION_TEST.json": 3,
+    }
+    if path.name not in expected_counts:
+        return
+    execute_nodes = [
+        node for node in workflow.get("nodes", [])
+        if node.get("type") == "n8n-nodes-base.executeWorkflow"
+    ]
+    if len(execute_nodes) != expected_counts[path.name]:
+        fail(errors, f"{path.name}: expected {expected_counts[path.name]} current Execute Sub-workflow nodes")
+    for node in execute_nodes:
+        parameters = node.get("parameters", {})
+        selector = parameters.get("workflowId")
+        label = f"{path.name} / {node.get('name', '(unnamed)')}"
+        if node.get("typeVersion") != 1.3:
+            fail(errors, f"{label}: Execute Sub-workflow typeVersion must be 1.3")
+        if parameters.get("source") != "database":
+            fail(errors, f"{label}: source must be database")
+        if not isinstance(selector, dict) or selector.get("__rl") is not True:
+            fail(errors, f"{label}: workflowId must use the current resource-locator object")
+        elif selector.get("value") != "" or selector.get("mode") != "list":
+            fail(errors, f"{label}: workflow selector must be an empty manual list selection")
+        if parameters.get("mode") != "once":
+            fail(errors, f"{label}: mode must be once")
+        if parameters.get("options", {}).get("waitForSubWorkflow") is not True:
+            fail(errors, f"{label}: must wait for sub-workflow completion")
+        if "workflowInputs" in parameters:
+            fail(errors, f"{label}: workflowInputs must be omitted for accept-all-data child triggers")
+        if path.name == "60_TRANSFORMATION_ORCHESTRATOR.json":
+            if node.get("onError") != "continueErrorOutput":
+                fail(errors, f"{label}: current n8n error output must be enabled")
+            outputs = workflow.get("connections", {}).get(node.get("name"), {}).get("main", [])
+            if len(outputs) != 2 or not outputs[0] or not outputs[1]:
+                fail(errors, f"{label}: success and error outputs must both be connected")
 
 
 def validate_workflow(path, workflow, errors):
@@ -177,6 +230,28 @@ def validate_workflow(path, workflow, errors):
                         errors,
                         f"{path.name}: connection from {source_name} output {output_index} references missing node {target}",
                     )
+    validate_gretel_60_execute_nodes(path, workflow, errors)
+
+    if path.name == "71_INTELLECTUS_WEB_ADAPTER.json":
+        if workflow.get("id") != "tBC3Pb82V2g5epzC":
+            fail(errors, f"{path.name}: final live webhook workflow ID mismatch")
+        if workflow.get("name") != "INTELLECTUS_LIVE_WEBHOOK":
+            fail(errors, f"{path.name}: workflow name must match final live webhook")
+        serialized = json.dumps(workflow)
+        if "TODO_LINK_SUBWORKFLOW" in serialized:
+            fail(errors, f"{path.name}: obsolete TODO subworkflow link remains")
+        for execute_node in [
+            node for node in workflow.get("nodes", [])
+            if node.get("type") == "n8n-nodes-base.executeWorkflow"
+        ]:
+            selector = execute_node.get("parameters", {}).get("workflowId", {})
+            if selector.get("value") != "62QlFvCwJ8b3weif":
+                fail(errors, f"{path.name}: final child workflow ID mismatch")
+        for decision_name in ("DECISION__WEB_REQUEST_VALID", "DECISION__FINAL_RESPONSE_VALID"):
+            decision = next((node for node in workflow.get("nodes", []) if node.get("name") == decision_name), None)
+            condition = (decision or {}).get("parameters", {}).get("conditions", {}).get("conditions", [{}])[0]
+            if condition.get("leftValue") != "={{ $json.valid }}":
+                fail(errors, f"{path.name}: {decision_name} must read $json.valid")
 
 
 def main():

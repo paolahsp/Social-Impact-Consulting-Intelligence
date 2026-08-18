@@ -3,9 +3,9 @@
   "nodes": [
     {
       "parameters": {
-        "content": "PURPOSE\nCoordinate transformation child workflows from hypotheses through roadmap.\n\nOWNER\nGRETEL TRACK B\n\nINPUT CONTRACT\nfinding.schema.json[] plus evidence ledger\n\nOUTPUT CONTRACT\nrecommendation.schema.json[] plus roadmap and validation questions\n\nSTATUS\nSkeleton only. Inactive by default. No credentials. Configure TODO nodes after import.",
-        "height": 340,
-        "width": 520,
+        "content": "PURPOSE\nOrchestrate 53 and 61-66 without duplicating specialist logic.\n\nOWNER\nGRETEL TRACK B\n\nINPUT\nExact flat Paola track handoff.\n\nSUCCESS OUTPUT\nExact Gretel Track six-array object.\n\nCHILD CALL FORMAT\nExecute Sub-workflow v1.3; database list selector; once; wait for completion; current error output.\n\nSTATUS\nPhase 2D repository-ready. Inactive. Manually select imported child workflows; no IDs or credentials are committed.",
+        "height": 440,
+        "width": 640,
         "color": 4
       },
       "id": "00_readme__purpose_owner_contracts_status",
@@ -13,40 +13,40 @@
       "type": "n8n-nodes-base.stickyNote",
       "typeVersion": 1,
       "position": [
-        -420,
-        -320
+        -650,
+        -500
       ]
     },
     {
       "parameters": {
-        "content": "TARGET FLOW\nMerged specialist findings -> 61 Hypothesis Builder -> 62 Root Cause / Diagnosis -> Prioritization -> 63 Action Design -> 64 KPI Design -> 65 Client Validation Questions -> 66 90-Day Roadmap -> Transformation Output Contract",
-        "height": 200,
-        "width": 520,
-        "color": 4
+        "content": "Paola handoff -> Operations/CX applicable? -> 53 or explicit skip -> merge findings -> Execute 61 -> 62 -> 63 -> 64 -> 65 -> 66 -> exact Gretel output.\n\nEach child is called through Execute Sub-workflow. Code nodes only validate, merge, and control routing.",
+        "height": 350,
+        "width": 640,
+        "color": 5
       },
-      "id": "note__1",
-      "name": "NOTE__1",
+      "id": "note__visible_orchestration_path",
+      "name": "NOTE__VISIBLE_ORCHESTRATION_PATH",
       "type": "n8n-nodes-base.stickyNote",
       "typeVersion": 1,
       "position": [
-        -420,
-        60
+        -650,
+        -20
       ]
     },
     {
       "parameters": {
-        "content": "LINK SUB-WORKFLOW AFTER IMPORT\nReplace transformation TODO_LINK nodes after 61, 62, 63, 64, 65, and 66 have real n8n workflow IDs.",
-        "height": 200,
-        "width": 520,
-        "color": 4
+        "content": "Every Execute Sub-workflow and cumulative post-call guard uses its current n8n error output. A child failure or missing cumulative collection stops the specialist chain and returns the six Gretel collections plus orchestration_status=partial_failure, failed_workflow, completed_workflows, missing_collections, error, and upstream_payload (the partial valid state). Failures are never silently discarded.",
+        "height": 340,
+        "width": 640,
+        "color": 3
       },
-      "id": "note__2",
-      "name": "NOTE__2",
+      "id": "note__controlled_child_failures",
+      "name": "NOTE__CONTROLLED_CHILD_FAILURES",
       "type": "n8n-nodes-base.stickyNote",
       "typeVersion": 1,
       "position": [
-        -420,
-        280
+        -650,
+        370
       ]
     },
     {
@@ -62,10 +62,10 @@
     },
     {
       "parameters": {
-        "jsCode": "// SKELETON_PLACEHOLDER: INPUT_CONTRACT__MERGED_FINDINGS\n// Accept merged specialist findings.\n// TODO: Replace this placeholder with configured production logic.\n// Contract discipline: preserve FACT / INFERENCE / HYPOTHESIS / UNKNOWN boundaries.\nreturn items;\n"
+        "jsCode": "const payload = items[0]?.json;\nif (!payload || typeof payload !== 'object' || Array.isArray(payload)) {\n  throw new Error('60 input requires one canonical n8n item: { json: payload }');\n}\nfor (const key of ['sources', 'evidence', 'findings', 'unknowns', 'contradictions']) {\n  if (!Array.isArray(payload[key])) throw new Error(`60 input requires ${key}[]`);\n}\nif (!payload.run_context?.run_id) throw new Error('60 input requires run_context.run_id');\nif (!payload.rag_metadata || typeof payload.rag_metadata !== 'object' || Array.isArray(payload.rag_metadata)) {\n  throw new Error('60 input requires rag_metadata object');\n}\nfunction unique(records, key, label) {\n  const values = records.map(record => record?.[key]);\n  if (values.some(value => typeof value !== 'string' || !value)) throw new Error(`60 ${label} require ${key}`);\n  if (new Set(values).size !== values.length) throw new Error(`60 input contains duplicate ${label} IDs`);\n  return new Set(values);\n}\nconst evidenceIds = unique(payload.evidence, 'evidence_id', 'evidence');\nunique(payload.findings, 'finding_id', 'finding');\nfor (const finding of payload.findings) {\n  if (!Array.isArray(finding.evidence_ids) || finding.evidence_ids.some(id => !evidenceIds.has(id))) {\n    throw new Error(`60 finding ${finding.finding_id} has a dangling evidence reference`);\n  }\n}\nfor (const unknown of payload.unknowns) {\n  if (unknown.evidence_ids && (!Array.isArray(unknown.evidence_ids) || unknown.evidence_ids.some(id => !evidenceIds.has(id)))) {\n    throw new Error(`60 unknown ${unknown.unknown_id || '(unidentified)'} has a dangling evidence reference`);\n  }\n}\nconst operationsApplicable = payload.evidence.some(ev => ev?.domain === 'operations_cx') ||\n  payload.unknowns.some(unknown => unknown?.domain === 'operations_cx');\nreturn [{ json: { payload, operations_cx_applicable: operationsApplicable } }];\n"
       },
-      "id": "input_contract__merged_findings",
-      "name": "INPUT_CONTRACT__MERGED_FINDINGS",
+      "id": "input_contract__paola_handoff",
+      "name": "INPUT_CONTRACT__PAOLA_HANDOFF",
       "type": "n8n-nodes-base.code",
       "typeVersion": 2,
       "position": [
@@ -75,12 +75,32 @@
     },
     {
       "parameters": {
-        "jsCode": "// SKELETON_PLACEHOLDER: TODO_LINK_SUBWORKFLOW__61_HYPOTHESIS_BUILDER\n// LINK SUB-WORKFLOW AFTER IMPORT: 61_HYPOTHESIS_BUILDER.\n// TODO: Replace this placeholder with configured production logic.\n// Contract discipline: preserve FACT / INFERENCE / HYPOTHESIS / UNKNOWN boundaries.\nreturn items;\n"
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 2
+          },
+          "conditions": [
+            {
+              "id": "decision__operations_cx_applicable_condition",
+              "leftValue": "={{ $json.operations_cx_applicable }}",
+              "operator": {
+                "type": "boolean",
+                "operation": "true",
+                "singleValue": true
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
       },
-      "id": "todo_link_subworkflow__61_hypothesis_builder",
-      "name": "TODO_LINK_SUBWORKFLOW__61_HYPOTHESIS_BUILDER",
-      "type": "n8n-nodes-base.code",
-      "typeVersion": 2,
+      "id": "decision__operations_cx_applicable",
+      "name": "DECISION__OPERATIONS_CX_APPLICABLE",
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.2,
       "position": [
         560,
         0
@@ -88,49 +108,75 @@
     },
     {
       "parameters": {
-        "jsCode": "// SKELETON_PLACEHOLDER: TODO_LINK_SUBWORKFLOW__62_ROOT_CAUSE_DIAGNOSIS\n// LINK SUB-WORKFLOW AFTER IMPORT: 62_ROOT_CAUSE_DIAGNOSIS.\n// TODO: Replace this placeholder with configured production logic.\n// Contract discipline: preserve FACT / INFERENCE / HYPOTHESIS / UNKNOWN boundaries.\nreturn items;\n"
+        "jsCode": "return [{ json: items[0].json.payload }];\n"
       },
-      "id": "todo_link_subworkflow__62_root_cause_diagnosis",
-      "name": "TODO_LINK_SUBWORKFLOW__62_ROOT_CAUSE_DIAGNOSIS",
+      "id": "prepare__53_input",
+      "name": "PREPARE__53_INPUT",
       "type": "n8n-nodes-base.code",
       "typeVersion": 2,
       "position": [
         860,
-        0
+        -180
       ]
     },
     {
       "parameters": {
-        "jsCode": "// SKELETON_PLACEHOLDER: PRIORITIZATION\n// Prioritize by evidence strength, client relevance, and feasibility.\n// TODO: Replace this placeholder with configured production logic.\n// Contract discipline: preserve FACT / INFERENCE / HYPOTHESIS / UNKNOWN boundaries.\nreturn items;\n"
+        "source": "database",
+        "workflowId": {
+          "__rl": true,
+          "value": "",
+          "mode": "list",
+          "cachedResultName": ""
+        },
+        "mode": "once",
+        "options": {
+          "waitForSubWorkflow": true
+        }
       },
-      "id": "prioritization",
-      "name": "PRIORITIZATION",
-      "type": "n8n-nodes-base.code",
-      "typeVersion": 2,
+      "id": "todo_link_subworkflow__53_operations_cx",
+      "name": "TODO_LINK_SUBWORKFLOW__53_OPERATIONS_CX",
+      "type": "n8n-nodes-base.executeWorkflow",
+      "typeVersion": 1.3,
       "position": [
         1160,
-        0
-      ]
+        -180
+      ],
+      "notes": "AFTER IMPORT: select 53_OPERATIONS_CX_AGENT from the Workflow list. No live workflow ID is committed.",
+      "onError": "continueErrorOutput"
     },
     {
       "parameters": {
-        "jsCode": "// SKELETON_PLACEHOLDER: TODO_LINK_SUBWORKFLOW__63_ACTION_DESIGN\n// LINK SUB-WORKFLOW AFTER IMPORT: 63_ACTION_DESIGN.\n// TODO: Replace this placeholder with configured production logic.\n// Contract discipline: preserve FACT / INFERENCE / HYPOTHESIS / UNKNOWN boundaries.\nreturn items;\n"
+        "jsCode": "const leaf = items[0]?.json;\nif (!leaf || !Array.isArray(leaf.findings)) throw new Error('53 returned no findings[] leaf output');\nconst upstream = $('INPUT_CONTRACT__PAOLA_HANDOFF').first().json.payload;\nconst evidenceById = new Map(upstream.evidence.map(ev => [ev.evidence_id, ev]));\nconst upstreamIds = new Set(upstream.findings.map(finding => finding.finding_id));\nconst generatedIds = new Set();\nfor (const finding of leaf.findings) {\n  if (!finding?.finding_id || upstreamIds.has(finding.finding_id) || generatedIds.has(finding.finding_id)) {\n    throw new Error(`53 returned colliding or invalid finding ID ${finding?.finding_id}`);\n  }\n  generatedIds.add(finding.finding_id);\n  if (finding.domain !== 'operations_cx') throw new Error(`53 returned cross-domain finding ${finding.finding_id}`);\n  if (!Array.isArray(finding.evidence_ids) || finding.evidence_ids.length === 0) {\n    throw new Error(`53 finding ${finding.finding_id} lacks evidence_ids`);\n  }\n  for (const evidenceId of finding.evidence_ids) {\n    const evidence = evidenceById.get(evidenceId);\n    if (!evidence || evidence.domain !== 'operations_cx') {\n      throw new Error(`53 finding ${finding.finding_id} has invalid evidence reference ${evidenceId}`);\n    }\n  }\n}\nreturn [{ json: leaf }];\n"
       },
-      "id": "todo_link_subworkflow__63_action_design",
-      "name": "TODO_LINK_SUBWORKFLOW__63_ACTION_DESIGN",
+      "id": "validate__53_findings",
+      "name": "VALIDATE__53_FINDINGS",
       "type": "n8n-nodes-base.code",
       "typeVersion": 2,
       "position": [
         1460,
-        0
+        -180
+      ],
+      "onError": "continueErrorOutput"
+    },
+    {
+      "parameters": {
+        "jsCode": "return [{ json: { findings: [], skipped: true, reason: 'No Operations/CX evidence or unknown was supplied.' } }];\n"
+      },
+      "id": "skip__53_not_applicable",
+      "name": "SKIP__53_NOT_APPLICABLE",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        1460,
+        180
       ]
     },
     {
       "parameters": {
-        "jsCode": "// SKELETON_PLACEHOLDER: TODO_LINK_SUBWORKFLOW__64_KPI_DESIGN\n// LINK SUB-WORKFLOW AFTER IMPORT: 64_KPI_DESIGN.\n// TODO: Replace this placeholder with configured production logic.\n// Contract discipline: preserve FACT / INFERENCE / HYPOTHESIS / UNKNOWN boundaries.\nreturn items;\n"
+        "jsCode": "const original = $('INPUT_CONTRACT__PAOLA_HANDOFF').first().json.payload;\nconst leaf = items[0]?.json ?? {};\nif (!Array.isArray(leaf.findings)) throw new Error('60 merge requires 53 findings[] or an explicit empty skip result');\nconst mergedFindings = [...original.findings, ...leaf.findings];\nconst findingIds = mergedFindings.map(finding => finding.finding_id);\nif (new Set(findingIds).size !== findingIds.length) throw new Error('60 merge produced duplicate finding IDs');\nconst evidenceIds = new Set(original.evidence.map(ev => ev.evidence_id));\nfor (const finding of mergedFindings) {\n  if (!Array.isArray(finding.evidence_ids) || finding.evidence_ids.some(id => !evidenceIds.has(id))) {\n    throw new Error(`60 merge found dangling evidence reference on ${finding.finding_id}`);\n  }\n}\nreturn [{ json: { ...original, findings: mergedFindings } }];\n"
       },
-      "id": "todo_link_subworkflow__64_kpi_design",
-      "name": "TODO_LINK_SUBWORKFLOW__64_KPI_DESIGN",
+      "id": "merge__upstream_and_operations_findings",
+      "name": "MERGE__UPSTREAM_AND_OPERATIONS_FINDINGS",
       "type": "n8n-nodes-base.code",
       "typeVersion": 2,
       "position": [
@@ -140,41 +186,354 @@
     },
     {
       "parameters": {
-        "jsCode": "// SKELETON_PLACEHOLDER: TODO_LINK_SUBWORKFLOW__65_CLIENT_VALIDATION_QUESTIONS\n// LINK SUB-WORKFLOW AFTER IMPORT: 65_CLIENT_VALIDATION_QUESTIONS.\n// TODO: Replace this placeholder with configured production logic.\n// Contract discipline: preserve FACT / INFERENCE / HYPOTHESIS / UNKNOWN boundaries.\nreturn items;\n"
+        "source": "database",
+        "workflowId": {
+          "__rl": true,
+          "value": "",
+          "mode": "list",
+          "cachedResultName": ""
+        },
+        "mode": "once",
+        "options": {
+          "waitForSubWorkflow": true
+        }
       },
-      "id": "todo_link_subworkflow__65_client_validation_questions",
-      "name": "TODO_LINK_SUBWORKFLOW__65_CLIENT_VALIDATION_QUESTIONS",
-      "type": "n8n-nodes-base.code",
-      "typeVersion": 2,
+      "id": "todo_link_subworkflow__61_hypothesis_builder",
+      "name": "TODO_LINK_SUBWORKFLOW__61_HYPOTHESIS_BUILDER",
+      "type": "n8n-nodes-base.executeWorkflow",
+      "typeVersion": 1.3,
       "position": [
         2060,
         0
-      ]
+      ],
+      "notes": "AFTER IMPORT: select 61_HYPOTHESIS_BUILDER from the Workflow list. No live workflow ID is committed.",
+      "onError": "continueErrorOutput"
     },
     {
       "parameters": {
-        "jsCode": "// SKELETON_PLACEHOLDER: TODO_LINK_SUBWORKFLOW__66_90_DAY_ROADMAP\n// LINK SUB-WORKFLOW AFTER IMPORT: 66_90_DAY_ROADMAP.\n// TODO: Replace this placeholder with configured production logic.\n// Contract discipline: preserve FACT / INFERENCE / HYPOTHESIS / UNKNOWN boundaries.\nreturn items;\n"
+        "jsCode": "const payload = items[0]?.json;\nconst expected = [\"hypotheses\"];\nconst missing = expected.filter(key => !Array.isArray(payload?.[key]));\nif (missing.length) {\n  throw new Error(`RUNTIME_CONTRACT_MISSING|61_HYPOTHESIS_BUILDER|${missing.join(',')}`);\n}\nreturn [{ json: payload }];\n"
       },
-      "id": "todo_link_subworkflow__66_90_day_roadmap",
-      "name": "TODO_LINK_SUBWORKFLOW__66_90_DAY_ROADMAP",
+      "id": "validate__61_output",
+      "name": "VALIDATE__61_OUTPUT",
       "type": "n8n-nodes-base.code",
       "typeVersion": 2,
       "position": [
         2360,
         0
+      ],
+      "onError": "continueErrorOutput"
+    },
+    {
+      "parameters": {
+        "source": "database",
+        "workflowId": {
+          "__rl": true,
+          "value": "",
+          "mode": "list",
+          "cachedResultName": ""
+        },
+        "mode": "once",
+        "options": {
+          "waitForSubWorkflow": true
+        }
+      },
+      "id": "todo_link_subworkflow__62_root_cause_diagnosis",
+      "name": "TODO_LINK_SUBWORKFLOW__62_ROOT_CAUSE_DIAGNOSIS",
+      "type": "n8n-nodes-base.executeWorkflow",
+      "typeVersion": 1.3,
+      "position": [
+        2660,
+        0
+      ],
+      "notes": "AFTER IMPORT: select 62_ROOT_CAUSE_DIAGNOSIS from the Workflow list. No live workflow ID is committed.",
+      "onError": "continueErrorOutput"
+    },
+    {
+      "parameters": {
+        "jsCode": "const payload = items[0]?.json;\nconst expected = [\"hypotheses\",\"diagnoses\"];\nconst missing = expected.filter(key => !Array.isArray(payload?.[key]));\nif (missing.length) {\n  throw new Error(`RUNTIME_CONTRACT_MISSING|62_ROOT_CAUSE_DIAGNOSIS|${missing.join(',')}`);\n}\nreturn [{ json: payload }];\n"
+      },
+      "id": "validate__62_output",
+      "name": "VALIDATE__62_OUTPUT",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        2960,
+        0
+      ],
+      "onError": "continueErrorOutput"
+    },
+    {
+      "parameters": {
+        "source": "database",
+        "workflowId": {
+          "__rl": true,
+          "value": "",
+          "mode": "list",
+          "cachedResultName": ""
+        },
+        "mode": "once",
+        "options": {
+          "waitForSubWorkflow": true
+        }
+      },
+      "id": "todo_link_subworkflow__63_action_design",
+      "name": "TODO_LINK_SUBWORKFLOW__63_ACTION_DESIGN",
+      "type": "n8n-nodes-base.executeWorkflow",
+      "typeVersion": 1.3,
+      "position": [
+        3260,
+        0
+      ],
+      "notes": "AFTER IMPORT: select 63_ACTION_DESIGN from the Workflow list. No live workflow ID is committed.",
+      "onError": "continueErrorOutput"
+    },
+    {
+      "parameters": {
+        "jsCode": "const payload = items[0]?.json;\nconst expected = [\"hypotheses\",\"diagnoses\",\"recommendations\"];\nconst missing = expected.filter(key => !Array.isArray(payload?.[key]));\nif (missing.length) {\n  throw new Error(`RUNTIME_CONTRACT_MISSING|63_ACTION_DESIGN|${missing.join(',')}`);\n}\nreturn [{ json: payload }];\n"
+      },
+      "id": "validate__63_output",
+      "name": "VALIDATE__63_OUTPUT",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        3560,
+        0
+      ],
+      "onError": "continueErrorOutput"
+    },
+    {
+      "parameters": {
+        "source": "database",
+        "workflowId": {
+          "__rl": true,
+          "value": "",
+          "mode": "list",
+          "cachedResultName": ""
+        },
+        "mode": "once",
+        "options": {
+          "waitForSubWorkflow": true
+        }
+      },
+      "id": "todo_link_subworkflow__64_kpi_design",
+      "name": "TODO_LINK_SUBWORKFLOW__64_KPI_DESIGN",
+      "type": "n8n-nodes-base.executeWorkflow",
+      "typeVersion": 1.3,
+      "position": [
+        3860,
+        0
+      ],
+      "notes": "AFTER IMPORT: select 64_KPI_DESIGN from the Workflow list. No live workflow ID is committed.",
+      "onError": "continueErrorOutput"
+    },
+    {
+      "parameters": {
+        "jsCode": "const payload = items[0]?.json;\nconst expected = [\"hypotheses\",\"diagnoses\",\"recommendations\",\"kpis\"];\nconst missing = expected.filter(key => !Array.isArray(payload?.[key]));\nif (missing.length) {\n  throw new Error(`RUNTIME_CONTRACT_MISSING|64_KPI_DESIGN|${missing.join(',')}`);\n}\nreturn [{ json: payload }];\n"
+      },
+      "id": "validate__64_output",
+      "name": "VALIDATE__64_OUTPUT",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        4160,
+        0
+      ],
+      "onError": "continueErrorOutput"
+    },
+    {
+      "parameters": {
+        "source": "database",
+        "workflowId": {
+          "__rl": true,
+          "value": "",
+          "mode": "list",
+          "cachedResultName": ""
+        },
+        "mode": "once",
+        "options": {
+          "waitForSubWorkflow": true
+        }
+      },
+      "id": "todo_link_subworkflow__65_client_validation_questions",
+      "name": "TODO_LINK_SUBWORKFLOW__65_CLIENT_VALIDATION_QUESTIONS",
+      "type": "n8n-nodes-base.executeWorkflow",
+      "typeVersion": 1.3,
+      "position": [
+        4460,
+        0
+      ],
+      "notes": "AFTER IMPORT: select 65_CLIENT_VALIDATION_QUESTIONS from the Workflow list. No live workflow ID is committed.",
+      "onError": "continueErrorOutput"
+    },
+    {
+      "parameters": {
+        "jsCode": "const payload = items[0]?.json;\nconst expected = [\"hypotheses\",\"diagnoses\",\"recommendations\",\"kpis\",\"validation_questions\"];\nconst missing = expected.filter(key => !Array.isArray(payload?.[key]));\nif (missing.length) {\n  throw new Error(`RUNTIME_CONTRACT_MISSING|65_CLIENT_VALIDATION_QUESTIONS|${missing.join(',')}`);\n}\nreturn [{ json: payload }];\n"
+      },
+      "id": "validate__65_output",
+      "name": "VALIDATE__65_OUTPUT",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        4760,
+        0
+      ],
+      "onError": "continueErrorOutput"
+    },
+    {
+      "parameters": {
+        "source": "database",
+        "workflowId": {
+          "__rl": true,
+          "value": "",
+          "mode": "list",
+          "cachedResultName": ""
+        },
+        "mode": "once",
+        "options": {
+          "waitForSubWorkflow": true
+        }
+      },
+      "id": "todo_link_subworkflow__66_90_day_roadmap",
+      "name": "TODO_LINK_SUBWORKFLOW__66_90_DAY_ROADMAP",
+      "type": "n8n-nodes-base.executeWorkflow",
+      "typeVersion": 1.3,
+      "position": [
+        5060,
+        0
+      ],
+      "notes": "AFTER IMPORT: select 66_90_DAY_ROADMAP from the Workflow list. No live workflow ID is committed.",
+      "onError": "continueErrorOutput"
+    },
+    {
+      "parameters": {
+        "jsCode": "const payload = items[0]?.json;\nconst keys = ['hypotheses', 'diagnoses', 'recommendations', 'kpis', 'validation_questions', 'roadmap_actions'];\nconst missing = keys.filter(key => !Array.isArray(payload?.[key]));\nif (missing.length) {\n  throw new Error(`RUNTIME_CONTRACT_MISSING|66_90_DAY_ROADMAP|${missing.join(',')}`);\n}\nconst source = $('MERGE__UPSTREAM_AND_OPERATIONS_FINDINGS').first().json;\nconst evidenceIds = new Set(source.evidence.map(ev => ev.evidence_id));\nconst findingIds = new Set(source.findings.map(finding => finding.finding_id));\nconst hypothesisIds = new Set(payload.hypotheses.map(record => record.hypothesis_id));\nconst diagnosisIds = new Set(payload.diagnoses.map(record => record.diagnosis_id));\nconst recommendationIds = new Set(payload.recommendations.map(record => record.recommendation_id));\nconst questionIds = new Set(payload.validation_questions.map(record => record.question_id));\nfunction allKnown(ids, known) { return Array.isArray(ids) && ids.every(id => known.has(id)); }\nfor (const hypothesis of payload.hypotheses) {\n  if (!allKnown(hypothesis.evidence_ids, evidenceIds) || !allKnown(hypothesis.finding_ids, findingIds) || hypothesis.requires_validation !== true) {\n    throw new Error(`60 traceability failure at hypothesis ${hypothesis.hypothesis_id}`);\n  }\n}\nfor (const diagnosis of payload.diagnoses) {\n  if (!allKnown(diagnosis.evidence_ids, evidenceIds) || !allKnown(diagnosis.finding_ids, findingIds) || !allKnown(diagnosis.hypothesis_ids, hypothesisIds)) {\n    throw new Error(`60 traceability failure at diagnosis ${diagnosis.diagnosis_id}`);\n  }\n}\nfor (const recommendation of payload.recommendations) {\n  if (!allKnown(recommendation.finding_ids, findingIds) || !allKnown(recommendation.diagnosis_ids || [], diagnosisIds)) {\n    throw new Error(`60 traceability failure at recommendation ${recommendation.recommendation_id}`);\n  }\n  if (recommendation.kpi?.baseline_status === 'unknown' && recommendation.kpi?.baseline !== null) {\n    throw new Error(`60 uncertainty failure: ${recommendation.recommendation_id} invented a baseline`);\n  }\n}\nfor (const question of payload.validation_questions) {\n  if (!allKnown(question.finding_ids, findingIds) || !allKnown(question.hypothesis_ids, hypothesisIds)) {\n    throw new Error(`60 traceability failure at validation question ${question.question_id}`);\n  }\n}\nfor (const action of payload.roadmap_actions) {\n  if (!allKnown(action.recommendation_ids, recommendationIds) || !allKnown(action.hypothesis_ids, hypothesisIds) || !allKnown(action.validation_question_ids, questionIds)) {\n    throw new Error(`60 traceability failure at roadmap action ${action.roadmap_action_id}`);\n  }\n}\nreturn [{ json: payload }];\n"
+      },
+      "id": "validate__66_output",
+      "name": "VALIDATE__66_OUTPUT",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        5360,
+        0
+      ],
+      "onError": "continueErrorOutput"
+    },
+    {
+      "parameters": {
+        "jsCode": "const payload = items[0]?.json;\nconst keys = ['hypotheses', 'diagnoses', 'recommendations', 'kpis', 'validation_questions', 'roadmap_actions'];\nconst missing = keys.filter(key => !Array.isArray(payload?.[key]));\nif (missing.length) {\n  throw new Error(`RUNTIME_CONTRACT_MISSING|FINAL_GRETEL_TRACK|${missing.join(',')}`);\n}\nreturn [{ json: payload }];\n"
+      },
+      "id": "final_runtime_contract__six_collections",
+      "name": "FINAL_RUNTIME_CONTRACT__SIX_COLLECTIONS",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        5660,
+        0
+      ],
+      "onError": "continueErrorOutput"
+    },
+    {
+      "parameters": {
+        "jsCode": "const payload = items[0].json;\nreturn [{ json: {\n  hypotheses: payload.hypotheses,\n  diagnoses: payload.diagnoses,\n  recommendations: payload.recommendations,\n  kpis: payload.kpis,\n  validation_questions: payload.validation_questions,\n  roadmap_actions: payload.roadmap_actions\n} }];\n"
+      },
+      "id": "output_contract__gretel_track",
+      "name": "OUTPUT_CONTRACT__GRETEL_TRACK",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        5960,
+        0
       ]
     },
     {
       "parameters": {
-        "jsCode": "// TERMINAL_OUTPUT_NODE: OUTPUT_CONTRACT__TRANSFORMATION_PACKAGE\n// Return diagnosis-action-KPI-validation chain.\n// TODO: Replace this placeholder with configured production logic.\n// Contract discipline: preserve FACT / INFERENCE / HYPOTHESIS / UNKNOWN boundaries.\nreturn items;\n"
+        "jsCode": "const checkpoint = $('INPUT_CONTRACT__PAOLA_HANDOFF').first().json.payload;\nconst raw = items[0]?.json ?? {};\nconst message = raw.error?.message || raw.message || (typeof raw.error === 'string' ? raw.error : null) ||\n  '53_OPERATIONS_CX_AGENT failed or returned an incompatible payload';\nconst expected = [\"findings\"];\nlet childOutput = null;\ntry { childOutput = $('TODO_LINK_SUBWORKFLOW__53_OPERATIONS_CX').first().json; } catch (_error) { childOutput = null; }\nconst transformationCollections = new Set(['hypotheses', 'diagnoses', 'recommendations', 'kpis', 'validation_questions', 'roadmap_actions']);\nconst childHasState = childOutput && typeof childOutput === 'object' && !childOutput.error &&\n  expected.some(key => transformationCollections.has(key) && Object.prototype.hasOwnProperty.call(childOutput, key));\nconst marker = message.match(/RUNTIME_CONTRACT_MISSING\\|[^|]+\\|([A-Za-z0-9_,]+)/);\nconst missingCollections = marker ? marker[1].split(',').filter(Boolean) :\n  (childHasState ? expected.filter(key => !Array.isArray(childOutput[key])) : []);\nconst partial = childHasState ? childOutput : checkpoint;\nreturn [{ json: {\n  hypotheses: Array.isArray(partial.hypotheses) ? partial.hypotheses : [],\n  diagnoses: Array.isArray(partial.diagnoses) ? partial.diagnoses : [],\n  recommendations: Array.isArray(partial.recommendations) ? partial.recommendations : [],\n  kpis: Array.isArray(partial.kpis) ? partial.kpis : [],\n  validation_questions: Array.isArray(partial.validation_questions) ? partial.validation_questions : [],\n  roadmap_actions: Array.isArray(partial.roadmap_actions) ? partial.roadmap_actions : [],\n  orchestration_status: 'partial_failure',\n  run_id: partial.run_context?.run_id || null,\n  failed_workflow: '53_OPERATIONS_CX_AGENT',\n  completed_workflows: [],\n  missing_collections: missingCollections,\n  error: { message },\n  upstream_payload: partial\n} }];\n"
       },
-      "id": "output_contract__transformation_package",
-      "name": "OUTPUT_CONTRACT__TRANSFORMATION_PACKAGE",
+      "id": "output__controlled_failure__53",
+      "name": "OUTPUT__CONTROLLED_FAILURE__53",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        1460,
+        520
+      ]
+    },
+    {
+      "parameters": {
+        "jsCode": "const checkpoint = $('MERGE__UPSTREAM_AND_OPERATIONS_FINDINGS').first().json;\nconst raw = items[0]?.json ?? {};\nconst message = raw.error?.message || raw.message || (typeof raw.error === 'string' ? raw.error : null) ||\n  '61_HYPOTHESIS_BUILDER failed or returned an incompatible payload';\nconst expected = [\"hypotheses\"];\nlet childOutput = null;\ntry { childOutput = $('TODO_LINK_SUBWORKFLOW__61_HYPOTHESIS_BUILDER').first().json; } catch (_error) { childOutput = null; }\nconst transformationCollections = new Set(['hypotheses', 'diagnoses', 'recommendations', 'kpis', 'validation_questions', 'roadmap_actions']);\nconst childHasState = childOutput && typeof childOutput === 'object' && !childOutput.error &&\n  expected.some(key => transformationCollections.has(key) && Object.prototype.hasOwnProperty.call(childOutput, key));\nconst marker = message.match(/RUNTIME_CONTRACT_MISSING\\|[^|]+\\|([A-Za-z0-9_,]+)/);\nconst missingCollections = marker ? marker[1].split(',').filter(Boolean) :\n  (childHasState ? expected.filter(key => !Array.isArray(childOutput[key])) : []);\nconst partial = childHasState ? childOutput : checkpoint;\nreturn [{ json: {\n  hypotheses: Array.isArray(partial.hypotheses) ? partial.hypotheses : [],\n  diagnoses: Array.isArray(partial.diagnoses) ? partial.diagnoses : [],\n  recommendations: Array.isArray(partial.recommendations) ? partial.recommendations : [],\n  kpis: Array.isArray(partial.kpis) ? partial.kpis : [],\n  validation_questions: Array.isArray(partial.validation_questions) ? partial.validation_questions : [],\n  roadmap_actions: Array.isArray(partial.roadmap_actions) ? partial.roadmap_actions : [],\n  orchestration_status: 'partial_failure',\n  run_id: partial.run_context?.run_id || null,\n  failed_workflow: '61_HYPOTHESIS_BUILDER',\n  completed_workflows: [\"53_OPERATIONS_CX_AGENT_OR_SKIP\"],\n  missing_collections: missingCollections,\n  error: { message },\n  upstream_payload: partial\n} }];\n"
+      },
+      "id": "output__controlled_failure__61",
+      "name": "OUTPUT__CONTROLLED_FAILURE__61",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        2060,
+        520
+      ]
+    },
+    {
+      "parameters": {
+        "jsCode": "const checkpoint = $('VALIDATE__61_OUTPUT').first().json;\nconst raw = items[0]?.json ?? {};\nconst message = raw.error?.message || raw.message || (typeof raw.error === 'string' ? raw.error : null) ||\n  '62_ROOT_CAUSE_DIAGNOSIS failed or returned an incompatible payload';\nconst expected = [\"hypotheses\",\"diagnoses\"];\nlet childOutput = null;\ntry { childOutput = $('TODO_LINK_SUBWORKFLOW__62_ROOT_CAUSE_DIAGNOSIS').first().json; } catch (_error) { childOutput = null; }\nconst transformationCollections = new Set(['hypotheses', 'diagnoses', 'recommendations', 'kpis', 'validation_questions', 'roadmap_actions']);\nconst childHasState = childOutput && typeof childOutput === 'object' && !childOutput.error &&\n  expected.some(key => transformationCollections.has(key) && Object.prototype.hasOwnProperty.call(childOutput, key));\nconst marker = message.match(/RUNTIME_CONTRACT_MISSING\\|[^|]+\\|([A-Za-z0-9_,]+)/);\nconst missingCollections = marker ? marker[1].split(',').filter(Boolean) :\n  (childHasState ? expected.filter(key => !Array.isArray(childOutput[key])) : []);\nconst partial = childHasState ? childOutput : checkpoint;\nreturn [{ json: {\n  hypotheses: Array.isArray(partial.hypotheses) ? partial.hypotheses : [],\n  diagnoses: Array.isArray(partial.diagnoses) ? partial.diagnoses : [],\n  recommendations: Array.isArray(partial.recommendations) ? partial.recommendations : [],\n  kpis: Array.isArray(partial.kpis) ? partial.kpis : [],\n  validation_questions: Array.isArray(partial.validation_questions) ? partial.validation_questions : [],\n  roadmap_actions: Array.isArray(partial.roadmap_actions) ? partial.roadmap_actions : [],\n  orchestration_status: 'partial_failure',\n  run_id: partial.run_context?.run_id || null,\n  failed_workflow: '62_ROOT_CAUSE_DIAGNOSIS',\n  completed_workflows: [\"53_OPERATIONS_CX_AGENT_OR_SKIP\",\"61_HYPOTHESIS_BUILDER\"],\n  missing_collections: missingCollections,\n  error: { message },\n  upstream_payload: partial\n} }];\n"
+      },
+      "id": "output__controlled_failure__62",
+      "name": "OUTPUT__CONTROLLED_FAILURE__62",
       "type": "n8n-nodes-base.code",
       "typeVersion": 2,
       "position": [
         2660,
-        0
+        520
+      ]
+    },
+    {
+      "parameters": {
+        "jsCode": "const checkpoint = $('VALIDATE__62_OUTPUT').first().json;\nconst raw = items[0]?.json ?? {};\nconst message = raw.error?.message || raw.message || (typeof raw.error === 'string' ? raw.error : null) ||\n  '63_ACTION_DESIGN failed or returned an incompatible payload';\nconst expected = [\"hypotheses\",\"diagnoses\",\"recommendations\"];\nlet childOutput = null;\ntry { childOutput = $('TODO_LINK_SUBWORKFLOW__63_ACTION_DESIGN').first().json; } catch (_error) { childOutput = null; }\nconst transformationCollections = new Set(['hypotheses', 'diagnoses', 'recommendations', 'kpis', 'validation_questions', 'roadmap_actions']);\nconst childHasState = childOutput && typeof childOutput === 'object' && !childOutput.error &&\n  expected.some(key => transformationCollections.has(key) && Object.prototype.hasOwnProperty.call(childOutput, key));\nconst marker = message.match(/RUNTIME_CONTRACT_MISSING\\|[^|]+\\|([A-Za-z0-9_,]+)/);\nconst missingCollections = marker ? marker[1].split(',').filter(Boolean) :\n  (childHasState ? expected.filter(key => !Array.isArray(childOutput[key])) : []);\nconst partial = childHasState ? childOutput : checkpoint;\nreturn [{ json: {\n  hypotheses: Array.isArray(partial.hypotheses) ? partial.hypotheses : [],\n  diagnoses: Array.isArray(partial.diagnoses) ? partial.diagnoses : [],\n  recommendations: Array.isArray(partial.recommendations) ? partial.recommendations : [],\n  kpis: Array.isArray(partial.kpis) ? partial.kpis : [],\n  validation_questions: Array.isArray(partial.validation_questions) ? partial.validation_questions : [],\n  roadmap_actions: Array.isArray(partial.roadmap_actions) ? partial.roadmap_actions : [],\n  orchestration_status: 'partial_failure',\n  run_id: partial.run_context?.run_id || null,\n  failed_workflow: '63_ACTION_DESIGN',\n  completed_workflows: [\"53_OPERATIONS_CX_AGENT_OR_SKIP\",\"61_HYPOTHESIS_BUILDER\",\"62_ROOT_CAUSE_DIAGNOSIS\"],\n  missing_collections: missingCollections,\n  error: { message },\n  upstream_payload: partial\n} }];\n"
+      },
+      "id": "output__controlled_failure__63",
+      "name": "OUTPUT__CONTROLLED_FAILURE__63",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        3260,
+        520
+      ]
+    },
+    {
+      "parameters": {
+        "jsCode": "const checkpoint = $('VALIDATE__63_OUTPUT').first().json;\nconst raw = items[0]?.json ?? {};\nconst message = raw.error?.message || raw.message || (typeof raw.error === 'string' ? raw.error : null) ||\n  '64_KPI_DESIGN failed or returned an incompatible payload';\nconst expected = [\"hypotheses\",\"diagnoses\",\"recommendations\",\"kpis\"];\nlet childOutput = null;\ntry { childOutput = $('TODO_LINK_SUBWORKFLOW__64_KPI_DESIGN').first().json; } catch (_error) { childOutput = null; }\nconst transformationCollections = new Set(['hypotheses', 'diagnoses', 'recommendations', 'kpis', 'validation_questions', 'roadmap_actions']);\nconst childHasState = childOutput && typeof childOutput === 'object' && !childOutput.error &&\n  expected.some(key => transformationCollections.has(key) && Object.prototype.hasOwnProperty.call(childOutput, key));\nconst marker = message.match(/RUNTIME_CONTRACT_MISSING\\|[^|]+\\|([A-Za-z0-9_,]+)/);\nconst missingCollections = marker ? marker[1].split(',').filter(Boolean) :\n  (childHasState ? expected.filter(key => !Array.isArray(childOutput[key])) : []);\nconst partial = childHasState ? childOutput : checkpoint;\nreturn [{ json: {\n  hypotheses: Array.isArray(partial.hypotheses) ? partial.hypotheses : [],\n  diagnoses: Array.isArray(partial.diagnoses) ? partial.diagnoses : [],\n  recommendations: Array.isArray(partial.recommendations) ? partial.recommendations : [],\n  kpis: Array.isArray(partial.kpis) ? partial.kpis : [],\n  validation_questions: Array.isArray(partial.validation_questions) ? partial.validation_questions : [],\n  roadmap_actions: Array.isArray(partial.roadmap_actions) ? partial.roadmap_actions : [],\n  orchestration_status: 'partial_failure',\n  run_id: partial.run_context?.run_id || null,\n  failed_workflow: '64_KPI_DESIGN',\n  completed_workflows: [\"53_OPERATIONS_CX_AGENT_OR_SKIP\",\"61_HYPOTHESIS_BUILDER\",\"62_ROOT_CAUSE_DIAGNOSIS\",\"63_ACTION_DESIGN\"],\n  missing_collections: missingCollections,\n  error: { message },\n  upstream_payload: partial\n} }];\n"
+      },
+      "id": "output__controlled_failure__64",
+      "name": "OUTPUT__CONTROLLED_FAILURE__64",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        3860,
+        520
+      ]
+    },
+    {
+      "parameters": {
+        "jsCode": "const checkpoint = $('VALIDATE__64_OUTPUT').first().json;\nconst raw = items[0]?.json ?? {};\nconst message = raw.error?.message || raw.message || (typeof raw.error === 'string' ? raw.error : null) ||\n  '65_CLIENT_VALIDATION_QUESTIONS failed or returned an incompatible payload';\nconst expected = [\"hypotheses\",\"diagnoses\",\"recommendations\",\"kpis\",\"validation_questions\"];\nlet childOutput = null;\ntry { childOutput = $('TODO_LINK_SUBWORKFLOW__65_CLIENT_VALIDATION_QUESTIONS').first().json; } catch (_error) { childOutput = null; }\nconst transformationCollections = new Set(['hypotheses', 'diagnoses', 'recommendations', 'kpis', 'validation_questions', 'roadmap_actions']);\nconst childHasState = childOutput && typeof childOutput === 'object' && !childOutput.error &&\n  expected.some(key => transformationCollections.has(key) && Object.prototype.hasOwnProperty.call(childOutput, key));\nconst marker = message.match(/RUNTIME_CONTRACT_MISSING\\|[^|]+\\|([A-Za-z0-9_,]+)/);\nconst missingCollections = marker ? marker[1].split(',').filter(Boolean) :\n  (childHasState ? expected.filter(key => !Array.isArray(childOutput[key])) : []);\nconst partial = childHasState ? childOutput : checkpoint;\nreturn [{ json: {\n  hypotheses: Array.isArray(partial.hypotheses) ? partial.hypotheses : [],\n  diagnoses: Array.isArray(partial.diagnoses) ? partial.diagnoses : [],\n  recommendations: Array.isArray(partial.recommendations) ? partial.recommendations : [],\n  kpis: Array.isArray(partial.kpis) ? partial.kpis : [],\n  validation_questions: Array.isArray(partial.validation_questions) ? partial.validation_questions : [],\n  roadmap_actions: Array.isArray(partial.roadmap_actions) ? partial.roadmap_actions : [],\n  orchestration_status: 'partial_failure',\n  run_id: partial.run_context?.run_id || null,\n  failed_workflow: '65_CLIENT_VALIDATION_QUESTIONS',\n  completed_workflows: [\"53_OPERATIONS_CX_AGENT_OR_SKIP\",\"61_HYPOTHESIS_BUILDER\",\"62_ROOT_CAUSE_DIAGNOSIS\",\"63_ACTION_DESIGN\",\"64_KPI_DESIGN\"],\n  missing_collections: missingCollections,\n  error: { message },\n  upstream_payload: partial\n} }];\n"
+      },
+      "id": "output__controlled_failure__65",
+      "name": "OUTPUT__CONTROLLED_FAILURE__65",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        4460,
+        520
+      ]
+    },
+    {
+      "parameters": {
+        "jsCode": "const checkpoint = $('VALIDATE__65_OUTPUT').first().json;\nconst raw = items[0]?.json ?? {};\nconst message = raw.error?.message || raw.message || (typeof raw.error === 'string' ? raw.error : null) ||\n  '66_90_DAY_ROADMAP failed or returned an incompatible payload';\nconst expected = [\"hypotheses\",\"diagnoses\",\"recommendations\",\"kpis\",\"validation_questions\",\"roadmap_actions\"];\nlet childOutput = null;\ntry { childOutput = $('TODO_LINK_SUBWORKFLOW__66_90_DAY_ROADMAP').first().json; } catch (_error) { childOutput = null; }\nconst transformationCollections = new Set(['hypotheses', 'diagnoses', 'recommendations', 'kpis', 'validation_questions', 'roadmap_actions']);\nconst childHasState = childOutput && typeof childOutput === 'object' && !childOutput.error &&\n  expected.some(key => transformationCollections.has(key) && Object.prototype.hasOwnProperty.call(childOutput, key));\nconst marker = message.match(/RUNTIME_CONTRACT_MISSING\\|[^|]+\\|([A-Za-z0-9_,]+)/);\nconst missingCollections = marker ? marker[1].split(',').filter(Boolean) :\n  (childHasState ? expected.filter(key => !Array.isArray(childOutput[key])) : []);\nconst partial = childHasState ? childOutput : checkpoint;\nreturn [{ json: {\n  hypotheses: Array.isArray(partial.hypotheses) ? partial.hypotheses : [],\n  diagnoses: Array.isArray(partial.diagnoses) ? partial.diagnoses : [],\n  recommendations: Array.isArray(partial.recommendations) ? partial.recommendations : [],\n  kpis: Array.isArray(partial.kpis) ? partial.kpis : [],\n  validation_questions: Array.isArray(partial.validation_questions) ? partial.validation_questions : [],\n  roadmap_actions: Array.isArray(partial.roadmap_actions) ? partial.roadmap_actions : [],\n  orchestration_status: 'partial_failure',\n  run_id: partial.run_context?.run_id || null,\n  failed_workflow: '66_90_DAY_ROADMAP',\n  completed_workflows: [\"53_OPERATIONS_CX_AGENT_OR_SKIP\",\"61_HYPOTHESIS_BUILDER\",\"62_ROOT_CAUSE_DIAGNOSIS\",\"63_ACTION_DESIGN\",\"64_KPI_DESIGN\",\"65_CLIENT_VALIDATION_QUESTIONS\"],\n  missing_collections: missingCollections,\n  error: { message },\n  upstream_payload: partial\n} }];\n"
+      },
+      "id": "output__controlled_failure__66",
+      "name": "OUTPUT__CONTROLLED_FAILURE__66",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        5060,
+        520
       ]
     }
   ],
@@ -183,14 +542,101 @@
       "main": [
         [
           {
-            "node": "INPUT_CONTRACT__MERGED_FINDINGS",
+            "node": "INPUT_CONTRACT__PAOLA_HANDOFF",
             "type": "main",
             "index": 0
           }
         ]
       ]
     },
-    "INPUT_CONTRACT__MERGED_FINDINGS": {
+    "INPUT_CONTRACT__PAOLA_HANDOFF": {
+      "main": [
+        [
+          {
+            "node": "DECISION__OPERATIONS_CX_APPLICABLE",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "DECISION__OPERATIONS_CX_APPLICABLE": {
+      "main": [
+        [
+          {
+            "node": "PREPARE__53_INPUT",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "SKIP__53_NOT_APPLICABLE",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "PREPARE__53_INPUT": {
+      "main": [
+        [
+          {
+            "node": "TODO_LINK_SUBWORKFLOW__53_OPERATIONS_CX",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "TODO_LINK_SUBWORKFLOW__53_OPERATIONS_CX": {
+      "main": [
+        [
+          {
+            "node": "VALIDATE__53_FINDINGS",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "OUTPUT__CONTROLLED_FAILURE__53",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "VALIDATE__53_FINDINGS": {
+      "main": [
+        [
+          {
+            "node": "MERGE__UPSTREAM_AND_OPERATIONS_FINDINGS",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "OUTPUT__CONTROLLED_FAILURE__53",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "SKIP__53_NOT_APPLICABLE": {
+      "main": [
+        [
+          {
+            "node": "MERGE__UPSTREAM_AND_OPERATIONS_FINDINGS",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "MERGE__UPSTREAM_AND_OPERATIONS_FINDINGS": {
       "main": [
         [
           {
@@ -205,7 +651,32 @@
       "main": [
         [
           {
+            "node": "VALIDATE__61_OUTPUT",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "OUTPUT__CONTROLLED_FAILURE__61",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "VALIDATE__61_OUTPUT": {
+      "main": [
+        [
+          {
             "node": "TODO_LINK_SUBWORKFLOW__62_ROOT_CAUSE_DIAGNOSIS",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "OUTPUT__CONTROLLED_FAILURE__61",
             "type": "main",
             "index": 0
           }
@@ -216,18 +687,32 @@
       "main": [
         [
           {
-            "node": "PRIORITIZATION",
+            "node": "VALIDATE__62_OUTPUT",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "OUTPUT__CONTROLLED_FAILURE__62",
             "type": "main",
             "index": 0
           }
         ]
       ]
     },
-    "PRIORITIZATION": {
+    "VALIDATE__62_OUTPUT": {
       "main": [
         [
           {
             "node": "TODO_LINK_SUBWORKFLOW__63_ACTION_DESIGN",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "OUTPUT__CONTROLLED_FAILURE__62",
             "type": "main",
             "index": 0
           }
@@ -238,7 +723,32 @@
       "main": [
         [
           {
+            "node": "VALIDATE__63_OUTPUT",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "OUTPUT__CONTROLLED_FAILURE__63",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "VALIDATE__63_OUTPUT": {
+      "main": [
+        [
+          {
             "node": "TODO_LINK_SUBWORKFLOW__64_KPI_DESIGN",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "OUTPUT__CONTROLLED_FAILURE__63",
             "type": "main",
             "index": 0
           }
@@ -249,7 +759,32 @@
       "main": [
         [
           {
+            "node": "VALIDATE__64_OUTPUT",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "OUTPUT__CONTROLLED_FAILURE__64",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "VALIDATE__64_OUTPUT": {
+      "main": [
+        [
+          {
             "node": "TODO_LINK_SUBWORKFLOW__65_CLIENT_VALIDATION_QUESTIONS",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "OUTPUT__CONTROLLED_FAILURE__64",
             "type": "main",
             "index": 0
           }
@@ -260,7 +795,32 @@
       "main": [
         [
           {
+            "node": "VALIDATE__65_OUTPUT",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "OUTPUT__CONTROLLED_FAILURE__65",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "VALIDATE__65_OUTPUT": {
+      "main": [
+        [
+          {
             "node": "TODO_LINK_SUBWORKFLOW__66_90_DAY_ROADMAP",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "OUTPUT__CONTROLLED_FAILURE__65",
             "type": "main",
             "index": 0
           }
@@ -271,7 +831,50 @@
       "main": [
         [
           {
-            "node": "OUTPUT_CONTRACT__TRANSFORMATION_PACKAGE",
+            "node": "VALIDATE__66_OUTPUT",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "OUTPUT__CONTROLLED_FAILURE__66",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "VALIDATE__66_OUTPUT": {
+      "main": [
+        [
+          {
+            "node": "FINAL_RUNTIME_CONTRACT__SIX_COLLECTIONS",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "OUTPUT__CONTROLLED_FAILURE__66",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "FINAL_RUNTIME_CONTRACT__SIX_COLLECTIONS": {
+      "main": [
+        [
+          {
+            "node": "OUTPUT_CONTRACT__GRETEL_TRACK",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "OUTPUT__CONTROLLED_FAILURE__66",
             "type": "main",
             "index": 0
           }

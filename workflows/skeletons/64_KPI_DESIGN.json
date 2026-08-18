@@ -3,9 +3,9 @@
   "nodes": [
     {
       "parameters": {
-        "content": "PURPOSE\nDefine KPIs without inventing unsupported baselines.\n\nOWNER\nGRETEL TRACK B\n\nINPUT CONTRACT\naction records plus findings/evidence\n\nOUTPUT CONTRACT\nkpi.schema.json[]\n\nSTATUS\nSkeleton only. Inactive by default. No credentials. Configure TODO nodes after import.",
-        "height": 340,
-        "width": 520,
+        "content": "PURPOSE\nDefine measurable KPIs without inventing numerical baselines or targets.\n\nOWNER\nGRETEL TRACK B\n\nINPUT CONTRACT\nAccumulated payload with recommendations[] and diagnoses[]\n\nOUTPUT CONTRACT\nAccumulated payload plus kpis[] conforming to kpi.schema.json; recommendation KPI objects synchronized\n\nSTATUS\nPhase 2B repository-ready. Inactive by default. No credentials. Deterministic fixture path; no Python execution.",
+        "height": 390,
+        "width": 560,
         "color": 4
       },
       "id": "00_readme__purpose_owner_contracts_status",
@@ -13,8 +13,24 @@
       "type": "n8n-nodes-base.stickyNote",
       "typeVersion": 1,
       "position": [
-        -420,
-        -320
+        -520,
+        -380
+      ]
+    },
+    {
+      "parameters": {
+        "content": "VISIBLE PATH\nAction -> desired outcome -> baseline known?\nYES -> preserve supplied baseline\nNO -> baseline null / unknown\nDefine measurement method -> structured KPI output.",
+        "height": 320,
+        "width": 560,
+        "color": 5
+      },
+      "id": "note__visible_transformation_path",
+      "name": "NOTE__VISIBLE_TRANSFORMATION_PATH",
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [
+        -520,
+        40
       ]
     },
     {
@@ -30,10 +46,10 @@
     },
     {
       "parameters": {
-        "jsCode": "// SKELETON_PLACEHOLDER: INPUT_CONTRACT__ACTIONS_FINDINGS\n// Accept actions with their evidence and finding links.\n// TODO: Replace this placeholder with configured production logic.\n// Contract discipline: preserve FACT / INFERENCE / HYPOTHESIS / UNKNOWN boundaries.\nreturn items;\n"
+        "jsCode": "const payload = items[0]?.json ?? {};\nif (!Array.isArray(payload.recommendations) || !Array.isArray(payload.diagnoses)) throw new Error('64 input requires recommendations[] and diagnoses[]');\nif (payload.recommendations.length === 0) return [{ json: { context: payload, skip: true, baseline_known: false } }];\nreturn payload.recommendations.map((recommendation, index) => {\n  const diagnosis = payload.diagnoses.find(d => (recommendation.diagnosis_ids || []).includes(d.diagnosis_id)) || {};\n  const scaffold = recommendation.kpi || {};\n  return { json: {\n    context: payload,\n    index,\n    recommendation,\n    domain: diagnosis.domain,\n    baseline_known: scaffold.baseline_status === 'known' && scaffold.baseline !== null && scaffold.baseline !== undefined\n  } };\n});\n"
       },
-      "id": "input_contract__actions_findings",
-      "name": "INPUT_CONTRACT__ACTIONS_FINDINGS",
+      "id": "input_contract__recommendations_diagnoses",
+      "name": "INPUT_CONTRACT__RECOMMENDATIONS_DIAGNOSES",
       "type": "n8n-nodes-base.code",
       "typeVersion": 2,
       "position": [
@@ -43,10 +59,10 @@
     },
     {
       "parameters": {
-        "jsCode": "// SKELETON_PLACEHOLDER: BASELINE_STATUS_CHECK\n// Classify baseline as known, estimated, unknown, or not_applicable.\n// TODO: Replace this placeholder with configured production logic.\n// Contract discipline: preserve FACT / INFERENCE / HYPOTHESIS / UNKNOWN boundaries.\nreturn items;\n"
+        "jsCode": "const outcomes = {\n  operations_cx: 'A clearer, faster stakeholder journey with fewer unverified handoffs',\n  revenue_resilience: 'A better-understood and more resilient funding mix',\n  impact_evidence: 'A usable and credible impact measurement journey'\n};\nreturn items.map(item => ({ json: { ...item.json, desired_outcome: outcomes[item.json.domain] || 'A measurable improvement tied to the validated diagnosis' } }));\n"
       },
-      "id": "baseline_status_check",
-      "name": "BASELINE_STATUS_CHECK",
+      "id": "define_desired_outcome",
+      "name": "DEFINE_DESIRED_OUTCOME",
       "type": "n8n-nodes-base.code",
       "typeVersion": 2,
       "position": [
@@ -56,12 +72,32 @@
     },
     {
       "parameters": {
-        "jsCode": "// SKELETON_PLACEHOLDER: TODO_AGENT__KPI\n// AGENT_INTERFACE__KPI_DESIGN.\n// TODO: Replace this placeholder with configured production logic.\n// Contract discipline: preserve FACT / INFERENCE / HYPOTHESIS / UNKNOWN boundaries.\nreturn items;\n"
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 2
+          },
+          "conditions": [
+            {
+              "id": "decision__baseline_known_condition",
+              "leftValue": "={{ $json.baseline_known }}",
+              "operator": {
+                "type": "boolean",
+                "operation": "true",
+                "singleValue": true
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
       },
-      "id": "todo_agent__kpi",
-      "name": "TODO_AGENT__KPI",
-      "type": "n8n-nodes-base.code",
-      "typeVersion": 2,
+      "id": "decision__baseline_known",
+      "name": "DECISION__BASELINE_KNOWN",
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.2,
       "position": [
         860,
         0
@@ -69,25 +105,39 @@
     },
     {
       "parameters": {
-        "jsCode": "// SKELETON_PLACEHOLDER: DEFINE_KPI_FIELDS\n// Define name, baseline, baseline_status, target, timeframe, and measurement_method.\n// TODO: Replace this placeholder with configured production logic.\n// Contract discipline: preserve FACT / INFERENCE / HYPOTHESIS / UNKNOWN boundaries.\nreturn items;\n"
+        "jsCode": "return items.map(item => ({ json: { ...item.json, baseline: item.json.recommendation.kpi.baseline, baseline_status: 'known' } }));\n"
       },
-      "id": "define_kpi_fields",
-      "name": "DEFINE_KPI_FIELDS",
+      "id": "preserve_known_baseline",
+      "name": "PRESERVE_KNOWN_BASELINE",
       "type": "n8n-nodes-base.code",
       "typeVersion": 2,
       "position": [
         1160,
-        0
+        -140
       ]
     },
     {
       "parameters": {
-        "jsCode": "// SKELETON_PLACEHOLDER: NO_INVENTED_BASELINE_GATE\n// Never invent a baseline where evidence does not support it.\n// TODO: Replace this placeholder with configured production logic.\n// Contract discipline: preserve FACT / INFERENCE / HYPOTHESIS / UNKNOWN boundaries.\nreturn items;\n"
+        "jsCode": "return items.map(item => ({ json: { ...item.json, baseline: null, baseline_status: 'unknown' } }));\n"
       },
-      "id": "no_invented_baseline_gate",
-      "name": "NO_INVENTED_BASELINE_GATE",
+      "id": "set_unknown_baseline_to_null",
+      "name": "SET_UNKNOWN_BASELINE_TO_NULL",
       "type": "n8n-nodes-base.code",
       "typeVersion": 2,
+      "position": [
+        1160,
+        140
+      ]
+    },
+    {
+      "parameters": {
+        "mode": "append",
+        "options": {}
+      },
+      "id": "merge__baseline_paths",
+      "name": "MERGE__BASELINE_PATHS",
+      "type": "n8n-nodes-base.merge",
+      "typeVersion": 3,
       "position": [
         1460,
         0
@@ -95,14 +145,40 @@
     },
     {
       "parameters": {
-        "jsCode": "// TERMINAL_OUTPUT_NODE: OUTPUT_CONTRACT__KPIS\n// Return KPI records.\n// TODO: Replace this placeholder with configured production logic.\n// Contract discipline: preserve FACT / INFERENCE / HYPOTHESIS / UNKNOWN boundaries.\nreturn items;\n"
+        "jsCode": "const definitions = {\n  operations_cx: { name: 'Stakeholder journey follow-up time', method: 'Measure elapsed time between the defined journey start and the first completed follow-up using agreed timestamps.' },\n  revenue_resilience: { name: 'Funding concentration visibility', method: 'Review verified income by funding source and calculate concentration after the baseline data is supplied.' },\n  impact_evidence: { name: 'Impact measurement coverage', method: 'Review the share of active programs with an agreed outcome, indicator, owner, and reporting cadence.' }\n};\nreturn items.map(item => {\n  if (item.json.skip) return { json: { ...item.json, kpi_record: null } };\n  const definition = definitions[item.json.domain] || { name: 'Validated improvement indicator', method: 'Agree the data source, owner, and reporting cadence with the client.' };\n  const scaffold = item.json.recommendation.kpi || {};\n  const known = item.json.baseline_status === 'known';\n  return { json: { ...item.json, kpi_record: {\n    name: definition.name,\n    baseline: known ? item.json.baseline : null,\n    baseline_status: known ? 'known' : 'unknown',\n    target: known ? (scaffold.target ?? null) : null,\n    timeframe: scaffold.timeframe || 'After baseline is confirmed',\n    measurement_method: definition.method\n  } } };\n});\n"
+      },
+      "id": "define_measurement_method",
+      "name": "DEFINE_MEASUREMENT_METHOD",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        1760,
+        0
+      ]
+    },
+    {
+      "parameters": {
+        "jsCode": "const context = items[0]?.json?.context ?? {};\nconst records = items.filter(item => item.json.kpi_record).sort((a, b) => a.json.index - b.json.index);\nconst kpis = records.map(item => item.json.kpi_record);\nconst byRecommendationId = new Map(records.map(item => [item.json.recommendation.recommendation_id, item.json.kpi_record]));\nconst recommendations = (context.recommendations || []).map(rec => ({ ...rec, kpi: byRecommendationId.get(rec.recommendation_id) || rec.kpi }));\nfor (const kpi of kpis) {\n  if (kpi.baseline_status === 'unknown' && kpi.baseline !== null) throw new Error('Unknown KPI baseline must be null');\n}\nreturn [{ json: { ...context, recommendations, kpis } }];\n"
+      },
+      "id": "structure_kpis_and_sync_recommendations",
+      "name": "STRUCTURE_KPIS_AND_SYNC_RECOMMENDATIONS",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        2060,
+        0
+      ]
+    },
+    {
+      "parameters": {
+        "jsCode": "const required = ['name', 'baseline', 'baseline_status', 'target', 'timeframe', 'measurement_method'];\nif (!(items[0].json.kpis || []).every(kpi => required.every(key => Object.prototype.hasOwnProperty.call(kpi, key)))) {\n  throw new Error('64 output violates KPI contract');\n}\nreturn items;\n"
       },
       "id": "output_contract__kpis",
       "name": "OUTPUT_CONTRACT__KPIS",
       "type": "n8n-nodes-base.code",
       "typeVersion": 2,
       "position": [
-        1760,
+        2360,
         0
       ]
     }
@@ -112,58 +188,98 @@
       "main": [
         [
           {
-            "node": "INPUT_CONTRACT__ACTIONS_FINDINGS",
+            "node": "INPUT_CONTRACT__RECOMMENDATIONS_DIAGNOSES",
             "type": "main",
             "index": 0
           }
         ]
       ]
     },
-    "INPUT_CONTRACT__ACTIONS_FINDINGS": {
+    "INPUT_CONTRACT__RECOMMENDATIONS_DIAGNOSES": {
       "main": [
         [
           {
-            "node": "BASELINE_STATUS_CHECK",
+            "node": "DEFINE_DESIRED_OUTCOME",
             "type": "main",
             "index": 0
           }
         ]
       ]
     },
-    "BASELINE_STATUS_CHECK": {
+    "DEFINE_DESIRED_OUTCOME": {
       "main": [
         [
           {
-            "node": "TODO_AGENT__KPI",
+            "node": "DECISION__BASELINE_KNOWN",
             "type": "main",
             "index": 0
           }
         ]
       ]
     },
-    "TODO_AGENT__KPI": {
+    "DECISION__BASELINE_KNOWN": {
       "main": [
         [
           {
-            "node": "DEFINE_KPI_FIELDS",
+            "node": "PRESERVE_KNOWN_BASELINE",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "SET_UNKNOWN_BASELINE_TO_NULL",
             "type": "main",
             "index": 0
           }
         ]
       ]
     },
-    "DEFINE_KPI_FIELDS": {
+    "PRESERVE_KNOWN_BASELINE": {
       "main": [
         [
           {
-            "node": "NO_INVENTED_BASELINE_GATE",
+            "node": "MERGE__BASELINE_PATHS",
             "type": "main",
             "index": 0
           }
         ]
       ]
     },
-    "NO_INVENTED_BASELINE_GATE": {
+    "SET_UNKNOWN_BASELINE_TO_NULL": {
+      "main": [
+        [
+          {
+            "node": "MERGE__BASELINE_PATHS",
+            "type": "main",
+            "index": 1
+          }
+        ]
+      ]
+    },
+    "MERGE__BASELINE_PATHS": {
+      "main": [
+        [
+          {
+            "node": "DEFINE_MEASUREMENT_METHOD",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "DEFINE_MEASUREMENT_METHOD": {
+      "main": [
+        [
+          {
+            "node": "STRUCTURE_KPIS_AND_SYNC_RECOMMENDATIONS",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "STRUCTURE_KPIS_AND_SYNC_RECOMMENDATIONS": {
       "main": [
         [
           {

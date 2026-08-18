@@ -1,0 +1,343 @@
+{
+  "id": "tBC3Pb82V2g5epzC",
+  "name": "INTELLECTUS_LIVE_WEBHOOK",
+  "nodes": [
+    {
+      "parameters": {
+        "content": "PURPOSE\nReceive the Intellectus browser request, validate the public transport contract, call DEV_PROJECT3_END_TO_END, validate the final envelope, and return the response to the web app.\n\nFINAL ARCHITECTURE\nweb -> INTELLECTUS_LIVE_WEBHOOK -> DEV_PROJECT3_END_TO_END -> response web.\n\nCANONICAL IDS\nINTELLECTUS_LIVE_WEBHOOK: tBC3Pb82V2g5epzC\nDEV_PROJECT3_END_TO_END: 62QlFvCwJ8b3weif\n\nSECURITY\nNo credential is committed. Keep production authorization, exact-origin CORS, rate limits, body limits, retention, redacted logs, and cancellation controls outside this export or in environment-specific n8n configuration.",
+        "height": 560,
+        "width": 700,
+        "color": 4
+      },
+      "id": "readme__intellectus_live_boundary",
+      "name": "README__INTELLECTUS_LIVE_BOUNDARY",
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [
+        -620,
+        -460
+      ]
+    },
+    {
+      "parameters": {
+        "httpMethod": "POST",
+        "path": "intellectus-diagnostic",
+        "responseMode": "responseNode",
+        "options": {}
+      },
+      "id": "webhook__post_intellectus_diagnostic",
+      "name": "WEBHOOK__POST_INTELLECTUS_DIAGNOSTIC",
+      "type": "n8n-nodes-base.webhook",
+      "typeVersion": 2,
+      "position": [
+        0,
+        0
+      ],
+      "webhookId": "tBC3Pb82V2g5epzC",
+      "notes": "Live workflow boundary. Configure endpoint exposure, authentication, CORS, payload limits, and retention in the target n8n environment before production use."
+    },
+    {
+      "parameters": {
+        "jsCode": "const webhookItem = items[0]?.json;\nconst raw = webhookItem && typeof webhookItem === 'object' && !Array.isArray(webhookItem)\n  ? (webhookItem.body ?? webhookItem)\n  : null;\nconst CONTRACT_VERSION = '1.0';\nconst MAX_BYTES = 256 * 1024;\nconst publicMessage = 'We couldn\\'t prepare the diagnostic. Try again or continue with the local demo.';\nfunction isObject(value) { return Boolean(value) && typeof value === 'object' && !Array.isArray(value); }\nfunction nonEmpty(value) { return typeof value === 'string' && value.trim().length > 0; }\nfunction envelope(status, correlationId, runId, extra = {}) {\n  return { contract_version: CONTRACT_VERSION, status, correlation_id: correlationId, run_id: runId, demo: false, message: publicMessage, ...extra };\n}\nfunction generatedId(prefix) {\n  const executionId = typeof $execution !== 'undefined' && $execution?.id ? String($execution.id) : crypto.randomUUID();\n  return `${prefix}-${executionId}`;\n}\nfunction utf8ByteLength(value) {\n  let bytes = 0;\n  for (let index = 0; index < value.length; index += 1) {\n    const code = value.charCodeAt(index);\n    if (code <= 0x7f) bytes += 1;\n    else if (code <= 0x7ff) bytes += 2;\n    else if (code >= 0xd800 && code <= 0xdbff && index + 1 < value.length && value.charCodeAt(index + 1) >= 0xdc00 && value.charCodeAt(index + 1) <= 0xdfff) {\n      bytes += 4;\n      index += 1;\n    } else bytes += 3;\n  }\n  return bytes;\n}\nfunction httpUrl(value) {\n  if (!nonEmpty(value) || /[\\s\\\\]/.test(value)) return false;\n  const match = /^(https?):\\/\\/([^/?#]+)(?:[/?#].*)?$/i.exec(value.trim());\n  if (!match) return false;\n  let authority = match[2];\n  const userInfoEnd = authority.lastIndexOf('@');\n  if (userInfoEnd >= 0) authority = authority.slice(userInfoEnd + 1);\n  const hostMatch = /^(\\[[0-9a-f:.]+\\]|[^:]+)(?::(\\d{1,5}))?$/i.exec(authority);\n  return Boolean(hostMatch && hostMatch[1] && (!hostMatch[2] || Number(hostMatch[2]) <= 65535));\n}\nfunction validIntake(intake) {\n  return isObject(intake)\n    && nonEmpty(intake.organization_name)\n    && httpUrl(intake.website)\n    && /^[A-Z]{2}$/.test(intake.country || '')\n    && nonEmpty(intake.current_challenge)\n    && isObject(intake.research_window)\n    && /^\\d{4}-\\d{2}-\\d{2}$/.test(intake.research_window.start_date || '')\n    && /^\\d{4}-\\d{2}-\\d{2}$/.test(intake.research_window.end_date || '')\n    && Array.isArray(intake.uploaded_document_refs)\n    && intake.uploaded_document_refs.every(nonEmpty);\n}\nconst correlationId = isObject(raw) && nonEmpty(raw.correlation_id) ? raw.correlation_id : generatedId('CORR');\nconst runId = isObject(raw) && nonEmpty(raw.run_id) ? raw.run_id : generatedId('RUN');\ntry {\n  if (!isObject(raw)) throw new Error('invalid');\n  if (utf8ByteLength(JSON.stringify(raw)) > MAX_BYTES) throw new Error('invalid');\n  if (raw.contract_version !== CONTRACT_VERSION || raw.mode !== 'live') throw new Error('invalid');\n  if (!validIntake(raw.intake)) throw new Error('invalid');\n  if (Object.prototype.hasOwnProperty.call(raw, 'evidence_handoff')) throw new Error('invalid');\n  return [{ json: { valid: true, contract_version: CONTRACT_VERSION, correlation_id: correlationId, run_id: runId, demo: false, intake: raw.intake } }];\n} catch {\n  return [{ json: { valid: false, response: envelope('error', correlationId, runId, { error: { code: 'invalid_request' } }) } }];\n}\n"
+      },
+      "id": "validate__web_request",
+      "name": "VALIDATE__WEB_REQUEST",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        280,
+        0
+      ]
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 2
+          },
+          "conditions": [
+            {
+              "id": "decision__web_request_valid_condition",
+              "leftValue": "={{ $json.valid }}",
+              "operator": {
+                "type": "boolean",
+                "operation": "true",
+                "singleValue": true
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "id": "decision__web_request_valid",
+      "name": "DECISION__WEB_REQUEST_VALID",
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.2,
+      "position": [
+        580,
+        0
+      ]
+    },
+    {
+      "parameters": {
+        "respondWith": "json",
+        "responseBody": "={{ $json.response }}",
+        "options": {
+          "responseCode": 400
+        }
+      },
+      "id": "respond__invalid_request_400",
+      "name": "RESPOND__INVALID_REQUEST_400",
+      "type": "n8n-nodes-base.respondToWebhook",
+      "typeVersion": 1.4,
+      "position": [
+        880,
+        180
+      ]
+    },
+    {
+      "parameters": {
+        "source": "database",
+        "workflowId": {
+          "__rl": true,
+          "value": "62QlFvCwJ8b3weif",
+          "mode": "list",
+          "cachedResultName": "DEV_PROJECT3_END_TO_END"
+        },
+        "mode": "once",
+        "options": {
+          "waitForSubWorkflow": true
+        }
+      },
+      "id": "call__dev_project3_end_to_end",
+      "name": "CALL__DEV_PROJECT3_END_TO_END",
+      "type": "n8n-nodes-base.executeWorkflow",
+      "typeVersion": 1.3,
+      "position": [
+        880,
+        -80
+      ],
+      "notes": "Canonical child workflow ID confirmed for the final Intellectus architecture.",
+      "onError": "continueErrorOutput"
+    },
+    {
+      "parameters": {
+        "jsCode": "const child = items[0]?.json;\nconst request = $('VALIDATE__WEB_REQUEST').first().json;\nconst base = { contract_version: '1.0', correlation_id: request.correlation_id, run_id: request.run_id, demo: false };\nfunction isObject(value) { return Boolean(value) && typeof value === 'object' && !Array.isArray(value); }\nfunction nonEmpty(value) { return typeof value === 'string' && value.trim().length > 0; }\nfunction validSource(source) { return isObject(source) && /^SRC-/.test(source.source_id || '') && nonEmpty(source.title) && nonEmpty(source.url) && typeof source.is_official === 'boolean'; }\nfunction validEvidence(evidence) { return isObject(evidence) && /^EV-/.test(evidence.evidence_id || '') && nonEmpty(evidence.run_id) && nonEmpty(evidence.claim) && Array.isArray(evidence.source_ids) && Number.isFinite(evidence.confidence) && evidence.confidence >= 0 && evidence.confidence <= 1; }\nfunction validFinding(finding) { return isObject(finding) && /^F-OPS-/.test(finding.finding_id || '') && finding.domain === 'operations_cx' && nonEmpty(finding.finding) && Array.isArray(finding.evidence_ids) && finding.evidence_ids.length > 0 && ['observed','inferred','hypothesis','unknown'].includes(finding.finding_type) && Number.isFinite(finding.confidence) && finding.confidence >= 0 && finding.confidence <= 1 && typeof finding.requires_validation === 'boolean' && (finding.validation_question === null || nonEmpty(finding.validation_question)); }\ntry {\n  if (!isObject(child) || child.status !== 'completed' || child.demo !== false) throw new Error('invalid');\n  const data = child.data;\n  if (!isObject(data) || !Array.isArray(data.sources) || !Array.isArray(data.evidence) || !Array.isArray(data.findings) || !data.findings.length) throw new Error('invalid');\n  if (!data.sources.every(validSource) || !data.evidence.every(validEvidence) || !data.findings.every(validFinding)) throw new Error('invalid');\n  const sourceIds = new Set(data.sources.map(source => source.source_id));\n  const evidenceIds = new Set(data.evidence.map(evidence => evidence.evidence_id));\n  if (sourceIds.size !== data.sources.length || evidenceIds.size !== data.evidence.length) throw new Error('invalid');\n  for (const evidence of data.evidence) for (const sourceId of evidence.source_ids) if (!sourceIds.has(sourceId)) throw new Error('invalid');\n  for (const finding of data.findings) {\n    for (const evidenceId of finding.evidence_ids) if (!evidenceIds.has(evidenceId)) throw new Error('invalid');\n    if (finding.finding_type === 'observed' && (finding.requires_validation || finding.validation_question !== null)) throw new Error('invalid');\n    if (finding.finding_type !== 'observed' && (!finding.requires_validation || !finding.validation_question)) throw new Error('invalid');\n  }\n  return [{ json: { valid: true, response: { ...base, ...child, demo: false } } }];\n} catch {\n  return [{ json: { valid: false, response: { ...base, status: 'error', message: 'We couldn\\'t prepare the diagnostic. Try again or continue with the local demo.', error: { code: 'invalid_upstream_response' } } } }];\n}\n"
+      },
+      "id": "validate__final_response",
+      "name": "VALIDATE__FINAL_RESPONSE",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        1180,
+        -160
+      ]
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 2
+          },
+          "conditions": [
+            {
+              "id": "decision__final_response_valid_condition",
+              "leftValue": "={{ $json.valid }}",
+              "operator": {
+                "type": "boolean",
+                "operation": "true",
+                "singleValue": true
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "id": "decision__final_response_valid",
+      "name": "DECISION__FINAL_RESPONSE_VALID",
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.2,
+      "position": [
+        1480,
+        -160
+      ]
+    },
+    {
+      "parameters": {
+        "respondWith": "json",
+        "responseBody": "={{ $json.response }}",
+        "options": {
+          "responseCode": 200
+        }
+      },
+      "id": "respond__success_200",
+      "name": "RESPOND__SUCCESS_200",
+      "type": "n8n-nodes-base.respondToWebhook",
+      "typeVersion": 1.4,
+      "position": [
+        1780,
+        -260
+      ]
+    },
+    {
+      "parameters": {
+        "respondWith": "json",
+        "responseBody": "={{ $json.response }}",
+        "options": {
+          "responseCode": 502
+        }
+      },
+      "id": "respond__invalid_child_response_502",
+      "name": "RESPOND__INVALID_CHILD_RESPONSE_502",
+      "type": "n8n-nodes-base.respondToWebhook",
+      "typeVersion": 1.4,
+      "position": [
+        1780,
+        -40
+      ]
+    },
+    {
+      "parameters": {
+        "jsCode": "const request = $('VALIDATE__WEB_REQUEST').first().json;\nreturn [{ json: { response: {\n  contract_version: '1.0',\n  status: 'error',\n  correlation_id: request.correlation_id,\n  run_id: request.run_id,\n  demo: false,\n  message: 'We couldn\\'t prepare the diagnostic. Try again or continue with the local demo.',\n  error: { code: 'upstream_failure' }\n} } }];\n"
+      },
+      "id": "map__child_workflow_error",
+      "name": "MAP__CHILD_WORKFLOW_ERROR",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        1180,
+        80
+      ]
+    },
+    {
+      "parameters": {
+        "respondWith": "json",
+        "responseBody": "={{ $json.response }}",
+        "options": {
+          "responseCode": 502
+        }
+      },
+      "id": "respond__child_workflow_error_502",
+      "name": "RESPOND__CHILD_WORKFLOW_ERROR_502",
+      "type": "n8n-nodes-base.respondToWebhook",
+      "typeVersion": 1.4,
+      "position": [
+        1480,
+        80
+      ]
+    }
+  ],
+  "connections": {
+    "WEBHOOK__POST_INTELLECTUS_DIAGNOSTIC": {
+      "main": [
+        [
+          {
+            "node": "VALIDATE__WEB_REQUEST",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "VALIDATE__WEB_REQUEST": {
+      "main": [
+        [
+          {
+            "node": "DECISION__WEB_REQUEST_VALID",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "DECISION__WEB_REQUEST_VALID": {
+      "main": [
+        [
+          {
+            "node": "CALL__DEV_PROJECT3_END_TO_END",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "RESPOND__INVALID_REQUEST_400",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "CALL__DEV_PROJECT3_END_TO_END": {
+      "main": [
+        [
+          {
+            "node": "VALIDATE__FINAL_RESPONSE",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "MAP__CHILD_WORKFLOW_ERROR",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "VALIDATE__FINAL_RESPONSE": {
+      "main": [
+        [
+          {
+            "node": "DECISION__FINAL_RESPONSE_VALID",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "DECISION__FINAL_RESPONSE_VALID": {
+      "main": [
+        [
+          {
+            "node": "RESPOND__SUCCESS_200",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "RESPOND__INVALID_CHILD_RESPONSE_502",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "MAP__CHILD_WORKFLOW_ERROR": {
+      "main": [
+        [
+          {
+            "node": "RESPOND__CHILD_WORKFLOW_ERROR_502",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": false,
+  "settings": {
+    "executionOrder": "v1"
+  },
+  "pinData": {}
+}

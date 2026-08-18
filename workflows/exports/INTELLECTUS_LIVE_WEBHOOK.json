@@ -1,0 +1,364 @@
+{
+  "name": "INTELLECTUS_LIVE_WEBHOOK",
+  "nodes": [
+    {
+      "parameters": {
+        "content": "# INTELLECTUS LIVE WEBHOOK\nThin HTTP adapter only: validate the Intellectus transport request, map the organization intake, execute the stored DEV_PROJECT3_END_TO_END workflow, validate the returned evidence chain, and map a JSON transport response. No research, evidence, finding, or transformation logic belongs here.",
+        "height": 260,
+        "width": 620,
+        "color": 4
+      },
+      "id": "a70daffe-5b85-48d9-b7b9-70b2360a68c6",
+      "name": "00_README__LIVE_BOUNDARY",
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [
+        0,
+        0
+      ]
+    },
+    {
+      "parameters": {
+        "httpMethod": "POST",
+        "path": "intellectus-diagnostic",
+        "responseMode": "responseNode",
+        "options": {
+          "allowedOrigins": "http://localhost:5173"
+        }
+      },
+      "id": "434727ad-b06d-4454-8cd8-68aeb44ad7ca",
+      "name": "WEBHOOK__INTELLECTUS_DIAGNOSTIC",
+      "type": "n8n-nodes-base.webhook",
+      "typeVersion": 2,
+      "position": [
+        144,
+        432
+      ],
+      "webhookId": "6cb039b5-f6ff-4139-8e26-e4e03b7fd4a8"
+    },
+    {
+      "parameters": {
+        "jsCode": "const envelope = items[0]?.json;\nconst raw = envelope && typeof envelope === 'object' && !Array.isArray(envelope)\n  ? (envelope.body ?? envelope)\n  : null;\nconst executionId = String($execution?.id ?? Date.now());\nconst corsHeaders = {\n  'Access-Control-Allow-Origin': 'http://localhost:5173',\n  'Vary': 'Origin',\n  'Content-Type': 'application/json'\n};\nconst nonEmpty = value => typeof value === 'string' && value.trim().length > 0;\nconst plainObject = value => Boolean(value) && typeof value === 'object' && !Array.isArray(value);\nconst validHttpUrl = value => nonEmpty(value) && /^https?:\\/\\/[^\\s]+$/i.test(value.trim());\n\nconst errors = [];\nif (!plainObject(raw)) errors.push('Request body must be a JSON object.');\nconst intake = plainObject(raw?.intake) ? raw.intake : null;\nif (!intake) {\n  errors.push('intake is required.');\n} else {\n  if (!nonEmpty(intake.organization_name)) errors.push('intake.organization_name is required.');\n  if (!validHttpUrl(intake.website)) errors.push('intake.website must be a valid HTTP(S) URL.');\n  if (!nonEmpty(intake.country)) errors.push('intake.country is required.');\n}\nconst request = {\n  ...(plainObject(raw) ? raw : {}),\n  contract_version: nonEmpty(raw?.contract_version) ? raw.contract_version : '1.0',\n  mode: 'live',\n  correlation_id: nonEmpty(raw?.correlation_id) ? raw.correlation_id : `CORR-${executionId}`,\n  run_id: nonEmpty(raw?.run_id) ? raw.run_id : `RUN-WEBHOOK-${executionId}`,\n  intake: intake ?? {}\n};\nreturn [{ json: { valid: errors.length === 0, errors, request, cors_headers: corsHeaders } }];"
+      },
+      "id": "55d7049a-8e54-4c30-a117-d3798fbd7c02",
+      "name": "VALIDATE__TRANSPORT_REQUEST",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        400,
+        432
+      ]
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 2
+          },
+          "conditions": [
+            {
+              "id": "condition__request_valid",
+              "leftValue": "={{ $json.valid }}",
+              "operator": {
+                "type": "boolean",
+                "operation": "true",
+                "singleValue": true
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "id": "e7ea4eef-e799-40a7-be56-fab35339e3d8",
+      "name": "IF__REQUEST_VALID",
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.2,
+      "position": [
+        672,
+        432
+      ]
+    },
+    {
+      "parameters": {
+        "respondWith": "json",
+        "responseBody": "={{ $json.response }}",
+        "options": {
+          "responseCode": 400,
+          "responseHeaders": {
+            "entries": [
+              {
+                "name": "Access-Control-Allow-Origin",
+                "value": "http://localhost:5173"
+              },
+              {
+                "name": "Vary",
+                "value": "Origin"
+              },
+              {
+                "name": "Content-Type",
+                "value": "application/json"
+              }
+            ]
+          }
+        }
+      },
+      "id": "78ffe3a4-5ecc-4b52-a543-38e452c7796f",
+      "name": "RESPOND__INVALID_REQUEST_400",
+      "type": "n8n-nodes-base.respondToWebhook",
+      "typeVersion": 1.4,
+      "position": [
+        928,
+        640
+      ]
+    },
+    {
+      "parameters": {
+        "jsCode": "const request = items[0].json.request;\nconst intake = request.intake;\nconst countryNames = { US: 'United States' };\nconst country = countryNames[intake.country] || intake.country;\nreturn [{ json: {\n  organization_name: intake.organization_name,\n  website: intake.website,\n  country,\n  query: `${intake.organization_name} annual report audited financial statements revenue funding grants donations impact outcomes`,\n  correlation_id: request.correlation_id,\n  transport_intake: intake,\n  run_context: {\n    run_id: request.run_id || `RUN-PROJECT3-${Date.now()}`,\n    organization: { name: intake.organization_name, website: intake.website, country },\n    current_challenge: intake.current_challenge,\n    uploaded_document_refs: intake.uploaded_document_refs,\n    research_window: intake.research_window,\n    status: 'created',\n    started_at: new Date().toISOString(),\n    errors: []\n  }\n} }];"
+      },
+      "id": "572e401d-98ac-45bd-a6a1-dd0118c8cadf",
+      "name": "MAP__END_TO_END_INPUT",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        928,
+        352
+      ]
+    },
+    {
+      "parameters": {
+        "workflowId": {
+          "__rl": true,
+          "value": "62QlFvCwJ8b3weif",
+          "mode": "list",
+          "cachedResultUrl": "/workflow/62QlFvCwJ8b3weif",
+          "cachedResultName": "DEV_PROJECT3_END_TO_END"
+        },
+        "workflowInputs": {
+          "mappingMode": "defineBelow",
+          "value": {},
+          "matchingColumns": [],
+          "schema": [],
+          "attemptToConvertTypes": false,
+          "convertFieldsToString": true
+        },
+        "options": {
+          "waitForSubWorkflow": true
+        }
+      },
+      "id": "685b9269-2359-4461-bace-302f783f2ab0",
+      "name": "EXECUTE__DEV_PROJECT3_END_TO_END",
+      "type": "n8n-nodes-base.executeWorkflow",
+      "typeVersion": 1.3,
+      "position": [
+        1200,
+        352
+      ],
+      "onError": "continueErrorOutput",
+      "notes": "After import, select the real stored DEV_PROJECT3_END_TO_END workflow through the n8n database selector."
+    },
+    {
+      "parameters": {
+        "jsCode": "const output = items[0]?.json;\nconst validated = $('VALIDATE__TRANSPORT_REQUEST').first().json;\nconst request = validated.request;\nconst runId = output?.run_context?.run_id || request.run_id || `RUN-WEBHOOK-${$execution.id}`;\nconst base = { contract_version: '1.0', correlation_id: request.correlation_id, run_id: runId, demo: false };\nconst isObject = value => Boolean(value) && typeof value === 'object' && !Array.isArray(value);\nconst rows = (value) => Array.isArray(value) ? value : [];\nconst sources = rows(output?.paola?.sources);\nconst evidence = rows(output?.paola?.evidence);\nconst findings = rows(output?.paola?.findings);\nconst unknowns = rows(output?.paola?.unknowns);\nconst contradictions = rows(output?.paola?.contradictions);\nconst sourceIds = new Set(sources.map(source => source?.source_id));\nconst evidenceIds = new Set(evidence.map(item => item?.evidence_id));\nconst unique = values => values.length === new Set(values).size;\nconst evidenceTraceValid = evidence.every(item => isObject(item) && Array.isArray(item.source_ids) && item.source_ids.every(id => sourceIds.has(id)));\nconst findingTraceValid = findings.every(item => isObject(item) && Array.isArray(item.evidence_ids) && item.evidence_ids.length > 0 && item.evidence_ids.every(id => evidenceIds.has(id)));\nconst complete = isObject(output) && ['demo_ready', 'partial_demo'].includes(output.controlled_state)\n  && sources.length > 0 && evidence.length > 0 && findings.length > 0\n  && unique(sources.map(source => source.source_id)) && unique(evidence.map(item => item.evidence_id)) && unique(findings.map(item => item.finding_id))\n  && evidenceTraceValid && findingTraceValid;\nif (!complete) {\n  return [{ json: {\n    http_status: 422,\n    response: { ...base, status: 'needs_evidence', message: 'Evidence is required before this analysis can run.', error: { code: 'evidence_required' } }\n  } }];\n}\nreturn [{ json: {\n  http_status: 200,\n  response: {\n    ...base,\n    status: 'completed',\n    message: 'Diagnostic prepared from the verified end-to-end workflow.',\n    completed_at: new Date().toISOString(),\n    data: {\n      intake: request.intake,\n      sources, evidence, findings, unknowns, contradictions,\n      rag_metadata: {\n        upstream_workflow: 'DEV_PROJECT3_END_TO_END',\n        controlled_state: output.controlled_state,\n        trace: output.trace || {},\n        paola_states: output.paola_states || {}\n      }\n    }\n  }\n} }];"
+      },
+      "id": "ad69f51e-1a80-4daf-9506-7cc549bc4410",
+      "name": "MAP__TRANSPORT_RESPONSE",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        1488,
+        352
+      ]
+    },
+    {
+      "parameters": {
+        "respondWith": "json",
+        "responseBody": "={{ $json.response }}",
+        "options": {
+          "responseCode": "={{ $json.http_status }}",
+          "responseHeaders": {
+            "entries": [
+              {
+                "name": "Access-Control-Allow-Origin",
+                "value": "http://localhost:5173"
+              },
+              {
+                "name": "Vary",
+                "value": "Origin"
+              },
+              {
+                "name": "Content-Type",
+                "value": "application/json"
+              }
+            ]
+          }
+        }
+      },
+      "id": "f14157be-4990-459e-9c2c-5f285b6dc6e9",
+      "name": "RESPOND__TRANSPORT",
+      "type": "n8n-nodes-base.respondToWebhook",
+      "typeVersion": 1.4,
+      "position": [
+        1760,
+        352
+      ]
+    },
+    {
+      "parameters": {
+        "jsCode": "const validated = $('VALIDATE__TRANSPORT_REQUEST').first().json;\nconst request = validated.request;\nreturn [{ json: { response: {\n  contract_version: '1.0', status: 'error', correlation_id: request.correlation_id,\n  run_id: request.run_id || `RUN-WEBHOOK-${$execution.id}`, demo: false,\n  message: 'The end-to-end diagnostic workflow did not complete.', error: { code: 'upstream_failure' }\n} } }];"
+      },
+      "id": "7b11f65a-ee4a-4501-96cb-d49af60e411d",
+      "name": "MAP__UPSTREAM_ERROR",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        1488,
+        608
+      ]
+    },
+    {
+      "parameters": {
+        "respondWith": "json",
+        "responseBody": "={{ $json.response }}",
+        "options": {
+          "responseCode": 502,
+          "responseHeaders": {
+            "entries": [
+              {
+                "name": "Access-Control-Allow-Origin",
+                "value": "http://localhost:5173"
+              },
+              {
+                "name": "Vary",
+                "value": "Origin"
+              },
+              {
+                "name": "Content-Type",
+                "value": "application/json"
+              }
+            ]
+          }
+        }
+      },
+      "id": "e348fd54-b2a8-41b7-a79a-bb7f997f0524",
+      "name": "RESPOND__UPSTREAM_FAILURE_502",
+      "type": "n8n-nodes-base.respondToWebhook",
+      "typeVersion": 1.4,
+      "position": [
+        1760,
+        608
+      ]
+    }
+  ],
+  "pinData": {},
+  "connections": {
+    "WEBHOOK__INTELLECTUS_DIAGNOSTIC": {
+      "main": [
+        [
+          {
+            "node": "VALIDATE__TRANSPORT_REQUEST",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "VALIDATE__TRANSPORT_REQUEST": {
+      "main": [
+        [
+          {
+            "node": "IF__REQUEST_VALID",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "IF__REQUEST_VALID": {
+      "main": [
+        [
+          {
+            "node": "MAP__END_TO_END_INPUT",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "RESPOND__INVALID_REQUEST_400",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "MAP__END_TO_END_INPUT": {
+      "main": [
+        [
+          {
+            "node": "EXECUTE__DEV_PROJECT3_END_TO_END",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "EXECUTE__DEV_PROJECT3_END_TO_END": {
+      "main": [
+        [
+          {
+            "node": "MAP__TRANSPORT_RESPONSE",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "MAP__UPSTREAM_ERROR",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "MAP__TRANSPORT_RESPONSE": {
+      "main": [
+        [
+          {
+            "node": "RESPOND__TRANSPORT",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "MAP__UPSTREAM_ERROR": {
+      "main": [
+        [
+          {
+            "node": "RESPOND__UPSTREAM_FAILURE_502",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": true,
+  "settings": {
+    "executionOrder": "v1",
+    "binaryMode": "separate",
+    "timeSavedMode": "fixed",
+    "callerPolicy": "workflowsFromSameOwner",
+    "availableInMCP": false
+  },
+  "versionId": "b6b8fd61-2d62-419a-80c8-5b365e845329",
+  "meta": {
+    "instanceId": "00cafa1eb8a383ac595b6bbf54c5f8acd05d9d1462911bd4a0edac031509b829"
+  },
+  "id": "tBC3Pb82V2g5epzC",
+  "tags": []
+}

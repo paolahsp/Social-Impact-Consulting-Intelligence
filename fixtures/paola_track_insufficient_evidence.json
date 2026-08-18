@@ -1,0 +1,92 @@
+{
+  "run_context": {
+    "run_id": "RUN-INSUFFICIENT-EVIDENCE-TEST",
+    "organization": {
+      "name": "Test Organization with Gaps",
+      "website": "https://test-org.example.org",
+      "country": "Kenya",
+      "mission_area": "health"
+    },
+    "current_challenge": "Testing insufficient evidence handling",
+    "status": "analyzing",
+    "started_at": "2026-08-10T09:00:00Z",
+    "errors": []
+  },
+  "sources": [
+    {
+      "source_id": "SRC-INSUF-001",
+      "title": "Organization homepage",
+      "url": "https://test-org.example.org",
+      "source_type": "official_website",
+      "publisher": "Test Organization",
+      "publication_date": null,
+      "retrieved_at": "2026-08-10T09:10:00Z",
+      "authority_level": "official",
+      "freshness": "current",
+      "is_official": true
+    }
+  ],
+  "evidence": [
+    {
+      "evidence_id": "EV-INSUF-001",
+      "run_id": "RUN-INSUFFICIENT-EVIDENCE-TEST",
+      "claim": "The organization website mentions community health programs.",
+      "source_ids": [
+        "SRC-INSUF-001"
+      ],
+      "domain": "impact_evidence",
+      "evidence_type": "fact",
+      "confidence": 0.45,
+      "status": "supported",
+      "contradiction_ids": [],
+      "requires_validation": true
+    },
+    {
+      "evidence_id": "EV-INSUF-002",
+      "run_id": "RUN-INSUFFICIENT-EVIDENCE-TEST",
+      "claim": "Internal impact measurement methodology is not described in public sources.",
+      "source_ids": [
+        "SRC-INSUF-001"
+      ],
+      "domain": "impact_evidence",
+      "evidence_type": "unknown",
+      "confidence": 0.3,
+      "status": "unknown",
+      "contradiction_ids": [],
+      "requires_validation": true
+    }
+  ],
+  "findings": [
+    {
+      "finding_id": "F-INSUF-001",
+      "domain": "impact_evidence",
+      "finding": "Public sources do not provide clear information about how the organization measures or reports impact.",
+      "evidence_ids": [
+        "EV-INSUF-001",
+        "EV-INSUF-002"
+      ],
+      "finding_type": "inferred",
+      "confidence": 0.35,
+      "requires_validation": true,
+      "validation_question": "What is your actual impact measurement approach?"
+    }
+  ],
+  "unknowns": [
+    {
+      "unknown_id": "UNK-INSUF-001",
+      "domain": "impact_evidence",
+      "description": "Impact measurement framework and methodology are not described in public sources.",
+      "evidence_ids": [
+        "EV-INSUF-002"
+      ]
+    }
+  ],
+  "contradictions": [],
+  "rag_metadata": {
+    "retrieval_run_id": "RAG-INSUF-001",
+    "domains": [
+      "impact_evidence"
+    ],
+    "retrieved_context_ids": []
+  }
+}

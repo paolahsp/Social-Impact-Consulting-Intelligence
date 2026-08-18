@@ -1,0 +1,31 @@
+{
+  "run_context": {
+    "run_id": "RUN-INSUFFICIENT-EVIDENCE-TEST",
+    "organization": {
+      "name": "Test Organization with Gaps",
+      "website": "https://test-org.example.org",
+      "country": "Kenya",
+      "mission_area": "health"
+    },
+    "current_challenge": "Testing insufficient evidence handling",
+    "status": "analyzing",
+    "started_at": "2026-08-10T09:00:00Z",
+    "errors": []
+  },
+  "hypotheses": [],
+  "diagnoses": [],
+  "recommendations": [],
+  "kpis": [],
+  "validation_questions": [
+    {
+      "question_id": "Q-001",
+      "finding_ids": [],
+      "hypothesis_ids": [],
+      "question": "Regarding 'Impact measurement framework and methodology are not described in public sources.' \u2014 can you walk us through how this actually works?",
+      "purpose": "Discover: Impact measurement framework and methodology are not described in public sources.",
+      "domain": "impact_evidence",
+      "priority": "medium"
+    }
+  ],
+  "roadmap_actions": []
+}

@@ -1,0 +1,388 @@
+{
+  "name": "DEV_GRETEL_60_TRANSFORMATION_TEST",
+  "nodes": [
+    {
+      "parameters": {
+        "content": "DEV_GRETEL_60_TRANSFORMATION_TEST\nImport after 60. Link all three current Execute Sub-workflow nodes to the imported 60 workflow, then run manually.\nOne execution runs normal, insufficient-evidence, and controlled-child-failure cases and only passes after all assertions complete.\nNo workflow IDs, credentials, or production data are committed.",
+        "height": 400,
+        "width": 620,
+        "color": 4
+      },
+      "id": "00_readme__dev_workflow",
+      "name": "00_README__DEV_WORKFLOW",
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [
+        -560,
+        -420
+      ]
+    },
+    {
+      "parameters": {
+        "content": "NORMAL\n53 runs, findings merge without collisions, and 61-66 return traceable transformation arrays.\n\nINSUFFICIENT EVIDENCE\n53 is explicitly skipped; uncertainty stays discovery-first and KPI baselines stay null/unknown.\n\nCONTROLLED CHILD FAILURE\n53 completes, then a development-only untraceable finding makes 61 fail. 60 must return partial_failure and preserve merged upstream findings.",
+        "height": 460,
+        "width": 620,
+        "color": 5
+      },
+      "id": "note__expected_tests",
+      "name": "NOTE__EXPECTED_TESTS",
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [
+        -560,
+        30
+      ]
+    },
+    {
+      "parameters": {},
+      "id": "start__manual_test_trigger",
+      "name": "START__MANUAL_TEST_TRIGGER",
+      "type": "n8n-nodes-base.manualTrigger",
+      "typeVersion": 1,
+      "position": [
+        0,
+        0
+      ]
+    },
+    {
+      "parameters": {
+        "jsCode": "// NORMAL: embedded from the repository fixture.\nconst fixture = {\"run_context\":{\"run_id\":\"RUN-FICTIONAL-001\",\"organization\":{\"name\":\"Fictional River Learning Collective\",\"website\":\"https://fictional-river-learning.example.org\",\"country\":\"Germany\",\"mission_area\":\"youth education\"},\"current_challenge\":\"Preparing for a pre-engagement diagnostic workshop\",\"uploaded_document_refs\":[],\"status\":\"analyzing\",\"started_at\":\"2026-08-09T09:00:00Z\",\"errors\":[]},\"sources\":[{\"source_id\":\"SRC-001\",\"title\":\"Fictional River Learning Collective Volunteer Page\",\"url\":\"https://fictional-river-learning.example.org/volunteer\",\"source_type\":\"official_website\",\"publisher\":\"Fictional River Learning Collective\",\"publication_date\":null,\"retrieved_at\":\"2026-08-09T09:10:00Z\",\"authority_level\":\"official\",\"freshness\":\"current\",\"is_official\":true},{\"source_id\":\"SRC-002\",\"title\":\"Fictional River Learning Collective Annual Snapshot\",\"url\":\"https://fictional-river-learning.example.org/annual-snapshot\",\"source_type\":\"public_report\",\"publisher\":\"Fictional River Learning Collective\",\"publication_date\":\"2026-03-01\",\"retrieved_at\":\"2026-08-09T09:14:00Z\",\"authority_level\":\"official\",\"freshness\":\"recent\",\"is_official\":true}],\"evidence\":[{\"evidence_id\":\"EV-001\",\"run_id\":\"RUN-FICTIONAL-001\",\"claim\":\"Volunteer applications are collected through a public website form.\",\"source_ids\":[\"SRC-001\"],\"domain\":\"operations_cx\",\"evidence_type\":\"fact\",\"confidence\":0.86,\"status\":\"supported\",\"contradiction_ids\":[],\"requires_validation\":false},{\"evidence_id\":\"EV-002\",\"run_id\":\"RUN-FICTIONAL-001\",\"claim\":\"The organization describes grant funding and small donor support in its annual snapshot.\",\"source_ids\":[\"SRC-002\"],\"domain\":\"revenue_resilience\",\"evidence_type\":\"fact\",\"confidence\":0.78,\"status\":\"supported\",\"contradiction_ids\":[],\"requires_validation\":false},{\"evidence_id\":\"EV-003\",\"run_id\":\"RUN-FICTIONAL-001\",\"claim\":\"The internal volunteer follow-up process is not described in public sources.\",\"source_ids\":[\"SRC-001\"],\"domain\":\"operations_cx\",\"evidence_type\":\"unknown\",\"confidence\":0.7,\"status\":\"unknown\",\"contradiction_ids\":[],\"requires_validation\":true}],\"findings\":[{\"finding_id\":\"F-001\",\"domain\":\"operations_cx\",\"finding\":\"The public volunteer journey includes an online application form.\",\"evidence_ids\":[\"EV-001\"],\"finding_type\":\"observed\",\"confidence\":0.82,\"requires_validation\":false,\"validation_question\":null},{\"finding_id\":\"F-002\",\"domain\":\"revenue_resilience\",\"finding\":\"Public reporting indicates more than one revenue signal, but the concentration of funding is not publicly visible.\",\"evidence_ids\":[\"EV-002\"],\"finding_type\":\"inferred\",\"confidence\":0.58,\"requires_validation\":true,\"validation_question\":\"What share of annual income comes from the largest funding source?\"}],\"unknowns\":[{\"unknown_id\":\"UNK-001\",\"domain\":\"operations_cx\",\"description\":\"The internal follow-up process after volunteer form submission is not publicly visible.\",\"evidence_ids\":[\"EV-003\"]},{\"unknown_id\":\"UNK-002\",\"domain\":\"revenue_resilience\",\"description\":\"Funding concentration cannot be determined from the public annual snapshot.\",\"evidence_ids\":[\"EV-002\"]}],\"contradictions\":[],\"rag_metadata\":{\"retrieval_run_id\":\"RAG-FICTIONAL-001\",\"domains\":[\"revenue_resilience\",\"operations_cx\"],\"retrieved_context_ids\":[\"FRAMEWORK-REV-001\",\"FRAMEWORK-OPS-001\"]}};\nreturn [{ json: fixture }];\n"
+      },
+      "id": "dev_input__normal_paola_fixture",
+      "name": "DEV_INPUT__NORMAL_PAOLA_FIXTURE",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        300,
+        -260
+      ]
+    },
+    {
+      "parameters": {
+        "jsCode": "// INSUFFICIENT EVIDENCE: embedded from the repository fixture.\nconst fixture = {\"run_context\":{\"run_id\":\"RUN-INSUFFICIENT-EVIDENCE-TEST\",\"organization\":{\"name\":\"Test Organization with Gaps\",\"website\":\"https://test-org.example.org\",\"country\":\"Kenya\",\"mission_area\":\"health\"},\"current_challenge\":\"Testing insufficient evidence handling\",\"status\":\"analyzing\",\"started_at\":\"2026-08-10T09:00:00Z\",\"errors\":[]},\"sources\":[{\"source_id\":\"SRC-INSUF-001\",\"title\":\"Organization homepage\",\"url\":\"https://test-org.example.org\",\"source_type\":\"official_website\",\"publisher\":\"Test Organization\",\"publication_date\":null,\"retrieved_at\":\"2026-08-10T09:10:00Z\",\"authority_level\":\"official\",\"freshness\":\"current\",\"is_official\":true}],\"evidence\":[{\"evidence_id\":\"EV-INSUF-001\",\"run_id\":\"RUN-INSUFFICIENT-EVIDENCE-TEST\",\"claim\":\"The organization website mentions community health programs.\",\"source_ids\":[\"SRC-INSUF-001\"],\"domain\":\"impact_evidence\",\"evidence_type\":\"fact\",\"confidence\":0.45,\"status\":\"supported\",\"contradiction_ids\":[],\"requires_validation\":true},{\"evidence_id\":\"EV-INSUF-002\",\"run_id\":\"RUN-INSUFFICIENT-EVIDENCE-TEST\",\"claim\":\"Internal impact measurement methodology is not described in public sources.\",\"source_ids\":[\"SRC-INSUF-001\"],\"domain\":\"impact_evidence\",\"evidence_type\":\"unknown\",\"confidence\":0.3,\"status\":\"unknown\",\"contradiction_ids\":[],\"requires_validation\":true}],\"findings\":[{\"finding_id\":\"F-INSUF-001\",\"domain\":\"impact_evidence\",\"finding\":\"Public sources do not provide clear information about how the organization measures or reports impact.\",\"evidence_ids\":[\"EV-INSUF-001\",\"EV-INSUF-002\"],\"finding_type\":\"inferred\",\"confidence\":0.35,\"requires_validation\":true,\"validation_question\":\"What is your actual impact measurement approach?\"}],\"unknowns\":[{\"unknown_id\":\"UNK-INSUF-001\",\"domain\":\"impact_evidence\",\"description\":\"Impact measurement framework and methodology are not described in public sources.\",\"evidence_ids\":[\"EV-INSUF-002\"]}],\"contradictions\":[],\"rag_metadata\":{\"retrieval_run_id\":\"RAG-INSUF-001\",\"domains\":[\"impact_evidence\"],\"retrieved_context_ids\":[]}};\nreturn [{ json: fixture }];\n"
+      },
+      "id": "dev_input__insufficient_evidence_fixture",
+      "name": "DEV_INPUT__INSUFFICIENT_EVIDENCE_FIXTURE",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        300,
+        0
+      ]
+    },
+    {
+      "parameters": {
+        "jsCode": "// CONTROLLED CHILD FAILURE: embedded from the repository fixture.\nconst fixture = {\"run_context\":{\"run_id\":\"RUN-CONTROLLED-CHILD-FAILURE\",\"organization\":{\"name\":\"Fictional River Learning Collective\",\"website\":\"https://fictional-river-learning.example.org\",\"country\":\"Germany\",\"mission_area\":\"youth education\"},\"current_challenge\":\"Verify controlled workflow 61 failure routing\",\"uploaded_document_refs\":[],\"status\":\"analyzing\",\"started_at\":\"2026-08-09T09:00:00Z\",\"errors\":[]},\"sources\":[{\"source_id\":\"SRC-001\",\"title\":\"Fictional River Learning Collective Volunteer Page\",\"url\":\"https://fictional-river-learning.example.org/volunteer\",\"source_type\":\"official_website\",\"publisher\":\"Fictional River Learning Collective\",\"publication_date\":null,\"retrieved_at\":\"2026-08-09T09:10:00Z\",\"authority_level\":\"official\",\"freshness\":\"current\",\"is_official\":true},{\"source_id\":\"SRC-002\",\"title\":\"Fictional River Learning Collective Annual Snapshot\",\"url\":\"https://fictional-river-learning.example.org/annual-snapshot\",\"source_type\":\"public_report\",\"publisher\":\"Fictional River Learning Collective\",\"publication_date\":\"2026-03-01\",\"retrieved_at\":\"2026-08-09T09:14:00Z\",\"authority_level\":\"official\",\"freshness\":\"recent\",\"is_official\":true}],\"evidence\":[{\"evidence_id\":\"EV-001\",\"run_id\":\"RUN-CONTROLLED-CHILD-FAILURE\",\"claim\":\"Volunteer applications are collected through a public website form.\",\"source_ids\":[\"SRC-001\"],\"domain\":\"operations_cx\",\"evidence_type\":\"fact\",\"confidence\":0.86,\"status\":\"supported\",\"contradiction_ids\":[],\"requires_validation\":false},{\"evidence_id\":\"EV-002\",\"run_id\":\"RUN-CONTROLLED-CHILD-FAILURE\",\"claim\":\"The organization describes grant funding and small donor support in its annual snapshot.\",\"source_ids\":[\"SRC-002\"],\"domain\":\"revenue_resilience\",\"evidence_type\":\"fact\",\"confidence\":0.78,\"status\":\"supported\",\"contradiction_ids\":[],\"requires_validation\":false},{\"evidence_id\":\"EV-003\",\"run_id\":\"RUN-CONTROLLED-CHILD-FAILURE\",\"claim\":\"The internal volunteer follow-up process is not described in public sources.\",\"source_ids\":[\"SRC-001\"],\"domain\":\"operations_cx\",\"evidence_type\":\"unknown\",\"confidence\":0.7,\"status\":\"unknown\",\"contradiction_ids\":[],\"requires_validation\":true}],\"findings\":[{\"finding_id\":\"F-001\",\"domain\":\"operations_cx\",\"finding\":\"The public volunteer journey includes an online application form.\",\"evidence_ids\":[\"EV-001\"],\"finding_type\":\"observed\",\"confidence\":0.82,\"requires_validation\":false,\"validation_question\":null},{\"finding_id\":\"F-002\",\"domain\":\"revenue_resilience\",\"finding\":\"Public reporting indicates more than one revenue signal, but the concentration of funding is not publicly visible.\",\"evidence_ids\":[\"EV-002\"],\"finding_type\":\"inferred\",\"confidence\":0.58,\"requires_validation\":true,\"validation_question\":\"What share of annual income comes from the largest funding source?\"},{\"finding_id\":\"F-DEV-FAIL-001\",\"domain\":\"impact_evidence\",\"finding\":\"This development-only finding intentionally has no evidence references so workflow 61 rejects it instead of fabricating traceability.\",\"evidence_ids\":[],\"finding_type\":\"unknown\",\"confidence\":0.2,\"requires_validation\":true,\"validation_question\":\"What evidence would be required to assess this development-only test finding?\"}],\"unknowns\":[{\"unknown_id\":\"UNK-001\",\"domain\":\"operations_cx\",\"description\":\"The internal follow-up process after volunteer form submission is not publicly visible.\",\"evidence_ids\":[\"EV-003\"]},{\"unknown_id\":\"UNK-002\",\"domain\":\"revenue_resilience\",\"description\":\"Funding concentration cannot be determined from the public annual snapshot.\",\"evidence_ids\":[\"EV-002\"]}],\"contradictions\":[],\"rag_metadata\":{\"retrieval_run_id\":\"RAG-CONTROLLED-CHILD-FAILURE\",\"domains\":[\"revenue_resilience\",\"operations_cx\"],\"retrieved_context_ids\":[\"FRAMEWORK-REV-001\",\"FRAMEWORK-OPS-001\"]}};\nreturn [{ json: fixture }];\n"
+      },
+      "id": "dev_input__controlled_child_failure",
+      "name": "DEV_INPUT__CONTROLLED_CHILD_FAILURE",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        300,
+        260
+      ]
+    },
+    {
+      "parameters": {
+        "source": "database",
+        "workflowId": {
+          "__rl": true,
+          "value": "",
+          "mode": "list",
+          "cachedResultName": ""
+        },
+        "mode": "once",
+        "options": {
+          "waitForSubWorkflow": true
+        }
+      },
+      "id": "todo_link_subworkflow__60_normal",
+      "name": "TODO_LINK_SUBWORKFLOW__60_NORMAL",
+      "type": "n8n-nodes-base.executeWorkflow",
+      "typeVersion": 1.3,
+      "position": [
+        620,
+        -260
+      ],
+      "notes": "AFTER IMPORT: select 60_TRANSFORMATION_ORCHESTRATOR from the Workflow list. No live workflow ID is committed."
+    },
+    {
+      "parameters": {
+        "source": "database",
+        "workflowId": {
+          "__rl": true,
+          "value": "",
+          "mode": "list",
+          "cachedResultName": ""
+        },
+        "mode": "once",
+        "options": {
+          "waitForSubWorkflow": true
+        }
+      },
+      "id": "todo_link_subworkflow__60_insufficient",
+      "name": "TODO_LINK_SUBWORKFLOW__60_INSUFFICIENT",
+      "type": "n8n-nodes-base.executeWorkflow",
+      "typeVersion": 1.3,
+      "position": [
+        620,
+        0
+      ],
+      "notes": "AFTER IMPORT: select 60_TRANSFORMATION_ORCHESTRATOR from the Workflow list. No live workflow ID is committed."
+    },
+    {
+      "parameters": {
+        "source": "database",
+        "workflowId": {
+          "__rl": true,
+          "value": "",
+          "mode": "list",
+          "cachedResultName": ""
+        },
+        "mode": "once",
+        "options": {
+          "waitForSubWorkflow": true
+        }
+      },
+      "id": "todo_link_subworkflow__60_controlled_failure",
+      "name": "TODO_LINK_SUBWORKFLOW__60_CONTROLLED_FAILURE",
+      "type": "n8n-nodes-base.executeWorkflow",
+      "typeVersion": 1.3,
+      "position": [
+        620,
+        260
+      ],
+      "notes": "AFTER IMPORT: select 60_TRANSFORMATION_ORCHESTRATOR from the Workflow list. No live workflow ID is committed."
+    },
+    {
+      "parameters": {
+        "jsCode": "const output = items[0]?.json;\nconst keys = ['hypotheses', 'diagnoses', 'recommendations', 'kpis', 'validation_questions', 'roadmap_actions'];\nif (!output || keys.some(key => !Array.isArray(output[key]) || output[key].length === 0)) throw new Error('Normal 60 test returned incomplete Gretel output');\nif (!output.hypotheses.some(record => record.domain === 'operations_cx')) throw new Error('Normal 60 test lost Operations/CX reasoning');\nif (!output.hypotheses.every(record => record.requires_validation === true)) throw new Error('Normal 60 test promoted a hypothesis to fact');\nif (!output.kpis.every(kpi => kpi.baseline_status !== 'unknown' || kpi.baseline === null)) throw new Error('Normal 60 test invented a KPI baseline');\nreturn [{ json: { test_case: 'normal', status: 'passed', counts: Object.fromEntries(keys.map(key => [key, output[key].length])) } }];\n"
+      },
+      "id": "assert__normal_path",
+      "name": "ASSERT__NORMAL_PATH",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        940,
+        -260
+      ]
+    },
+    {
+      "parameters": {
+        "jsCode": "const output = items[0]?.json;\nconst keys = ['hypotheses', 'diagnoses', 'recommendations', 'kpis', 'validation_questions', 'roadmap_actions'];\nif (!output || keys.some(key => !Array.isArray(output[key]) || output[key].length === 0)) throw new Error('Insufficient-evidence 60 test returned incomplete Gretel output');\nif (!output.diagnoses.every(record => record.diagnosis_type === 'unknown' && record.requires_validation === true)) throw new Error('Insufficient-evidence diagnosis exceeded the evidence');\nif (!output.recommendations.every(record => record.requires_human_review === true)) throw new Error('Insufficient-evidence recommendation lost human review');\nif (!output.kpis.every(kpi => kpi.baseline === null && kpi.baseline_status === 'unknown')) throw new Error('Insufficient-evidence test invented a KPI baseline');\nif (!output.roadmap_actions.every(action => action.action_type === 'discovery' && action.time_bucket === '30_days')) throw new Error('Insufficient-evidence roadmap did not remain discovery-first');\nreturn [{ json: { test_case: 'insufficient_evidence', status: 'passed', counts: Object.fromEntries(keys.map(key => [key, output[key].length])) } }];\n"
+      },
+      "id": "assert__insufficient_evidence_path",
+      "name": "ASSERT__INSUFFICIENT_EVIDENCE_PATH",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        940,
+        0
+      ]
+    },
+    {
+      "parameters": {
+        "jsCode": "const output = items[0]?.json;\nconst keys = ['hypotheses', 'diagnoses', 'recommendations', 'kpis', 'validation_questions', 'roadmap_actions'];\nif (!output || keys.some(key => !Array.isArray(output[key]))) throw new Error('Controlled-failure test lost Gretel collections');\nif (output.orchestration_status !== 'partial_failure') throw new Error('Controlled child failure appeared successful');\nif (output.failed_workflow !== '61_HYPOTHESIS_BUILDER') throw new Error('Controlled child failure did not identify workflow 61');\nif (!Array.isArray(output.completed_workflows) || !output.completed_workflows.includes('53_OPERATIONS_CX_AGENT_OR_SKIP')) {\n  throw new Error('Controlled child failure lost completed workflow state');\n}\nif (!output.error?.message) throw new Error('Controlled child failure lost error information');\nif (!Array.isArray(output.missing_collections)) throw new Error('Controlled child failure lost missing-collection diagnostics');\nif (!output.upstream_payload || !Array.isArray(output.upstream_payload.findings)) throw new Error('Controlled child failure lost upstream data');\nif (!output.upstream_payload.findings.some(finding => finding.finding_id === 'F-DEV-FAIL-001')) throw new Error('Controlled child failure lost the triggering upstream finding');\nif (!output.upstream_payload.findings.some(finding => /^F-OPS-/.test(finding.finding_id))) throw new Error('Controlled child failure lost completed 53 findings');\nreturn [{ json: {\n  test_case: 'controlled_child_failure',\n  status: 'passed',\n  failed_workflow: output.failed_workflow,\n  completed_workflows: output.completed_workflows,\n  preserved_finding_count: output.upstream_payload.findings.length,\n  counts: Object.fromEntries(keys.map(key => [key, output[key].length]))\n} }];\n"
+      },
+      "id": "assert__controlled_child_failure",
+      "name": "ASSERT__CONTROLLED_CHILD_FAILURE",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        940,
+        260
+      ]
+    },
+    {
+      "parameters": {
+        "mode": "append",
+        "options": {}
+      },
+      "id": "merge__success_test_results",
+      "name": "MERGE__SUCCESS_TEST_RESULTS",
+      "type": "n8n-nodes-base.merge",
+      "typeVersion": 3,
+      "position": [
+        1240,
+        -120
+      ]
+    },
+    {
+      "parameters": {
+        "mode": "append",
+        "options": {}
+      },
+      "id": "merge__all_test_results",
+      "name": "MERGE__ALL_TEST_RESULTS",
+      "type": "n8n-nodes-base.merge",
+      "typeVersion": 3,
+      "position": [
+        1480,
+        0
+      ]
+    },
+    {
+      "parameters": {
+        "jsCode": "const results = items.map(item => item.json).sort((a, b) => a.test_case.localeCompare(b.test_case));\nif (results.length !== 3 || results.some(result => result.status !== 'passed')) throw new Error('All three 60 scenarios must pass in one execution');\nreturn [{ json: { status: 'passed', scenarios: results } }];\n"
+      },
+      "id": "final__all_60_cases_passed",
+      "name": "FINAL__ALL_60_CASES_PASSED",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        1780,
+        0
+      ]
+    }
+  ],
+  "connections": {
+    "START__MANUAL_TEST_TRIGGER": {
+      "main": [
+        [
+          {
+            "node": "DEV_INPUT__NORMAL_PAOLA_FIXTURE",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "DEV_INPUT__INSUFFICIENT_EVIDENCE_FIXTURE",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "DEV_INPUT__CONTROLLED_CHILD_FAILURE",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "DEV_INPUT__NORMAL_PAOLA_FIXTURE": {
+      "main": [
+        [
+          {
+            "node": "TODO_LINK_SUBWORKFLOW__60_NORMAL",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "DEV_INPUT__INSUFFICIENT_EVIDENCE_FIXTURE": {
+      "main": [
+        [
+          {
+            "node": "TODO_LINK_SUBWORKFLOW__60_INSUFFICIENT",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "DEV_INPUT__CONTROLLED_CHILD_FAILURE": {
+      "main": [
+        [
+          {
+            "node": "TODO_LINK_SUBWORKFLOW__60_CONTROLLED_FAILURE",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "TODO_LINK_SUBWORKFLOW__60_NORMAL": {
+      "main": [
+        [
+          {
+            "node": "ASSERT__NORMAL_PATH",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "TODO_LINK_SUBWORKFLOW__60_INSUFFICIENT": {
+      "main": [
+        [
+          {
+            "node": "ASSERT__INSUFFICIENT_EVIDENCE_PATH",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "TODO_LINK_SUBWORKFLOW__60_CONTROLLED_FAILURE": {
+      "main": [
+        [
+          {
+            "node": "ASSERT__CONTROLLED_CHILD_FAILURE",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "ASSERT__NORMAL_PATH": {
+      "main": [
+        [
+          {
+            "node": "MERGE__SUCCESS_TEST_RESULTS",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "ASSERT__INSUFFICIENT_EVIDENCE_PATH": {
+      "main": [
+        [
+          {
+            "node": "MERGE__SUCCESS_TEST_RESULTS",
+            "type": "main",
+            "index": 1
+          }
+        ]
+      ]
+    },
+    "MERGE__SUCCESS_TEST_RESULTS": {
+      "main": [
+        [
+          {
+            "node": "MERGE__ALL_TEST_RESULTS",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "ASSERT__CONTROLLED_CHILD_FAILURE": {
+      "main": [
+        [
+          {
+            "node": "MERGE__ALL_TEST_RESULTS",
+            "type": "main",
+            "index": 1
+          }
+        ]
+      ]
+    },
+    "MERGE__ALL_TEST_RESULTS": {
+      "main": [
+        [
+          {
+            "node": "FINAL__ALL_60_CASES_PASSED",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": false,
+  "settings": {
+    "executionOrder": "v1"
+  },
+  "pinData": {}
+}

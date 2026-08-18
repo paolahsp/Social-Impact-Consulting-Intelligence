@@ -148,15 +148,17 @@ Use this checklist per workflow during n8n setup.
 
 ## 53_OPERATIONS_CX_AGENT
 
-- [ ] Imported
-- [ ] Trigger works
-- [ ] Input contract validated
-- [ ] API configured
-- [ ] Agent configured
-- [ ] Output matches contract
-- [ ] Error path tested
-- [ ] Connected to parent workflow
-- [ ] Integration test passed
+- [ ] Retained evidence that workflow 53 was imported into n8n where required
+  by the transformation stack
+- [ ] Retained n8n trigger execution evidence
+- [x] Input contract validated offline
+- [x] No API or credential required by the committed deterministic workflow
+- [x] Repository workflow logic configured
+- [x] Output contract validated offline
+- [x] Error and rejection paths validated offline
+- [x] Offline workflow 53 harness passed
+- [ ] Retained evidence of a configured n8n parent link
+- [ ] Retained n8n integration execution artifact
 
 ## 54_EVIDENCE_GAP_RESEARCH
 
@@ -265,6 +267,27 @@ Use this checklist per workflow during n8n setup.
 - [ ] Error path tested
 - [ ] Connected to parent workflow
 - [ ] Integration test passed
+
+## 71_INTELLECTUS_WEB_ADAPTER
+
+- [x] Repository export represents `INTELLECTUS_LIVE_WEBHOOK`
+  (`tBC3Pb82V2g5epzC`)
+- [x] Child workflow selector points to `DEV_PROJECT3_END_TO_END`
+  (`62QlFvCwJ8b3weif`)
+- [x] No credential exported to the repository
+- [ ] Authorization boundary configured
+- [ ] Exact-origin CORS configured
+- [ ] Proxy/BFF rate and 256 KiB body limits configured
+- [x] Request and final response contracts validated offline
+- [x] IF nodes read `$json.valid`
+- [x] Offline 400, 502 and 200 response-code configuration validated
+- [x] Offline validator rejects legacy `evidence_handoff`
+- [x] Retained parent execution evidence: 3015, HTTP 200, completed,
+  `demo: false`, 16.38 s
+- [x] Retained child execution evidence: 3016 successful
+- [x] Golden run 2935 remains intact
+- [ ] Retention, redacted logging, cancellation and idempotency controls agreed
+- [ ] Production gateway evidence retained before broad activation
 
 ## 99_GLOBAL_ERROR_HANDLER
 
