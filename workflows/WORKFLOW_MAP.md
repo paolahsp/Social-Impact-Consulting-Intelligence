@@ -1,6 +1,11 @@
 # Workflow Map
 
-All workflows are skeletons, inactive by default, and intentionally use TODO placeholders for APIs, agents, storage, RAG, and sub-workflow links.
+The frozen baseline workflows are inactive by default and use TODO placeholders
+where APIs, agents, storage, RAG, or environment-specific sub-workflow links
+remain unconfigured. Workflow 71 is the documented branch-scoped exception: it
+contains the validated `INTELLECTUS_LIVE_WEBHOOK` boundary and the confirmed
+child workflow ID, while remaining inactive in the repository export to avoid
+unsafe automatic activation after import.
 
 | Workflow | Owner | Purpose | Input | Output | Dependencies | Future configuration |
 | --- | --- | --- | --- | --- | --- | --- |
