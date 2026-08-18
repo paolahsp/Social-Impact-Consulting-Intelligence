@@ -18,6 +18,7 @@ Phase 2 rule:
 
 New product ideas go to `docs/FUTURE_BACKLOG.md`, not into the current workflow skeletons. The architecture may not be redesigned during Phase 2 unless a genuine technical blocker makes the frozen design impossible to configure.
 
-Branch-scoped integration exception: `71_INTELLECTUS_WEB_ADAPTER` adds an
-inactive HTTP boundary around the unchanged 53 leaf. It does not redesign 53,
-replace Paola's research workflows or change a shared JSON schema.
+Branch-scoped integration exception: `71_INTELLECTUS_WEB_ADAPTER` now documents
+the final `INTELLECTUS_LIVE_WEBHOOK` boundary and its confirmed child
+`DEV_PROJECT3_END_TO_END`. The exception records canonical workflow IDs for the
+live integration; it does not commit credentials or secrets.

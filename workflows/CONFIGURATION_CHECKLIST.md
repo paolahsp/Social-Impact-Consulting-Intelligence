@@ -148,15 +148,15 @@ Use this checklist per workflow during n8n setup.
 
 ## 53_OPERATIONS_CX_AGENT
 
-- [ ] Retained evidence that workflow 53 was imported into n8n; execution through
-  71 is reported in PR #1 but is not independently auditable
+- [ ] Retained evidence that workflow 53 was imported into n8n where required
+  by the transformation stack
 - [ ] Retained n8n trigger execution evidence
 - [x] Input contract validated offline
 - [x] No API or credential required by the committed deterministic workflow
 - [x] Repository workflow logic configured
 - [x] Output contract validated offline
 - [x] Error and rejection paths validated offline
-- [x] Offline 71 -> 53 composition harness passed
+- [x] Offline workflow 53 harness passed
 - [ ] Retained evidence of a configured n8n parent link
 - [ ] Retained n8n integration execution artifact
 
@@ -270,26 +270,24 @@ Use this checklist per workflow during n8n setup.
 
 ## 71_INTELLECTUS_WEB_ADAPTER
 
-- [ ] Retained evidence that 71 was imported after `53_OPERATIONS_CX_AGENT`;
-  controlled execution is reported in PR #1 but is not independently auditable
-- [ ] Retained evidence that `TODO_LINK_SUBWORKFLOW__53_OPERATIONS_CX` was
-  selected in n8n; the repository export intentionally remains unlinked
-- [x] No workflow ID or credential exported to the repository
+- [x] Repository export represents `INTELLECTUS_LIVE_WEBHOOK`
+  (`tBC3Pb82V2g5epzC`)
+- [x] Child workflow selector points to `DEV_PROJECT3_END_TO_END`
+  (`62QlFvCwJ8b3weif`)
+- [x] No credential exported to the repository
 - [ ] Authorization boundary configured
 - [ ] Exact-origin CORS configured
 - [ ] Proxy/BFF rate and 256 KiB body limits configured
-- [x] Input, evidence handoff and output contracts validated offline
-- [x] Offline 400, 422, 502 and 200 demo branch logic and response-code
-  configuration validated
-- [ ] Retained n8n HTTP captures for 400, 422, 502 and 200 demo responses
-- [x] Offline demo result contains `demo: true`
-- [x] Offline live fixture without Operations/CX evidence returns
-  `needs_evidence`
-- [ ] Retained workflow 71 Test Webhook execution artifact; execution is
-  reported in PR #1 but is not independently auditable
+- [x] Request and final response contracts validated offline
+- [x] IF nodes read `$json.valid`
+- [x] Offline 400, 502 and 200 response-code configuration validated
+- [x] Offline validator rejects legacy `evidence_handoff`
+- [x] Retained parent execution evidence: 3015, HTTP 200, completed,
+  `demo: false`, 16.38 s
+- [x] Retained child execution evidence: 3016 successful
+- [x] Golden run 2935 remains intact
 - [ ] Retention, redacted logging, cancellation and idempotency controls agreed
-- [ ] Live browser -> public research -> validated handoff -> 71 -> 53 -> web
-  run artifact retained before any active claim
+- [ ] Production gateway evidence retained before broad activation
 
 ## 99_GLOBAL_ERROR_HANDLER
 

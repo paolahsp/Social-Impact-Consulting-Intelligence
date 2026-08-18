@@ -45,9 +45,9 @@ the request/response boundary and production limitations.
 
 ## Current limits
 
-- No environment-specific webhook, workflow ID or credential is committed.
-- A live web request cannot complete until the shared research track supplies a
-  validated Operations/CX evidence handoff.
+- The public workflow IDs are documented; no credential or secret is committed.
+- The live webhook delegates research and transformation to
+  `DEV_PROJECT3_END_TO_END`.
 - Direct browser-to-workflow deployment cannot protect a secret; production
   requires an authenticated backend/BFF or equivalent gateway.
 - KPI baselines and targets are not established.

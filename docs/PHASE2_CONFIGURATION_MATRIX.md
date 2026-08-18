@@ -26,5 +26,5 @@ P0 = vertical slice. P1 = required expansion. P2 = hardening.
 | 65_CLIENT_VALIDATION_QUESTIONS | Gretel | P0 | No | Yes | No | No | 61,62 | Core MVP workflow |
 | 66_90_DAY_ROADMAP | Gretel | P0 | No | Yes | Optional | No | 63,64,65 | P0 transformation |
 | 70_REPORT_QA_DELIVERY | Gretel / Shared integration | P0 | No | Optional | No | Yes | Paola + Gretel outputs | Shared P0 after tracks work |
-| 71_INTELLECTUS_WEB_ADAPTER | Shared integration | P0 | Webhook | No | No | No | Paola handoff, 53 | Inactive repository-ready export; 71 -> 53 composition validated offline; controlled Test Webhook execution reported in PR #1 without a retained workflow 71 run artifact; live security and public-research e2e verification pending |
+| 71_INTELLECTUS_WEB_ADAPTER / INTELLECTUS_LIVE_WEBHOOK | Shared integration | P0 | Webhook | No | No | No | DEV_PROJECT3_END_TO_END | Final live architecture recorded with workflow IDs `tBC3Pb82V2g5epzC` and `62QlFvCwJ8b3weif`; execution 3015 completed with HTTP 200, `status: completed`, `demo: false` in 16.38 s; child execution 3016 successful; production gateway hardening remains required |
 | 99_GLOBAL_ERROR_HANDLER | Shared | P2 | No | No | No | Optional | All workflows | Hardening |

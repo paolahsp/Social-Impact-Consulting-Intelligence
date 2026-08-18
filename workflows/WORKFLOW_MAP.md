@@ -26,7 +26,7 @@ All workflows are skeletons, inactive by default, and intentionally use TODO pla
 | 65_CLIENT_VALIDATION_QUESTIONS | GRETEL TRACK B | Turns gaps and hypotheses into consultant questions | Gaps/hypotheses/diagnoses | Validation questions | 61,62 | Client questions agent |
 | 66_90_DAY_ROADMAP | GRETEL TRACK B | Organizes supported work into 30/60/90 day roadmap | Actions/KPIs/questions | Roadmap actions | 63,64,65 | Roadmap agent |
 | 70_REPORT_QA_DELIVERY | GRETEL TRACK B | Assembles and QAs diagnostic pack | Report components | Final package | All upstream | Storage/export |
-| 71_INTELLECTUS_WEB_ADAPTER | SHARED INTEGRATION | Validates the web boundary and calls 53 without researching | Intellectus envelope + Paola handoff | Stable HTTP envelope | 53 | Manual 53 selection and production security boundary |
+| 71_INTELLECTUS_WEB_ADAPTER / INTELLECTUS_LIVE_WEBHOOK | SHARED INTEGRATION | Validates the web boundary and calls the final project workflow | Intellectus live intake envelope | Stable HTTP envelope | DEV_PROJECT3_END_TO_END (`62QlFvCwJ8b3weif`) | Production security boundary, gateway controls and audit retention |
 | 99_GLOBAL_ERROR_HANDLER | SHARED | Normalizes errors | n8n error event | Error event/log | All workflows may attach | Logging/notification |
 
 Core principle: every stage must preserve the distinction between fact, inference, hypothesis, and unknown.

@@ -29,6 +29,7 @@ async function prepareDiagnostic(options = {}) {
   fillDiagnostic(options)
   fireEvent.click(screen.getByRole('button', { name: 'Prepare diagnostic' }))
   await waitFor(() => expect(window.location.pathname).toBe('/overview'))
+  await screen.findByRole('button', { name: 'Prepare client conversation' })
 }
 
 async function reachConversation(options = {}) {

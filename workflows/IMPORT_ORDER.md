@@ -10,7 +10,7 @@ Recommended sequence:
 6. 51_REVENUE_RESILIENCE_AGENT
 7. 52_IMPACT_EVIDENCE_AGENT
 8. 53_OPERATIONS_CX_AGENT
-9. 71_INTELLECTUS_WEB_ADAPTER
+9. 71_INTELLECTUS_WEB_ADAPTER / INTELLECTUS_LIVE_WEBHOOK
 10. 54_EVIDENCE_GAP_RESEARCH
 11. 40_RAG_RETRIEVAL_PIPELINE
 12. 30_EVIDENCE_PIPELINE
@@ -32,8 +32,12 @@ Why this order:
 - Import leaf workflows first so parent placeholders can later be replaced with real Execute Workflow nodes.
 - Import shared error handling before normal workflows so it can be attached during configuration.
 - Import transformation child workflows before 60_TRANSFORMATION_ORCHESTRATOR.
-- Import 53 before 71, then select 53 manually in 71 after import.
+- Confirm `DEV_PROJECT3_END_TO_END` exists before activating
+  `INTELLECTUS_LIVE_WEBHOOK`.
 - Import orchestrators after their children.
 - Import the main orchestrator last because it links the whole architecture.
 
-No workflow IDs are hardcoded in these skeletons. Link sub-workflows manually after import.
+Most frozen skeletons still avoid environment-specific workflow IDs. The
+Intellectus live webhook is the branch-scoped exception: it records the
+confirmed workflow IDs `tBC3Pb82V2g5epzC` and `62QlFvCwJ8b3weif`, which are not
+credentials.

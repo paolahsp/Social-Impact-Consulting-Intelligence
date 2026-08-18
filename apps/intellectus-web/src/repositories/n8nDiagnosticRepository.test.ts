@@ -31,13 +31,39 @@ function response(status: number, body: unknown) {
 }
 
 describe('N8nDiagnosticRepository', () => {
-  it('sends a schema-valid live request without treating intake or browser files as evidence', async () => {
+  it('sends a schema-valid live request and maps a completed live response', async () => {
     const fetchImpl = vi.fn(async (_url: string | URL | Request, init?: RequestInit) => {
       const body = JSON.parse(String(init?.body))
       expect(body).toMatchObject({ contract_version: '1.0', mode: 'live', intake: input })
       expect(body).not.toHaveProperty('evidence_handoff')
       expect(body.intake.uploaded_document_refs).toEqual([])
       expect(init?.signal).toBeInstanceOf(AbortSignal)
+      const fixture = JSON.parse(readFileSync(resolve(process.cwd(), '../../fixtures/intellectus_71_success_response.json'), 'utf8'))
+      return response(200, {
+        ...fixture,
+        correlation_id: body.correlation_id,
+        run_id: 'RUN-LIVE-001',
+        demo: false,
+        data: {
+          ...fixture.data,
+          intake: input,
+        },
+      })
+    }) as typeof fetch
+    const repository = new N8nDiagnosticRepository('https://workflow.example.test/webhook', { fetchImpl })
+    await expect(repository.prepareDiagnostic(input)).resolves.toMatchObject({
+      run_status: 'completed',
+      diagnostic: {
+        id: 'RUN-LIVE-001',
+        isDemo: false,
+      },
+    })
+    expect(fetchImpl).toHaveBeenCalledOnce()
+  })
+
+  it('still treats a legacy needs_evidence response as an evidence-required error', async () => {
+    const fetchImpl = vi.fn(async (_url: string | URL | Request, init?: RequestInit) => {
+      const body = JSON.parse(String(init?.body))
       return response(422, {
         contract_version: '1.0', status: 'needs_evidence', correlation_id: body.correlation_id,
         run_id: 'RUN-OFFLINE-001', demo: false,
@@ -47,7 +73,6 @@ describe('N8nDiagnosticRepository', () => {
     }) as typeof fetch
     const repository = new N8nDiagnosticRepository('https://workflow.example.test/webhook', { fetchImpl })
     await expect(repository.prepareDiagnostic(input)).rejects.toBeInstanceOf(EvidenceRequiredError)
-    expect(fetchImpl).toHaveBeenCalledOnce()
   })
 
   it('maps malformed, upstream and network responses to one public error without internal detail', async () => {

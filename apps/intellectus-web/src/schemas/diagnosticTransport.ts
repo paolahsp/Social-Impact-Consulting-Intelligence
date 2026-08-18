@@ -86,17 +86,13 @@ export const EvidenceHandoffSchema = z.object({
 
 export const DiagnosticTransportRequestSchema = z.object({
   contract_version: DiagnosticContractVersionSchema,
-  mode: z.enum(['live', 'demo']),
+  mode: z.literal('live'),
   correlation_id: z.string().min(1).optional(),
   run_id: z.string().min(1).optional(),
   intake: DiagnosticInputSchema,
-  evidence_handoff: EvidenceHandoffSchema.optional(),
 }).superRefine((request, context) => {
-  if (request.mode === 'demo' && request.evidence_handoff) {
-    context.addIssue({ code: 'custom', path: ['evidence_handoff'], message: 'Demo mode cannot accept a supplied evidence handoff' })
-  }
-  if (request.mode === 'demo' && request.intake.uploaded_document_refs.length > 0) {
-    context.addIssue({ code: 'custom', path: ['intake', 'uploaded_document_refs'], message: 'Demo mode cannot use document references' })
+  if (request.intake.uploaded_document_refs.length > 0) {
+    context.addIssue({ code: 'custom', path: ['intake', 'uploaded_document_refs'], message: 'Document references require a server-side upload and research boundary' })
   }
 })
 

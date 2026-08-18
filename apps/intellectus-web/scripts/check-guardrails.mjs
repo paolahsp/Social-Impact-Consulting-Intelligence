@@ -88,18 +88,19 @@ if (/min-w-\[(?!0)/.test(await readFile(join(sourceRoot, 'pages', 'ProductPages.
 
 for (const file of files) {
   const contents = await readFile(file, 'utf8')
-  if (/\bfetch\b/.test(contents) && relative(projectRoot, file) !== 'src/repositories/n8nDiagnosticRepository.ts') {
-    violations.push(`${relative(projectRoot, file)}: network transport must remain inside the n8n infrastructure adapter`)
+  const projectPath = relative(projectRoot, file).replaceAll('\\', '/')
+  if (/\bfetch\b/.test(contents) && projectPath !== 'src/repositories/n8nDiagnosticRepository.ts') {
+    violations.push(`${projectPath}: network transport must remain inside the n8n infrastructure adapter`)
   }
   for (const { label, pattern } of forbiddenPatterns) {
     if (pattern.test(contents)) {
-      violations.push(`${relative(projectRoot, file)}: ${label}`)
+      violations.push(`${projectPath}: ${label}`)
     }
   }
   const externalUrls = contents.match(/https?:\/\/[^'"`\s]+/g) ?? []
   for (const url of externalUrls) {
     if (url !== 'https://calendar.google.com/calendar/render') {
-      violations.push(`${relative(projectRoot, file)}: unapproved direct HTTP(S) URL (${url})`)
+      violations.push(`${projectPath}: unapproved direct HTTP(S) URL (${url})`)
     }
   }
 }

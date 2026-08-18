@@ -53,3 +53,13 @@ Before live services are configured, use `fixtures/paola_track_output.json` as G
 - No credentials in workflow JSON.
 - No live Salesforce, WhatsApp, Telegram, CRM, or internal-data integrations.
 - Unknown public evidence remains `unknown` or `requires_validation`.
+
+## Intellectus Live Webhook
+
+- Run `python scripts/test_n8n_71_intellectus_web_adapter.py` to validate the
+  committed `INTELLECTUS_LIVE_WEBHOOK` export, canonical child workflow ID,
+  `$json.valid` IF conditions, public request contract, final response
+  validator and sanitized error paths.
+- Treat execution 3015 and child execution 3016 as live n8n evidence, not
+  replayable repository fixtures.
+- Keep golden run 2935 intact.

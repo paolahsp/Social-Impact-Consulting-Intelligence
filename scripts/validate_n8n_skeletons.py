@@ -66,6 +66,7 @@ REQUIRED_DOCS = [
     ROOT / "docs" / "GRETEL_53_N8N_IMPORT.md",
     ROOT / "docs" / "GRETEL_60_N8N_IMPORT.md",
     ROOT / "docs" / "INTELLECTUS_71_N8N_IMPORT.md",
+    ROOT / "docs" / "INTELLECTUS_AUDIT_GUIDE.md",
     ROOT / "tests" / "PHASE2_TEST_PLAN.md",
     ROOT / "stack_decision.md",
 ]
@@ -230,6 +231,27 @@ def validate_workflow(path, workflow, errors):
                         f"{path.name}: connection from {source_name} output {output_index} references missing node {target}",
                     )
     validate_gretel_60_execute_nodes(path, workflow, errors)
+
+    if path.name == "71_INTELLECTUS_WEB_ADAPTER.json":
+        if workflow.get("id") != "tBC3Pb82V2g5epzC":
+            fail(errors, f"{path.name}: final live webhook workflow ID mismatch")
+        if workflow.get("name") != "INTELLECTUS_LIVE_WEBHOOK":
+            fail(errors, f"{path.name}: workflow name must match final live webhook")
+        serialized = json.dumps(workflow)
+        if "TODO_LINK_SUBWORKFLOW" in serialized:
+            fail(errors, f"{path.name}: obsolete TODO subworkflow link remains")
+        for execute_node in [
+            node for node in workflow.get("nodes", [])
+            if node.get("type") == "n8n-nodes-base.executeWorkflow"
+        ]:
+            selector = execute_node.get("parameters", {}).get("workflowId", {})
+            if selector.get("value") != "62QlFvCwJ8b3weif":
+                fail(errors, f"{path.name}: final child workflow ID mismatch")
+        for decision_name in ("DECISION__WEB_REQUEST_VALID", "DECISION__FINAL_RESPONSE_VALID"):
+            decision = next((node for node in workflow.get("nodes", []) if node.get("name") == decision_name), None)
+            condition = (decision or {}).get("parameters", {}).get("conditions", {}).get("conditions", [{}])[0]
+            if condition.get("leftValue") != "={{ $json.valid }}":
+                fail(errors, f"{path.name}: {decision_name} must read $json.valid")
 
 
 def main():

@@ -35,11 +35,11 @@ Consultant notes remain human-controlled session state. The workflow must never
 overwrite their text or inclusion choice. Private notes are excluded from the
 brief, print output and Calendar description.
 
-## Current workflow 71 mapping
+## Current live workflow mapping
 
-Workflow 71 passes the flat Paola handoff to 53 without renaming its seven
-top-level fields. The response returns 53's Operations/CX `findings` alongside
-the unchanged source/evidence context required for traceability. The web maps:
+`INTELLECTUS_LIVE_WEBHOOK` receives the browser intake and calls
+`DEV_PROJECT3_END_TO_END`. The response returns the reviewed source/evidence
+context and Operations/CX findings required for traceability. The web maps:
 
 - 53 observed findings to source-linked public-evidence items;
 - inferred, hypothesis and unknown findings to items requiring human review;
@@ -47,9 +47,6 @@ the unchanged source/evidence context required for traceability. The web maps:
 - finding text to overview/brief summaries;
 - the original Paola sources and evidence to the hidden typed ledger.
 
-The review action shown by Intellectus is a UI control, not a recommendation
-produced by 53. Workflow 53 does not produce diagnoses, recommendations, KPIs
-or a roadmap, so those analytical outputs remain absent. A complete shared
-final-package mapping is **To verify against shared research contract** and the
-transformation orchestrator contract; no values are synthesized to fill that
-gap.
+The review action shown by Intellectus is a UI control, not an automatic client
+recommendation. Fields that are not returned by the final response remain empty
+or locally bounded; no values are synthesized to fill gaps.
